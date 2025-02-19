@@ -1,3 +1,7 @@
-/* 
-    General Styles used on every website (Don't Repeat Yourself)
-*/
+.form {
+    width: 70%;
+    margin: auto;
+    text-align: left;
+    
+    
+}
