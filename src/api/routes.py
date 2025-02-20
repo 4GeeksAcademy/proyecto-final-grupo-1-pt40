@@ -196,10 +196,9 @@ def add_dish():
 
 @api.route('/delete/dish/<int:dish_id>', methods=['DELETE'])
 def delete_dish(dish_id):
-    data = request.json
     try:
-        if data["id"]:
-            delete_dish = Dish.query.filter_by(id=dish_id)
+        if dish_id:
+            delete_dish = Dish.query.filter_by(id=dish_id).first()
             if delete_dish:
                 db.session.delete(delete_dish)
                 db.session.commit()
@@ -219,7 +218,7 @@ def delete_dish(dish_id):
 def edit_dish():
     data = request.get_json()
     try:
-        edit_dish = Dish.query.filter_by(id=data["menuID"]).first()
+        edit_dish = Dish.query.filter_by(id=data["dishID"]).first()
         if edit_dish:
             for key, value in data.items():
                 if hasattr(edit_dish, key):

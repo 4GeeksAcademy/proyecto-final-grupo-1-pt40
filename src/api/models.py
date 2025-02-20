@@ -78,7 +78,7 @@ class Menu(db.Model):
     name = db.Column(db.String(100), nullable=False)
     created = db.Column(db.DateTime,default=db.func.now())
     last_updated = db.Column(db.DateTime, default=db.func.now(),onupdate=db.func.now())
-    categories = db.Column(db.Text, nullable=False)
+    categories = db.Column(db.Text, nullable=True)
     restaurantID = db.Column(db.Integer, ForeignKey('restaurant.id'), nullable=False)
 
     restaurant = relationship('Restaurant', back_populates='menus')
