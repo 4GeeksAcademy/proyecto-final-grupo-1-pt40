@@ -1,8 +1,8 @@
-"""empty message
+"""Recreando migraciones
 
-Revision ID: 4ef753beab3b
-Revises: c9d683b13f05
-Create Date: 2025-02-18 03:49:36.411658
+Revision ID: 05b7009929e6
+Revises: 
+Create Date: 2025-02-19 01:49:14.402419
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '4ef753beab3b'
-down_revision = 'c9d683b13f05'
+revision = '05b7009929e6'
+down_revision = None
 branch_labels = None
 depends_on = None
 
@@ -57,6 +57,14 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
+    )
+    op.create_table('user',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('email', sa.String(length=120), nullable=False),
+    sa.Column('password', sa.String(length=80), nullable=False),
+    sa.Column('is_active', sa.Boolean(), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email')
     )
     op.create_table('client_notifications',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -119,6 +127,7 @@ def downgrade():
     op.drop_table('restaurant_notifications')
     op.drop_table('menu')
     op.drop_table('client_notifications')
+    op.drop_table('user')
     op.drop_table('restaurant')
     op.drop_table('client')
     op.drop_table('admin')
