@@ -4,6 +4,7 @@ import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 
 import MenuBuilder from "./pages/MenuBuilder.jsx";
+import SignUp from './pages/SignUp.jsx';
 
 import { Home } from "./pages/home";
 import { Demo } from "./pages/demo";
@@ -19,21 +20,22 @@ const Layout = () => {
     // you can set the basename on the .env file located at the root of this project, E.g: BASENAME=/react-hello-webapp/
     const basename = process.env.BASENAME || "";
 
-    if(!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL/ >;
+    if (!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL />;
 
     return (
         <div>
             <BrowserRouter basename={basename}>
                 <ScrollToTop>
-                    
+
                     <Routes>
                         <Route element={<Home />} path="/" />
+                        <Route element={<SignUp />} path="/signup" />
                         <Route element={<Demo />} path="/demo" />
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<MenuBuilder />} path="/menu-builder" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
-                    
+
                 </ScrollToTop>
             </BrowserRouter>
         </div>

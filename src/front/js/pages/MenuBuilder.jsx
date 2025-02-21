@@ -1,16 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Button, Form, ListGroup, Card } from "react-bootstrap";
+import { Context } from "../store/appContext";
 
 const MenuBuilder = () => {
+  const { store, actions } = useContext(Context);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [newDish, setNewDish] = useState({ name: "", image: "", description: "", price: "" });
+
   const [categories, setCategories] = useState(() => {
     return JSON.parse(localStorage.getItem("categories")) || [];
   });
   const [newCategory, setNewCategory] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(null);
+ 
   const [dishes, setDishes] = useState(() => {
     return JSON.parse(localStorage.getItem("dishes")) || [];
   });
-  const [newDish, setNewDish] = useState({ name: "", image: "", description: "", price: "" });
+
+  
+  const onLoad = async () =>{
+    await actions.menuBuilderLoad(4)
+  }
+
+  useEffect(()=>{
+    onLoad()
+  },[])
 
   useEffect(() => {
     localStorage.setItem("categories", JSON.stringify(categories));
@@ -19,6 +32,7 @@ const MenuBuilder = () => {
   useEffect(() => {
     localStorage.setItem("dishes", JSON.stringify(dishes));
   }, [dishes]);
+
 
   const addCategory = () => {
     if (newCategory && !categories.includes(newCategory)) {
