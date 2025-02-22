@@ -1,66 +1,74 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Button, Form, ListGroup, Card } from "react-bootstrap";
+import Spinner from 'react-bootstrap/Spinner';
 import { Context } from "../store/appContext";
 
 const MenuBuilder = () => {
   const { store, actions } = useContext(Context);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [newDish, setNewDish] = useState({ name: "", image: "", description: "", price: "" });
-
-  const [categories, setCategories] = useState(() => {
-    return JSON.parse(localStorage.getItem("categories")) || [];
-  });
+  const [categories, setCategories] = useState(null);
   const [newCategory, setNewCategory] = useState("");
- 
-  const [dishes, setDishes] = useState(() => {
-    return JSON.parse(localStorage.getItem("dishes")) || [];
-  });
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [dishes, setDishes] = useState(null);
+  const [newDish, setNewDish] = useState({ name: "", image: "", description: "", price: "", category: "" });
 
-  
-  const onLoad = async () =>{
-    await actions.menuBuilderLoad(4)
+
+  const onLoad = async () => {
+    await actions.menuBuilderLoad(3)
+    setCategories(store.menuBuilder.menu.categories)
+    setDishes(store.menuBuilder.dishes)
   }
 
-  useEffect(()=>{
+  const editCategories = async () => {
+    await actions.menuBuilderCategories(3, categories)
+  }
+
+  useEffect(() => {
     onLoad()
-  },[])
+  }, [])
 
   useEffect(() => {
-    localStorage.setItem("categories", JSON.stringify(categories));
-  }, [categories]);
-
-  useEffect(() => {
-    localStorage.setItem("dishes", JSON.stringify(dishes));
-  }, [dishes]);
+    if (categories) editCategories();
+  }, [categories])
 
 
-  const addCategory = () => {
+  const addCategory = async () => {
     if (newCategory && !categories.includes(newCategory)) {
       setCategories([...categories, newCategory]);
       setNewCategory("");
+      await actions.menuBuilderCategories(3, categories)
     }
   };
 
-  const removeCategory = (category) => {
+  const removeCategory = async (category) => {
     setCategories(categories.filter(cat => cat !== category));
-    setDishes(dishes.filter(dish => dish.category !== category));
+    setDishes(prevCat => {
+      const newCat = { ...prevCat }
+      delete newCat[category]
+      return newCat
+    });
     if (selectedCategory === category) setSelectedCategory(null);
   };
 
-  const addDish = () => {
-    if (newDish.name && newDish.image && newDish.price && selectedCategory) {
-      setDishes([...dishes, { ...newDish, id: Date.now(), category: selectedCategory }]);
-      setNewDish({ name: "", image: "", description: "", price: "" });
+  const addDish = async () => {
+    if (newDish.name && newDish.price && selectedCategory) {
+      const dishResult = await actions.menuBuilderAddDish(3, { ...newDish }, selectedCategory)
+      setDishes({ ...dishes, [selectedCategory]: [...dishes[selectedCategory], dishResult] });
+      setNewDish({ name: "", image: "", description: "", price: "", category: "" });
     }
   };
 
-  const removeDish = (dishId) => {
-    setDishes(dishes.filter(dish => dish.id !== dishId));
+  const removeDish = async (dishID) => {
+    setDishes(dishes[selectedCategory].filter(dish => dish.id !== dishID));
+    await actions.menuBuilderDeleteDish(dishID)
   };
+
+  const convertImage = async (file) => {
+    return await actions.imageToBase64(file)
+  }
 
   return (
     <div className="d-flex">
-      <div className="w-25 p-3 border-end">
+      {categories ? <div className="w-25 p-3 border-end">
         <h4>Categorías</h4>
         <ListGroup>
           {categories.map((category, index) => (
@@ -77,7 +85,7 @@ const MenuBuilder = () => {
           onChange={(e) => setNewCategory(e.target.value)}
         />
         <Button className="mt-2" onClick={addCategory}>Agregar Categoría</Button>
-      </div>
+      </div> : <Spinner animation="border" variant="danger" />}
 
       <div className="w-75 p-3">
         <h4>{selectedCategory ? `Agregar Platillo a ${selectedCategory}` : "Seleccione una categoría"}</h4>
@@ -113,10 +121,10 @@ const MenuBuilder = () => {
         )}
 
         <h4 className="mt-4">Platillos</h4>
+
         <div className="d-flex flex-wrap">
-          {dishes
-            .filter((dish) => dish.category === selectedCategory)
-            .map((dish, index) => (
+          {dishes ? (Array.isArray(dishes[selectedCategory]) ?
+            (dishes[selectedCategory]?.map((dish, index) => (
               <Card key={index} style={{ width: "18rem" }} className="m-2">
                 <Card.Img variant="top" src={dish.image} />
                 <Card.Body>
@@ -125,8 +133,8 @@ const MenuBuilder = () => {
                   <Card.Text><strong>Precio:</strong> {dish.price}</Card.Text>
                   <Button variant="danger" size="sm" onClick={() => removeDish(dish.id)}>Eliminar</Button>
                 </Card.Body>
-              </Card>
-            ))}
+              </Card>)
+            )) : (<p>Aun no hay platillos en esta categoría</p>)) : <Spinner animation="border" variant="danger" />}
         </div>
       </div>
     </div>

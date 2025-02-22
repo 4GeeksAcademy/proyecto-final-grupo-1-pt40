@@ -56,7 +56,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
 
                 catch {
-                    console.error('Error loading Menu Builder', error);
+                    console.error('Error loading Menu Builder');
                 }
 
             },
@@ -81,20 +81,25 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
 
                 catch {
-                    console.error('Error loading Menu Builder categories', error);
+                    console.error('Error loading Menu Builder categories');
                 }
             },
 
-            menuBuilderAddDish: async (menuID, name, description, price, image, category) => {
+            menuBuilderAddDish: async (menuID, dishInfo, category) => {
+                const name = dishInfo['name']
+                const description = dishInfo['description']
+                const price = dishInfo['price']
+                const image = dishInfo['image']
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
+                const actions = getActions();
                 try {
                     const response = await fetch(`${backendURL}api/new/dish`,
                         {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
-                                'menuID': menuID, 'categories': category,
+                                'menuID': menuID, 'category': category,
                                 'name': name, 'description': description, 'price': price, 'image': image
                             })
                         })
@@ -102,10 +107,12 @@ const getState = ({ getStore, getActions, setStore }) => {
                     if (!response.ok) {
                         throw new Error(res.statusText);
                     }
-                    return true;
+
+                    const dish = await response.json()
+                    return dish;
                 }
                 catch {
-                    console.error('Error loading Menu Builder categories', error);
+                    console.error('Error adding Menu Builder dish');
                 }
             },
 
@@ -125,7 +132,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return true;
                 }
                 catch {
-                    console.error('Error loading Menu Builder categories', error);
+                    console.error('Error deleting Menu Builder dish');
                 }
             },
 
@@ -140,7 +147,8 @@ const getState = ({ getStore, getActions, setStore }) => {
                             body: JSON.stringify({
                                 'dishID': dishID, 'categories': category,
                                 'name': name, 'description': description, 'price': price, 'image': image
-                            }})
+                            })
+                        })
 
                     if (!response.ok) {
                         throw new Error(res.statusText);
@@ -150,6 +158,24 @@ const getState = ({ getStore, getActions, setStore }) => {
                 catch {
                     console.error('Error loading Menu Builder categories', error);
                 }
+            },
+
+            imageToBase64: async (file) => {
+                try {
+                    const response = await fetch(file);
+                    const blob = await response.blob();
+                    const reader = new FileReader();
+                    return new Promise((resolve, reject) => {
+                        reader.onload = () => resolve(reader.result.split(',')[1]);
+                        reader.onerror = error => reject(error)
+                        reader.readAsDataURL(blob);
+                    })
+
+                } catch (error) {
+                    console.error("Error fetching blob")
+                    throw error;
+                }
+
             }
 
 

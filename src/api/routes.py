@@ -2,6 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
+import base64
 from api.models import db, Client, Restaurant, Menu, Dish
 from sqlalchemy.exc import DataError
 from api.utils import generate_sitemap, APIException
@@ -177,6 +178,8 @@ def delete_menu(menu_id):
 def add_dish():
     data = request.json
     image = data.get('image',None)
+    if image:
+        image = base64.b64decode(data['image'])
     description = data.get('description',None)
     try:
         if data["name"] and data["category"] and data["price"] and data["menuID"]:
@@ -264,14 +267,14 @@ def get_menu(menu_id):
             if categories == 'No categories at the moment':
                 return jsonify(menu.serialize()), 201
             menu_response = {"menu":menu.serialize()}
-
+            dish_list = {}
             for category in categories:
                 dishes = Dish.query.filter_by(menuID=menu_id, category=category).order_by(Dish.id).all()
                 if dishes:
-                    menu_response[category] = [dish.serialize() for dish in dishes]
+                    dish_list[category] = [dish.serialize() for dish in dishes]
                 else:
-                    menu_response[category] = 'No dishes in this category'
-            return jsonify(menu_response),201
+                    dish_list[category] = 'No dishes in this category'
+            return jsonify({**menu_response,**{'dishes':dish_list}}),201
         else:
             return jsonify('Menu ID not found'),401
     except DataError as e:
