@@ -3,7 +3,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
 import base64
-from api.models import db, Client, Restaurant, Menu, Dish
+from api.models import db, Client, Restaurant, Menu, Dish,Favorites
 from sqlalchemy.exc import DataError
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
@@ -299,3 +299,48 @@ def get_restaurants():
     except Exception as e:
          db.session.rollback()
          return jsonify('Server error: Failed to process request'), 500
+    
+@api.route('/api/favorites', methods=['POST'])
+def add_favorite():
+    data = request.json
+    client_id = data.get("client_id")
+    dish_id = data.get("dish_id")
+
+    if not client_id or not dish_id:
+        return jsonify({"error": "Missing client_id or dish_id"}), 400
+
+    existing_favorite = Favorites.query.filter_by(client_id=client_id, dish_id=dish_id).first()
+    if existing_favorite:
+        return jsonify({"message": "Dish is already in favorites"}), 400
+
+    try:
+        new_favorite = Favorites(client_id=client_id, dish_id=dish_id)
+        db.session.add(new_favorite)
+        db.session.commit()
+        return jsonify({"message": "Dish added to favorites"}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to add favorite"}), 500
+
+@api.route('/favorites/<int:favorite_id>', methods=['DELETE'])
+def remove_favorite(favorite_id):
+    favorite = Favorites.query.get(favorite_id)
+    if not favorite:
+        return jsonify({"error": "Favorite not found"}), 404
+
+    try:
+        db.session.delete(favorite)
+        db.session.commit()
+        return jsonify({"message": "Favorite removed"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to remove favorite"}), 500       
+
+@api.route('/favorites/<int:client_id>', methods=['GET'])
+def get_favorites(client_id):
+    favorites = Favorites.query.filter_by(client_id=client_id).all()
+    if not favorites:
+        return jsonify({"message": "No favorites found"}), 200
+
+    favorite_dishes = [fav.serialize() for fav in favorites]
+    return jsonify(favorite_dishes), 200     
