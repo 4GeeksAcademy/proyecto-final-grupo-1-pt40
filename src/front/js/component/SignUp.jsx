@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 
-const SignInForm = () => {
+const SignUp = () => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate();
 
@@ -31,7 +31,7 @@ const SignInForm = () => {
                         className={`nav-link ${userType === "client" ? "active" : ""}`}
                         onClick={() => setUserType("client")}
                     >
-                        Sign in as a client
+                        Sign up as a client
                     </button>
                 </li>
                 <li className="nav-item">
@@ -39,7 +39,7 @@ const SignInForm = () => {
                         className={`nav-link ${userType === "restaurant" ? "active" : ""}`}
                         onClick={() => setUserType("restaurant")}
                     >
-                        Sign in as a restaurant
+                        Sign up as a restaurant
                     </button>
                 </li>
             </ul>
@@ -67,7 +67,7 @@ const SignInForm = () => {
                             <label className="form-label">Department</label>
                             <input type="text" className="form-control" value={department} onChange={(e) => setDepartment(e.target.value)} required />
                         </div>
-                        <button type="submit" className="btn btn-primary">Sign In</button>
+                        <button type="submit" className="btn btn-primary">Sign Up</button>
                     </form>
                 </div>
 
@@ -93,7 +93,7 @@ const SignInForm = () => {
                             <label className="form-label">Department</label>
                             <input type="text" className="form-control" value={department} onChange={(e) => setDepartment(e.target.value)} required />
                         </div>
-                        <button type="submit" className="btn btn-primary">Sign In</button>
+                        <button type="submit" className="btn btn-primary">Sign Up</button>
                     </form>
                 </div>
             </div>
@@ -101,4 +101,4 @@ const SignInForm = () => {
     );
 };
 
-export default SignInForm;
+export default SignUp;

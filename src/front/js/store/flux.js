@@ -7,6 +7,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             restaurant: {},
             menuBuilder: {},
             menu: {},
+            favorites: [],
             editRequest: {}
         },
         actions: {
@@ -194,22 +195,63 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            editRequested: (dishID, category) => {
-                const store = getStore();
-                const editDishes = [...store.menuBuilder.dishes[category]];
-                let toEdit = ''
-                for (const dish in editDishes) {
-                    if (dish.id === dishID) {
-                        toEdit = dish
+            fetchFavorites: async (userId) => {
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
+                try {
+                    const response = await fetch(`${backendUrl}/api/favorites/${userId}`);
+
+                    if (!response.ok) {
+                        throw new Error(`Error en la solicitud: ${response.status}`);
                     }
+
+                    const data = await response.json();
+                    setStore({ favorites: data });
+                } catch (error) {
+                    console.error("Error al obtener favoritos:", error);
                 }
-                setStore({ ...store, editRequest: toEdit })
+            },
+            
+
+            addFavorite: async (userId, dishId) => {
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
+                try {
+                    const response = await fetch(`${backendUrl}/api/favorites`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ user_id: userId, dish_id: dishId }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Error en la solicitud: ${response.status}`);
+                    }
+
+                    const newFavorite = await response.json();
+                    const store = getStore();
+                    setStore({ favorites: [...store.favorites, newFavorite] });
+                } catch (error) {
+                    console.error("Error al agregar favorito:", error);
+                }
             },
 
-            editReset: () => {
-                const store = getStore();
-                setStore({ ...store, editRequest: '' })
-            }
+            removeFavorite: async (favoriteId) => {
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
+                try {
+                    const response = await fetch(`${backendUrl}/api/favorites/${favoriteId}`, {
+                        method: "DELETE",
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Error en la solicitud: ${response.status}`);
+                    }
+
+                    const store = getStore();
+                    setStore({ favorites: store.favorites.filter(fav => fav.id !== favoriteId) });
+                } catch (error) {
+                    console.error("Error al eliminar favorito:", error);
+                }
+            },
 
         }
     }

@@ -4,13 +4,13 @@ import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 
 import MenuBuilder from "./pages/MenuBuilder.jsx";
-import SignUp from './pages/SignUp.jsx';
+import SignUpPage from './pages/SignUpPage.jsx';
 
 import { Home } from "./pages/home";
 import { Demo } from "./pages/demo";
 import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
-
+import LoginPage from "./pages/LoginPage.jsx";
 
 
 
@@ -29,7 +29,8 @@ const Layout = () => {
 
                     <Routes>
                         <Route element={<Home />} path="/" />
-                        <Route element={<SignUp />} path="/signup" />
+                        <Route element={<SignUpPage />} path="/signup" />
+                        <Route element={<LoginPage />}  path="/login" />
                         <Route element={<Demo />} path="/demo" />
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<MenuBuilder />} path="/menu-builder" />
