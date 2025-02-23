@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { Button, Form, ListGroup, Card } from "react-bootstrap";
 import Spinner from 'react-bootstrap/Spinner';
 import { Context } from "../store/appContext";
@@ -11,7 +11,7 @@ const MenuBuilder = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [dishes, setDishes] = useState(null);
   const [newDish, setNewDish] = useState({ name: "", description: "", price: "", category: "", image: "" });
-  const [image, setImage] = useState(null)
+  const isMounted = useRef(false)
 
 
   const onLoad = async () => {
@@ -20,24 +20,9 @@ const MenuBuilder = () => {
     setDishes(store.menuBuilder.dishes)
   }
 
-
-
   const editCategories = async () => {
     await actions.menuBuilderCategories(3, categories)
   }
-
-  useEffect(() => {
-    onLoad()
-  }, [])
-
-  useEffect(() => {
-    setDishes(store.menuBuilder.dishes)
-    setCategories(store.menuBuilder.menu.categories)
-  }, [store.menuBuilder])
-  useEffect(() => {
-    if (categories) editCategories();
-  }, [categories])
-
 
   const addCategory = async () => {
     if (newCategory && !categories.includes(newCategory)) {
@@ -59,16 +44,25 @@ const MenuBuilder = () => {
   const addDish = async () => {
     if (newDish.name && newDish.price && selectedCategory) {
       await actions.menuBuilderAddDish(3, newDish, selectedCategory)
-      setDishes(store.menuBuilder.dishes)
       setNewDish({ name: "", description: "", price: "", category: "", image: "" });
     }
   };
 
   const removeDish = async (dishID) => {
     await actions.menuBuilderDeleteDish(3, dishID)
-    setDishes(store.menuBuilder.dishes);
   };
 
+  useEffect(() => {
+    onLoad()
+  }, [])
+
+  useEffect(() => {
+  }, [store.menuBuilder.dishes])
+
+
+  useEffect(() => {
+    if (categories) editCategories();
+  }, [categories])
 
   return (
     <div className="d-flex">
@@ -127,8 +121,8 @@ const MenuBuilder = () => {
         <h4 className="mt-4">Platillos</h4>
 
         <div className="d-flex flex-wrap">
-          {dishes ? (Array.isArray(dishes[selectedCategory]) ?
-            (dishes[selectedCategory]?.map((dish, index) => (
+          {store.menuBuilder.dishes ? (Array.isArray(store.menuBuilder.dishes[selectedCategory]) ?
+            (store.menuBuilder.dishes[selectedCategory]?.map((dish, index) => (
               <Card key={index} style={{ width: "18rem" }} className="m-2">
                 <Card.Img variant="top" src={dish.image} />
                 <Card.Body>

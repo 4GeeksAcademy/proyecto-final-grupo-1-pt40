@@ -7,7 +7,6 @@ const getState = ({ getStore, getActions, setStore }) => {
             restaurant: {},
             menuBuilder: {},
             menu: {},
-            images: []
         },
         actions: {
             registerUser: async (userType, email, password, username, department, city) => {
@@ -77,9 +76,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
                     const menuDetails = await response.json()
                     setStore({ ...store, menuBuilder: { ...store.menuBuilder, menu: menuDetails } });
-                    return true;
                 }
-
                 catch {
                     console.error('Error loading Menu Builder categories');
                 }
@@ -106,12 +103,13 @@ const getState = ({ getStore, getActions, setStore }) => {
                     if (!response.ok) {
                         throw new Error(res.statusText);
                     }
-                    const dish = await response.json()
+
+                    let dish = await response.json()
 
                     if (dishInfo.image) {
                         dish = await actions.uploadImage(dishInfo.image, dish.id)
-
                     }
+
                     const dish_transform = actions.transformDish(dish)
                     const updatedDishes = { ...store.menuBuilder.dishes }
 
@@ -121,6 +119,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         updatedDishes[dish.category] = [dish_transform];
                     }
                     setStore({ ...store, menuBuilder: { ...store.menuBuilder, dishes: updatedDishes } });
+                    
                     return dish_transform;
                 }
                 catch {
@@ -130,7 +129,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             menuBuilderDeleteDish: async (menuID, dishID) => {
                 const backendURL = process.env.BACKEND_URL
-                const store = getStore();
                 const actions = getActions();
                 try {
                     const response = await fetch(`${backendURL}api/delete/dish/${dishID}`,
@@ -142,7 +140,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     if (!response.ok) {
                         throw new Error(res.statusText);
                     }
-                    actions.menuBuilderLoad(menuID)
+                    await actions.menuBuilderLoad(menuID)
                 }
                 catch {
                     console.error('Error deleting Menu Builder dish');
