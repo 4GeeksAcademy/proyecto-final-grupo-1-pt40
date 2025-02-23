@@ -2,22 +2,24 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import { Button, Form, ListGroup, Card } from "react-bootstrap";
 import Spinner from 'react-bootstrap/Spinner';
 import { Context } from "../store/appContext";
+import { Widget } from "@uploadcare/react-widget";
+import EditModal from "../component/EditModal.jsx"
 
 
 const MenuBuilder = () => {
   const { store, actions } = useContext(Context);
-  const [categories, setCategories] = useState(null);
+  const [categories, setCategories] = useState(['Agrega una categoria']);
   const [newCategory, setNewCategory] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [dishes, setDishes] = useState(null);
   const [newDish, setNewDish] = useState({ name: "", description: "", price: "", category: "", image: "" });
-  const isMounted = useRef(false)
+  const [editDish, setEditDish] = useState('')
 
 
   const onLoad = async () => {
-    await actions.menuBuilderLoad(3)
-    setCategories(store.menuBuilder.menu.categories)
-    setDishes(store.menuBuilder.dishes)
+    if (await actions.menuBuilderLoad(3)) {
+      setCategories(store.menuBuilder.menu.categories)
+    }
   }
 
   const editCategories = async () => {
@@ -48,17 +50,17 @@ const MenuBuilder = () => {
     }
   };
 
+  const handleFileChange = (file) => {
+    setNewDish({ ...newDish, image: file.cdnUrl })
+  }
+
   const removeDish = async (dishID) => {
-    await actions.menuBuilderDeleteDish(3, dishID)
+    await actions.menuBuilderDeleteDish(3, dishID, selectedCategory)
   };
 
   useEffect(() => {
     onLoad()
   }, [])
-
-  useEffect(() => {
-  }, [store.menuBuilder.dishes])
-
 
   useEffect(() => {
     if (categories) editCategories();
@@ -75,6 +77,7 @@ const MenuBuilder = () => {
               <Button variant="danger" size="sm" onClick={() => removeCategory(category)}>X</Button>
             </ListGroup.Item>
           ))}
+
         </ListGroup>
         <Form.Control
           type="text"
@@ -95,11 +98,7 @@ const MenuBuilder = () => {
               value={newDish.name}
               onChange={(e) => setNewDish({ ...newDish, name: e.target.value })}
             />
-            <Form.Control
-              type="file"
-              className="mt-2"
-              onChange={(e) => setNewDish({ ...newDish, image: e.target.files[0] })}
-            />
+            <Widget publicKey='47bd03853371888b5541' onChange={handleFileChange} />
             <Form.Control
               as="textarea"
               placeholder="Descripción del Platillo"
@@ -117,23 +116,36 @@ const MenuBuilder = () => {
             <Button className="mt-2" onClick={addDish}>Agregar Platillo</Button>
           </Form>
         )}
-
         <h4 className="mt-4">Platillos</h4>
 
-        <div className="d-flex flex-wrap">
-          {store.menuBuilder.dishes ? (Array.isArray(store.menuBuilder.dishes[selectedCategory]) ?
-            (store.menuBuilder.dishes[selectedCategory]?.map((dish, index) => (
-              <Card key={index} style={{ width: "18rem" }} className="m-2">
-                <Card.Img variant="top" src={dish.image} />
-                <Card.Body>
-                  <Card.Title>{dish.name}</Card.Title>
-                  <Card.Text>{dish.description}</Card.Text>
-                  <Card.Text><strong>Precio:</strong> {dish.price}</Card.Text>
-                  <Button variant="danger" size="sm" onClick={() => removeDish(dish.id)}>Eliminar</Button>
-                </Card.Body>
-              </Card>)
-            )) : (<p>Aun no hay platillos en esta categoría</p>)) : <Spinner animation="border" variant="danger" />}
-        </div>
+        {selectedCategory && (<div>
+          <div className="d-flex flex-wrap">
+            {store.menuBuilder.dishes ? (
+              Array.isArray(store.menuBuilder.dishes[selectedCategory]) ? (
+                store.menuBuilder.dishes[selectedCategory]?.length > 0 ? (
+                  store.menuBuilder.dishes[selectedCategory].map((dish, index) => (
+                    <Card key={index} style={{ width: "18rem" }} className="m-2">
+                      <Card.Img variant="top" src={dish.image} />
+                      <Card.Body>
+                        <Card.Title>{dish.name}</Card.Title>
+                        <Card.Text>{dish.description}</Card.Text>
+                        <Card.Text><strong>Precio:</strong> {dish.price}</Card.Text>
+                        <EditModal dish={dish}/>
+                        <Button variant="danger" size="sm" onClick={() => removeDish(dish.id)}>Eliminar</Button>
+                      </Card.Body>
+                    </Card>
+                  ))
+                ) : (
+                  <p>Aun no hay platillos en esta categoría</p>
+                )
+              ) : (
+                <p>Aun no hay platillos en esta categoría</p>
+              )
+            ) : (
+              <Spinner animation="border" variant="danger" />)}
+          </div>
+        </div>)}
+
       </div>
     </div>
   );

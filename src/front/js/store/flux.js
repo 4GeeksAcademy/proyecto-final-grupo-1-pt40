@@ -7,6 +7,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             restaurant: {},
             menuBuilder: {},
             menu: {},
+            editRequest: {}
         },
         actions: {
             registerUser: async (userType, email, password, username, department, city) => {
@@ -44,16 +45,15 @@ const getState = ({ getStore, getActions, setStore }) => {
             menuBuilderLoad: async (menuID) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
-                const actions = getActions();
                 try {
                     const response = await fetch(`${backendURL}api/menu/${menuID}`)
                     if (!response.ok) {
                         throw new Error(res.statusText);
                     }
                     const menu = await response.json()
-                    const menu_store = actions.transformImages(menu)
 
-                    setStore({ ...store, menuBuilder: menu_store });
+                    setStore({ ...store, menuBuilder: menu });
+                    return true
                 }
                 catch {
                     console.error('Error loading Menu Builder');
@@ -86,8 +86,8 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const name = dishInfo['name']
                 const description = dishInfo['description']
                 const price = dishInfo['price']
+                const image = dishInfo['image']
                 const backendURL = process.env.BACKEND_URL
-                const actions = getActions();
                 const store = getStore();
                 try {
                     const response = await fetch(`${backendURL}api/new/dish`,
@@ -96,7 +96,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 'menuID': menuID, 'category': category,
-                                'name': name, 'description': description, 'price': price
+                                'name': name, 'description': description, 'price': price, 'image': image
                             })
                         })
 
@@ -104,32 +104,27 @@ const getState = ({ getStore, getActions, setStore }) => {
                         throw new Error(res.statusText);
                     }
 
-                    let dish = await response.json()
+                    const dish = await response.json()
 
-                    if (dishInfo.image) {
-                        dish = await actions.uploadImage(dishInfo.image, dish.id)
-                    }
-
-                    const dish_transform = actions.transformDish(dish)
                     const updatedDishes = { ...store.menuBuilder.dishes }
 
                     if (Array.isArray(updatedDishes[dish.category])) {
-                        updatedDishes[dish.category].push(dish_transform);
+                        updatedDishes[dish.category].push(dish);
                     } else {
-                        updatedDishes[dish.category] = [dish_transform];
+                        updatedDishes[dish.category] = [dish];
                     }
                     setStore({ ...store, menuBuilder: { ...store.menuBuilder, dishes: updatedDishes } });
-                    
-                    return dish_transform;
+
+                    return dish;
                 }
                 catch {
                     console.error('Error adding Menu Builder dish');
                 }
             },
 
-            menuBuilderDeleteDish: async (menuID, dishID) => {
+            menuBuilderDeleteDish: async (menuID, dishID, category) => {
                 const backendURL = process.env.BACKEND_URL
-                const actions = getActions();
+                const store = getStore();
                 try {
                     const response = await fetch(`${backendURL}api/delete/dish/${dishID}`,
                         {
@@ -140,109 +135,80 @@ const getState = ({ getStore, getActions, setStore }) => {
                     if (!response.ok) {
                         throw new Error(res.statusText);
                     }
-                    await actions.menuBuilderLoad(menuID)
+
+                    const updatedDishes = { ...store.menuBuilder.dishes };
+                    updatedDishes[category] = updatedDishes[category].filter(dish => dish.id !== dishID);
+
+
+                    setStore({
+                        menuBuilder: {
+                            ...store.menuBuilder,
+                            dishes: updatedDishes,
+                        },
+                    });
                 }
                 catch {
                     console.error('Error deleting Menu Builder dish');
                 }
             },
 
-            menuBuilderEditDish: async (dishID, name, description, price, image, category) => {
+            menuBuilderEditDish: async (dishID, dishInfo, category) => {
                 const backendURL = process.env.BACKEND_URL
+                const name = dishInfo['name']
+                const description = dishInfo['description']
+                const price = dishInfo['price']
+                const image = dishInfo['image']
                 const store = getStore();
                 try {
-                    const response = await fetch(`${backendURL}api/delete/dish/${dishID}`,
+                    const response = await fetch(`${backendURL}api/edit/dish`,
                         {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 'dishID': dishID, 'categories': category,
-                                'name': name, 'description': description, 'price': price, 'image': image
+                                'name': name, 'description': description, 'price': price, 'image_URL': image
                             })
                         })
 
                     if (!response.ok) {
                         throw new Error(res.statusText);
                     }
-                    return true;
+
+                    const updatedDish = await response.json()
+
+                    const updatedDishes = { ...store.menuBuilder.dishes };
+
+                    updatedDishes[category] = updatedDishes[category].map(dish =>
+                        dish.id === dishID ? updatedDish : dish
+                    );
+
+                    setStore({
+                        menuBuilder: {
+                            ...store.menuBuilder,
+                            dishes: updatedDishes,
+                        },
+                    });
                 }
-                catch {
+                catch (error) {
                     console.error('Error loading Menu Builder categories', error);
                 }
             },
 
-            uploadImage: async (imageFile, dishID) => {
-                const backendURL = process.env.BACKEND_URL
-                try {
-                    const formData = new FormData();
-                    formData.append('image', imageFile)
-                    const response = await fetch(`${backendURL}api/add/dish/image/${dishID}`,
-                        {
-                            method: "POST",
-                            body: formData
-                        })
-                    if (!response.ok) {
-                        throw new Error(`Error: ${response.status}`);
+            editRequested: (dishID, category) => {
+                const store = getStore();
+                const editDishes = [...store.menuBuilder.dishes[category]];
+                let toEdit = ''
+                for (const dish in editDishes) {
+                    if (dish.id === dishID) {
+                        toEdit = dish
                     }
-                    const data = await response.json();
-                    return data;
-                } catch (error) {
-                    console.error('Error:', error);
-                    throw error;
                 }
+                setStore({ ...store, editRequest: toEdit })
             },
 
-            transformImages: (menu) => {
-                const menuINFO = menu['menu']
-                const dishINFO = menu['dishes']
-                const defaultImage = '/../img/rigo-baby.jpg'
-
-                menuINFO['categories'].forEach(category => {
-                    if (Array.isArray(dishINFO[category])) {
-                        dishINFO[category] = dishINFO[category].map(dish => {
-                            if (dish.image) {
-                                const hexImage = dish.image;
-                                try {
-                                    const byteArray = new Uint8Array(hexImage.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-                                    const blob = new Blob([byteArray], { type: `image/${dish.extension || 'jpeg'}` }); // Default to 'jpeg' if extension is missing
-                                    const imageUrl = URL.createObjectURL(blob);
-                                    dish.image = imageUrl;
-                                } catch (error) {
-                                    console.error('Error converting hex image:', error);
-                                    dish.image = defaultImage;
-                                }
-                            } else {
-                                dish.image = defaultImage;
-                            }
-                            return dish;
-                        });
-                    } else {
-                        console.warn(`No array found for category: ${category}`);
-                        dishINFO[category] = defaultImage;
-                    }
-                });
-
-                return { menu: menuINFO, dishes: dishINFO };
-            },
-
-            transformDish: (dish) => {
-                const defaultImage = '/../img/rigo-baby.jpg';
-                if (dish.image) {
-                    const hexImage = dish.image;
-                    try {
-                        const byteArray = new Uint8Array(hexImage.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-                        const blob = new Blob([byteArray], { type: `image/${dish.extension || 'jpeg'}` }); // Default to 'jpeg' if extension is missing
-                        const imageUrl = URL.createObjectURL(blob);
-                        dish.image = imageUrl;
-                    } catch (error) {
-                        console.error('Error converting hex image:', error);
-                        dish.image = defaultImage;
-                    }
-                } else {
-                    dish.image = defaultImage;
-                }
-                console.log(dish.image)
-                return dish;
+            editReset: () => {
+                const store = getStore();
+                setStore({ ...store, editRequest: '' })
             }
 
         }

@@ -187,64 +187,16 @@ def delete_menu(menu_id):
 def add_dish():
     data = request.json
     description = data.get('description',None)
+    image_URL = data.get('image',None)
     try:
         if data["name"] and data["category"] and data["price"] and data["menuID"]:
-            new_dish = Dish(name=data['name'], category=data['category'], price=float(data["price"]),menuID=data["menuID"],description=description)
+            new_dish = Dish(name=data['name'], category=data['category'], price=float(data["price"]),menuID=data["menuID"],description=description, image_URL=image_URL)
             if new_dish:
                 db.session.add(new_dish)
                 db.session.commit()
                 return jsonify(new_dish.serialize()), 201
         else:
              return jsonify('Bad Request: Request is missing data/fields'),400
-    except DataError as e:
-        db.session.rollback()
-        return jsonify('Bad Request: Incorrect data format/type'),400
-    except Exception as e:
-         db.session.rollback()
-         return jsonify('Server error: Failed to process request'), 500
-
-
-@api.route('/add/dish/image/<int:dishID>', methods=['POST'])
-def add_image(dishID):
-    if 'image' not in request.files:
-        return jsonify({'BadRequest':'File not found in request'}),400
-    file = request.files['image']
-    if file.filename == '':
-        return jsonify({'BadRequest':'Image not found in request'}),400
-    
-    filename = secure_filename(file.filename)
-    _, ext = os.path.splitext(filename)
-    ext = ext.lower().replace('.', '')
-    if ext not in MIME_TYPES:
-        return jsonify({'BadRequest': 'Unsupported file extension'}), 400
-
-    image_stream = BytesIO(file.read())
-    image_bytes = image_stream.getvalue()
-    try:
-        get_dish = Dish.query.filter_by(id=dishID).first()
-        if get_dish:
-            get_dish.image_data = image_bytes
-            get_dish.extension = ext
-            db.session.commit()
-        return jsonify(get_dish.serialize()), 201
-   
-    except DataError as e:
-        db.session.rollback()
-        return jsonify('Bad Request: Incorrect data format/type'),400
-    except Exception as e:
-         db.session.rollback()
-         return jsonify('Server error: Failed to process request'), 500
-
-@api.route('/dish/images/<string:category>', methods=['GET'])
-def get_image(category): 
-    response = [];
-    try:
-       dishes = Dish.query.filter_by(category=category).order_by(Dish.id).all()
-       for dish in dishes:
-        image_record = Images.query.filter_by(dishID=dish.id).first()
-        if image_record:
-            response.append({'dishID':dish.id,'image_data':image_record.image_data.hex()})
-        return jsonify(response),200
     except DataError as e:
         db.session.rollback()
         return jsonify('Bad Request: Incorrect data format/type'),400
@@ -283,6 +235,7 @@ def edit_dish():
                     if value:
                         setattr(edit_dish,key,value)
             db.session.commit()
+            
             return jsonify(edit_dish.serialize()),200
         else:
              return jsonify('Bad Request: Dish ID not found'),400

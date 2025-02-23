@@ -109,15 +109,10 @@ class Dish(db.Model):
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(255), nullable=True)
-    image_data = db.Column(db.LargeBinary, nullable=True)
-    extension = db.Column(db.String(10),nullable=True)
+    image_URL = db.Column(db.String(255), nullable=True)
 
     menu = relationship('Menu', back_populates='dishes')
 
-    def imageHex(self):
-        if self.image_data:
-            return self.image_data.hex()
-        return None
     def serialize(self):
         return {
             "id":self.id,
@@ -126,8 +121,7 @@ class Dish(db.Model):
             "menuID": self.menuID,
             "category": self.category,
             "price": float(self.price),
-            "image":self.imageHex(),
-            "extension":self.extension
+            "image":self.image_URL,
         }
 
 
