@@ -3,13 +3,15 @@ import { Button, Form, ListGroup, Card } from "react-bootstrap";
 import Spinner from 'react-bootstrap/Spinner';
 import { Context } from "../store/appContext";
 
+
 const MenuBuilder = () => {
   const { store, actions } = useContext(Context);
   const [categories, setCategories] = useState(null);
   const [newCategory, setNewCategory] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [dishes, setDishes] = useState(null);
-  const [newDish, setNewDish] = useState({ name: "", image: "", description: "", price: "", category: "" });
+  const [newDish, setNewDish] = useState({ name: "", description: "", price: "", category: "", image: "" });
+  const [image, setImage] = useState(null)
 
 
   const onLoad = async () => {
@@ -17,6 +19,8 @@ const MenuBuilder = () => {
     setCategories(store.menuBuilder.menu.categories)
     setDishes(store.menuBuilder.dishes)
   }
+
+
 
   const editCategories = async () => {
     await actions.menuBuilderCategories(3, categories)
@@ -27,6 +31,10 @@ const MenuBuilder = () => {
   }, [])
 
   useEffect(() => {
+    setDishes(store.menuBuilder.dishes)
+    setCategories(store.menuBuilder.menu.categories)
+  }, [store.menuBuilder])
+  useEffect(() => {
     if (categories) editCategories();
   }, [categories])
 
@@ -35,7 +43,6 @@ const MenuBuilder = () => {
     if (newCategory && !categories.includes(newCategory)) {
       setCategories([...categories, newCategory]);
       setNewCategory("");
-      await actions.menuBuilderCategories(3, categories)
     }
   };
 
@@ -51,20 +58,17 @@ const MenuBuilder = () => {
 
   const addDish = async () => {
     if (newDish.name && newDish.price && selectedCategory) {
-      const dishResult = await actions.menuBuilderAddDish(3, { ...newDish }, selectedCategory)
-      setDishes({ ...dishes, [selectedCategory]: [...dishes[selectedCategory], dishResult] });
-      setNewDish({ name: "", image: "", description: "", price: "", category: "" });
+      await actions.menuBuilderAddDish(3, newDish, selectedCategory)
+      setDishes(store.menuBuilder.dishes)
+      setNewDish({ name: "", description: "", price: "", category: "", image: "" });
     }
   };
 
   const removeDish = async (dishID) => {
-    setDishes(dishes[selectedCategory].filter(dish => dish.id !== dishID));
-    await actions.menuBuilderDeleteDish(dishID)
+    await actions.menuBuilderDeleteDish(3, dishID)
+    setDishes(store.menuBuilder.dishes);
   };
 
-  const convertImage = async (file) => {
-    return await actions.imageToBase64(file)
-  }
 
   return (
     <div className="d-flex">
@@ -100,7 +104,7 @@ const MenuBuilder = () => {
             <Form.Control
               type="file"
               className="mt-2"
-              onChange={(e) => setNewDish({ ...newDish, image: URL.createObjectURL(e.target.files[0]) })}
+              onChange={(e) => setNewDish({ ...newDish, image: e.target.files[0] })}
             />
             <Form.Control
               as="textarea"
