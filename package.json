@@ -73,6 +73,7 @@
 		]
 	},
 	"dependencies": {
+		"@uploadcare/react-widget": "^2.4.7",
 		"bootstrap": "^5.3.3",
 		"prop-types": "^15.6.1",
 		"react": "^16.8.4",

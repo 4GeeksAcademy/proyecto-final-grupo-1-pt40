@@ -109,7 +109,7 @@ class Dish(db.Model):
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(255), nullable=True)
-    image = db.Column(db.LargeBinary, nullable=True)
+    image_URL = db.Column(db.String(255), nullable=True)
 
     menu = relationship('Menu', back_populates='dishes')
 
@@ -121,7 +121,9 @@ class Dish(db.Model):
             "menuID": self.menuID,
             "category": self.category,
             "price": float(self.price),
+            "image":self.image_URL,
         }
+
 
 class Favorites(db.Model):
     id = db.Column(db.Integer, primary_key=True)

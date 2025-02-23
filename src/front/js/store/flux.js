@@ -7,7 +7,8 @@ const getState = ({ getStore, getActions, setStore }) => {
             restaurant: {},
             menuBuilder: {},
             menu: {},
-            favorites: []
+            favorites: [],
+            editRequest: {}
         },
         actions: {
             registerUser: async (userType, email, password, username, department, city) => {
@@ -47,19 +48,17 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const store = getStore();
                 try {
                     const response = await fetch(`${backendURL}api/menu/${menuID}`)
-
                     if (!response.ok) {
                         throw new Error(res.statusText);
                     }
                     const menu = await response.json()
-                    setStore({ ...store, menuBuilder: menu });
-                    return true;
-                }
 
+                    setStore({ ...store, menuBuilder: menu });
+                    return true
+                }
                 catch {
                     console.error('Error loading Menu Builder');
                 }
-
             },
 
             menuBuilderCategories: async (menuID, categories) => {
@@ -78,9 +77,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
                     const menuDetails = await response.json()
                     setStore({ ...store, menuBuilder: { ...store.menuBuilder, menu: menuDetails } });
-                    return true;
                 }
-
                 catch {
                     console.error('Error loading Menu Builder categories');
                 }
@@ -93,7 +90,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const image = dishInfo['image']
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
-                const actions = getActions();
                 try {
                     const response = await fetch(`${backendURL}api/new/dish`,
                         {
@@ -110,6 +106,16 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
 
                     const dish = await response.json()
+
+                    const updatedDishes = { ...store.menuBuilder.dishes }
+
+                    if (Array.isArray(updatedDishes[dish.category])) {
+                        updatedDishes[dish.category].push(dish);
+                    } else {
+                        updatedDishes[dish.category] = [dish];
+                    }
+                    setStore({ ...store, menuBuilder: { ...store.menuBuilder, dishes: updatedDishes } });
+
                     return dish;
                 }
                 catch {
@@ -117,7 +123,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            menuBuilderDeleteDish: async (dishID) => {
+            menuBuilderDeleteDish: async (menuID, dishID, category) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
@@ -130,53 +136,63 @@ const getState = ({ getStore, getActions, setStore }) => {
                     if (!response.ok) {
                         throw new Error(res.statusText);
                     }
-                    return true;
+
+                    const updatedDishes = { ...store.menuBuilder.dishes };
+                    updatedDishes[category] = updatedDishes[category].filter(dish => dish.id !== dishID);
+
+
+                    setStore({
+                        menuBuilder: {
+                            ...store.menuBuilder,
+                            dishes: updatedDishes,
+                        },
+                    });
                 }
                 catch {
                     console.error('Error deleting Menu Builder dish');
                 }
             },
 
-            menuBuilderEditDish: async (dishID, name, description, price, image, category) => {
+            menuBuilderEditDish: async (dishID, dishInfo, category) => {
                 const backendURL = process.env.BACKEND_URL
+                const name = dishInfo['name']
+                const description = dishInfo['description']
+                const price = dishInfo['price']
+                const image = dishInfo['image']
                 const store = getStore();
                 try {
-                    const response = await fetch(`${backendURL}api/delete/dish/${dishID}`,
+                    const response = await fetch(`${backendURL}api/edit/dish`,
                         {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 'dishID': dishID, 'categories': category,
-                                'name': name, 'description': description, 'price': price, 'image': image
+                                'name': name, 'description': description, 'price': price, 'image_URL': image
                             })
                         })
 
                     if (!response.ok) {
                         throw new Error(res.statusText);
                     }
-                    return true;
+
+                    const updatedDish = await response.json()
+
+                    const updatedDishes = { ...store.menuBuilder.dishes };
+
+                    updatedDishes[category] = updatedDishes[category].map(dish =>
+                        dish.id === dishID ? updatedDish : dish
+                    );
+
+                    setStore({
+                        menuBuilder: {
+                            ...store.menuBuilder,
+                            dishes: updatedDishes,
+                        },
+                    });
                 }
-                catch {
+                catch (error) {
                     console.error('Error loading Menu Builder categories', error);
                 }
-            },
-
-            imageToBase64: async (file) => {
-                try {
-                    const response = await fetch(file);
-                    const blob = await response.blob();
-                    const reader = new FileReader();
-                    return new Promise((resolve, reject) => {
-                        reader.onload = () => resolve(reader.result.split(',')[1]);
-                        reader.onerror = error => reject(error)
-                        reader.readAsDataURL(blob);
-                    })
-
-                } catch (error) {
-                    console.error("Error fetching blob")
-                    throw error;
-                }
-
             },
 
             fetchFavorites: async (userId) => {
@@ -237,10 +253,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-
-
         }
-    };
-};
+    }
+
+}
 
 export default getState;

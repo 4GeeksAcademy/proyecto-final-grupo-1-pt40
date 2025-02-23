@@ -1,17 +1,20 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from flask import Flask, request, jsonify, url_for, Blueprint
-import base64
 from api.models import db, Client, Restaurant, Menu, Dish,Favorites
+from flask import Flask, request, jsonify, url_for, Blueprint, Response,send_file
+from werkzeug.utils import secure_filename
 from sqlalchemy.exc import DataError
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
+
 
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
 CORS(api)
+
+
 
 
 @api.route('/hello', methods=['POST', 'GET'])
@@ -177,13 +180,11 @@ def delete_menu(menu_id):
 @api.route('/new/dish/', methods=['POST'])
 def add_dish():
     data = request.json
-    image = data.get('image',None)
-    if image:
-        image = base64.b64decode(data['image'])
     description = data.get('description',None)
+    image_URL = data.get('image',None)
     try:
         if data["name"] and data["category"] and data["price"] and data["menuID"]:
-            new_dish = Dish(name=data['name'], category=data['category'], price=float(data["price"]),menuID=data["menuID"],image=image,description=description)
+            new_dish = Dish(name=data['name'], category=data['category'], price=float(data["price"]),menuID=data["menuID"],description=description, image_URL=image_URL)
             if new_dish:
                 db.session.add(new_dish)
                 db.session.commit()
@@ -228,6 +229,7 @@ def edit_dish():
                     if value:
                         setattr(edit_dish,key,value)
             db.session.commit()
+            
             return jsonify(edit_dish.serialize()),200
         else:
              return jsonify('Bad Request: Dish ID not found'),400
@@ -300,7 +302,7 @@ def get_restaurants():
          db.session.rollback()
          return jsonify('Server error: Failed to process request'), 500
     
-@api.route('/api/favorites', methods=['POST'])
+@api.route('/favorites', methods=['POST'])
 def add_favorite():
     data = request.json
     client_id = data.get("client_id")
