@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import Spinner from 'react-bootstrap/Spinner';
+import { Navbar, Nav, Container } from "react-bootstrap";
+import { LinkContainer } from "react-router-bootstrap";
 
 const ClientDashboard = () => {
     const navigate = useNavigate();
@@ -70,6 +72,7 @@ const ClientDashboard = () => {
             default:
                 // Mostrar las opciones de restaurantes por defecto
                 return (
+                    
                     <div>
                         <h2>Opciones de Restaurante</h2>
                         <div className="row">
@@ -101,34 +104,24 @@ const ClientDashboard = () => {
     };
 
     return (
-        <div className="container mt-4">
-            <div className="d-flex mb-4">
-                <button
-                    className={`btn btn-outline-primary me-2 ${activeMenu === "restaurants" ? "active" : ""}`}
-                    onClick={() => setActiveMenu("restaurants")}
-                >
-                    Restaurantes
-                </button>
-                <button
-                    className={`btn btn-outline-primary me-2 ${activeMenu === "perfil" ? "active" : ""}`}
-                    onClick={() => setActiveMenu("perfil")}
-                >
-                    Perfil
-                </button>
-                <button
-                    className={`btn btn-outline-primary me-2 ${activeMenu === "favoritos" ? "active" : ""}`}
-                    onClick={() => setActiveMenu("favoritos")}
-                >
-                    Favoritos
-                </button>
-                <button
-                    className={`btn btn-outline-primary ${activeMenu === "ayuda" ? "active" : ""}`}
-                    onClick={() => setActiveMenu("ayuda")}
-                >
-                    Ayuda
-                </button>
-            </div>
-            <div>{renderContent()}</div>
+        <div>
+            
+            <Navbar bg="dark" variant="dark" expand="lg">
+                <Container>
+                    <Navbar.Brand>El punto</Navbar.Brand>
+                    <Nav className="ml-auto">
+                        <Nav.Link onClick={() => setActiveMenu("restaurants")} active={activeMenu === "restaurants"}>Restaurantes</Nav.Link>
+                        <Nav.Link onClick={() => setActiveMenu("perfil")} active={activeMenu === "perfil"}>Perfil</Nav.Link>
+                        <LinkContainer to="/favorites">
+                            <Nav.Link active={activeMenu === "favoritos"}>Favoritos</Nav.Link>
+                        </LinkContainer>
+                        <Nav.Link onClick={() => setActiveMenu("ayuda")} active={activeMenu === "ayuda"}>Ayuda</Nav.Link>
+                    </Nav>
+                </Container>
+            </Navbar>
+
+            
+            <Container className="mt-4">{renderContent()}</Container>
         </div>
     );
 };

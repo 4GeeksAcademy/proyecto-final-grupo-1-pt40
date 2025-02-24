@@ -12,13 +12,15 @@ const Login = () => {
 
   const handleLogin = async (role) => {
     if (email && password) {
-      const response = await actions.loginUser(role, email, password)
-      if (response) {
+      const success = await actions.loginUser(role, email, password);
+      if (success) {
         if (role === "client") {
-          navigate("/client-dahsboard");
-        } else if (role === "restaurante") {
+          navigate("/client-dashboard"); 
+        } else if (role === "restaurant") {
           navigate("/restaurant-dashboard");
         }
+      } else {
+        alert("Error en el login. Verifica tus credenciales.");
       }
     } else {
       alert("Por favor, ingrese su email y contraseña.");

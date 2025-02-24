@@ -12,7 +12,7 @@ export const Home = () => {
 
 	return (
 		<Container className="text-center mt-5">
-		<h1>Bienvenido a El Punto</h1>
+		<h1>Bienvenido Al Punto</h1>
 		<p>Elige una opción para continuar:</p>
 		<Button variant="primary" className="m-2" onClick={() => navigate("/login")}>
 		  Iniciar Sesión

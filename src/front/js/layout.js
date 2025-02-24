@@ -15,7 +15,7 @@ import MenuView from "./pages/MenuView.jsx";
 import RestaurantDashboard from "./pages/RestaurantDashboard.jsx";
 import RestaurantProfile from "./pages/RestaurantProfile.jsx";
 import RestaurantForm from "./pages/RestaurantForm.jsx";
-
+import FavoritePage from "./pages/FavoritePage.jsx";
 
 //create your first component
 const Layout = () => {
@@ -39,9 +39,10 @@ const Layout = () => {
                         <Route element={<MenuBuilder />} path="/menu-builder" />
                         <Route element={<MenuView />} path="/menu/:menuID" />
                         <Route element={<ClientDashboard />} path="/client-dashboard" />
+                        <Route element={<FavoritePage />}  path="/favorites"  />
                         <Route element={<RestaurantDashboard />} path="/restaurant-dashboard" />
-                        <Route path="/restaurant-form" element={<RestaurantForm />} />
-                        <Route path="/restaurant-profile" element={<RestaurantProfile />} />
+                        <Route element={<RestaurantForm />} path="/restaurant-form"  />
+                        <Route element={<RestaurantProfile />} path="/restaurant-profile" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
 

@@ -5,14 +5,15 @@ const FavoriteView = ({ userId }) => {
     const { store, actions } = useContext(Context);
 
     useEffect(() => {
-        actions.fetchFavorites(userId);
-    }, [userId]);
-
+        if (store.client && store.client.id) {
+            actions.fetchFavorites(store.client.id);
+        }
+    }, [store.client]);
     return (
         <div>
             <h2>Mis Favoritos</h2>
             {store.favorites.length === 0 ? (
-                <p>No tienes favoritos aún.</p>
+                <p>No tienes favoritos aún .</p>
             ) : (
                 <ul>
                     {store.favorites.map(fav => (

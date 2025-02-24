@@ -39,10 +39,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            loginUser: async (userType, email, password) => {
+            loginUser: async (userType, email, password, navigate) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 const endpoint = `${backendUrl}/api/login/${userType}`.replace(/([^:]\/)\/+/g, "$1");
-
+            
                 try {
                     const response = await fetch(endpoint, {
                         method: "POST",
@@ -51,22 +51,31 @@ const getState = ({ getStore, getActions, setStore }) => {
                         },
                         body: JSON.stringify({ email, password }),
                     });
-
+            
                     if (!response.ok) {
                         const errorData = await response.json();
                         console.error(`Error en la solicitud: ${response.status} ${response.statusText}`, errorData);
                         return false;
                     }
-
+            
                     const data = await response.json();
-                    localStorage.setItem(`${userType}`, data.id)
+            
+                    
+                    sessionStorage.setItem("token", data.token);
+                    sessionStorage.setItem("userRole", userType);
+            
+                    if (userType === "client") {
+                        sessionStorage.setItem("clientId", data.client_id);
+                    } else if (userType === "restaurant") {
+                        sessionStorage.setItem("restaurantId", data.restaurant_id);
+                    }
+            
                     return true;
                 } catch (error) {
                     console.error("Error en la solicitud:", error.message);
                     return false;
                 }
             },
-
             menuBuilderLoad: async (menuID) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
@@ -253,10 +262,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            fetchFavorites: async (userId) => {
+            fetchFavorites: async (clientId) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
-                    const response = await fetch(`${backendUrl}/api/favorites/${userId}`);
+                    const response = await fetch(`${backendUrl}/api/favorites/${clientId}`);
 
                     if (!response.ok) {
                         throw new Error(`Error en la solicitud: ${response.status}`);
@@ -270,7 +279,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
 
-            addFavorite: async (userId, dishId) => {
+            addFavorite: async (clientId, dishId) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
                     const response = await fetch(`${backendUrl}/api/favorites`, {
@@ -278,7 +287,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         headers: {
                             "Content-Type": "application/json",
                         },
-                        body: JSON.stringify({ user_id: userId, dish_id: dishId }),
+                        body: JSON.stringify({ client_id: clientId, dish_id: dishId }),
                     });
 
                     if (!response.ok) {
