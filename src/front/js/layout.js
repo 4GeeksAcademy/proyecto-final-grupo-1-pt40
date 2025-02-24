@@ -5,7 +5,7 @@ import { BackendURL } from "./component/backendURL";
 
 import MenuBuilder from "./pages/MenuBuilder.jsx";
 import SignUpPage from './pages/SignUpPage.jsx';
-
+import ClientDashboard from "./pages/ClientDashboard.jsx";
 import { Home } from "./pages/home";
 import { Demo } from "./pages/demo";
 import { Single } from "./pages/single";
@@ -36,6 +36,7 @@ const Layout = () => {
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<MenuBuilder />} path="/menu-builder" />
                         <Route element={<MenuView />} path="/menu/3" />
+                        <Route element={<ClientDashboard />} path="/client-dashboard" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
 
