@@ -4,26 +4,27 @@ import Spinner from 'react-bootstrap/Spinner';
 import { Context } from "../store/appContext";
 import { Widget } from "@uploadcare/react-widget";
 import EditModal from "../component/EditModal.jsx"
+import { useParams } from 'react-router-dom';
 
 
 const MenuBuilder = () => {
+  const { menuID } = useParams();
   const { store, actions } = useContext(Context);
-  const [categories, setCategories] = useState(['Agrega una categoria']);
+  const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [dishes, setDishes] = useState(null);
   const [newDish, setNewDish] = useState({ name: "", description: "", price: "", category: "", image: "" });
-  const [editDish, setEditDish] = useState('')
 
 
   const onLoad = async () => {
-    if (await actions.menuBuilderLoad(3)) {
+    if (await actions.menuBuilderLoad(menuID)) {
       setCategories(store.menuBuilder.menu.categories)
     }
   }
 
   const editCategories = async () => {
-    await actions.menuBuilderCategories(3, categories)
+    await actions.menuBuilderCategories(menuID, categories)
   }
 
   const addCategory = async () => {
@@ -45,7 +46,7 @@ const MenuBuilder = () => {
 
   const addDish = async () => {
     if (newDish.name && newDish.price && selectedCategory) {
-      await actions.menuBuilderAddDish(3, newDish, selectedCategory)
+      await actions.menuBuilderAddDish(id, newDish, selectedCategory)
       setNewDish({ name: "", description: "", price: "", category: "", image: "" });
     }
   };
@@ -55,7 +56,7 @@ const MenuBuilder = () => {
   }
 
   const removeDish = async (dishID) => {
-    await actions.menuBuilderDeleteDish(3, dishID, selectedCategory)
+    await actions.menuBuilderDeleteDish(id, dishID, selectedCategory)
   };
 
   useEffect(() => {
@@ -68,17 +69,17 @@ const MenuBuilder = () => {
 
   return (
     <div className="d-flex">
-      {categories ? <div className="w-25 p-3 border-end">
+      {store.menuBuilder.menu.categories ? <div className="w-25 p-3 border-end">
         <h4>Categorías</h4>
-        <ListGroup>
-          {categories.map((category, index) => (
-            <ListGroup.Item key={index} action onClick={() => setSelectedCategory(category)} className="d-flex justify-content-between align-items-center">
-              <span>{category}</span>
-              <Button variant="danger" size="sm" onClick={() => removeCategory(category)}>X</Button>
-            </ListGroup.Item>
-          ))}
-
-        </ListGroup>
+        {Array.isArray(store.menuBuilder.menu.categories) ?
+          (<ListGroup>
+            {store.menuBuilder.menu.categories.map((category, index) => (
+              <ListGroup.Item key={index} action onClick={() => setSelectedCategory(category)} className="d-flex justify-content-between align-items-center">
+                <span>{category}</span>
+                <Button variant="danger" size="sm" onClick={() => removeCategory(category)}>X</Button>
+              </ListGroup.Item>))}
+          </ListGroup>) : (
+            <div>No hay categorías en este momento</div>)}
         <Form.Control
           type="text"
           placeholder="Nueva categoría"
@@ -130,7 +131,7 @@ const MenuBuilder = () => {
                         <Card.Title>{dish.name}</Card.Title>
                         <Card.Text>{dish.description}</Card.Text>
                         <Card.Text><strong>Precio:</strong> {dish.price}</Card.Text>
-                        <EditModal dish={dish}/>
+                        <EditModal dish={dish} />
                         <Button variant="danger" size="sm" onClick={() => removeDish(dish.id)}>Eliminar</Button>
                       </Card.Body>
                     </Card>

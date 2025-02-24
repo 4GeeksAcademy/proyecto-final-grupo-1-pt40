@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import Spinner from 'react-bootstrap/Spinner';
+import Card from 'react-bootstrap/Card';
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 
@@ -72,7 +73,7 @@ const ClientDashboard = () => {
             default:
                 // Mostrar las opciones de restaurantes por defecto
                 return (
-                    
+
                     <div>
                         <h2>Opciones de Restaurante</h2>
                         <div className="row">
@@ -105,7 +106,7 @@ const ClientDashboard = () => {
 
     return (
         <div>
-            
+
             <Navbar bg="dark" variant="dark" expand="lg">
                 <Container>
                     <Navbar.Brand>El punto</Navbar.Brand>
@@ -120,7 +121,7 @@ const ClientDashboard = () => {
                 </Container>
             </Navbar>
 
-            
+
             <Container className="mt-4">{renderContent()}</Container>
         </div>
     );
