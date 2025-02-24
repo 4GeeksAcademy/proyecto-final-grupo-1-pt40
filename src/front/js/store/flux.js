@@ -5,10 +5,11 @@ const getState = ({ getStore, getActions, setStore }) => {
         store: {
             client: {},
             restaurant: {},
-            menuBuilder: {},
+            menuBuilder: { "menu": { "categories": [] } },
             menu: {},
             favorites: [],
             menuList: [],
+            menuRestaurant: [],
         },
         actions: {
             registerUser: async (userType, email, password, username, department, city) => {
@@ -42,7 +43,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             loginUser: async (userType, email, password, navigate) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 const endpoint = `${backendUrl}/api/login/${userType}`.replace(/([^:]\/)\/+/g, "$1");
-            
+
                 try {
                     const response = await fetch(endpoint, {
                         method: "POST",
@@ -51,25 +52,25 @@ const getState = ({ getStore, getActions, setStore }) => {
                         },
                         body: JSON.stringify({ email, password }),
                     });
-            
+
                     if (!response.ok) {
                         const errorData = await response.json();
                         console.error(`Error en la solicitud: ${response.status} ${response.statusText}`, errorData);
                         return false;
                     }
-            
+
                     const data = await response.json();
-            
-                    
+
+
                     sessionStorage.setItem("token", data.token);
                     sessionStorage.setItem("userRole", userType);
-            
+
                     if (userType === "client") {
-                        sessionStorage.setItem("clientId", data.client_id);
+                        sessionStorage.setItem("client", data.id);
                     } else if (userType === "restaurant") {
-                        sessionStorage.setItem("restaurantId", data.restaurant_id);
+                        sessionStorage.setItem("restaurant", data.id);
                     }
-            
+
                     return true;
                 } catch (error) {
                     console.error("Error en la solicitud:", error.message);
@@ -246,6 +247,28 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
+            createMenu: async (name, restaurantID) => {
+                const backendURL = process.env.BACKEND_URL
+                const store = getStore();
+                try {
+                    const response = await fetch(`${backendURL}api/new/menu`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ name: name, restaurantID: restaurantID })
+                    }
+                    )
+                    if (!response.ok) {
+                        throw new Error(res.statusText);
+                    }
+                    const data = await response.json()
+                    localStorage.setItem('menuID', data.id)
+                    return data
+                }
+                catch {
+                    console.error('Error creating menu');
+                }
+            },
+
             getRestaurants: async () => {
                 const backendURL = process.env.BACKEND_URL || "http://127.0.0.1:3001/";
                 const store = getStore();
@@ -260,6 +283,24 @@ const getState = ({ getStore, getActions, setStore }) => {
                 } catch (error) {
                     console.error('Error loading Menu Builder:',error);
                 }
+            },
+
+            getRestaurantMenus: async (restaurantID) => {
+                const backendURL = process.env.BACKEND_URL
+                const store = getStore();
+                try {
+                    const response = await fetch(`${backendURL}api/restaurant/menus/${restaurantID}`)
+                    if (!response.ok) {
+                        throw new Error(res.statusText);
+                    }
+                    const menus = await response.json()
+                    setStore({ ...store, menuRestaurant: menus });
+                    return true
+                }
+                catch {
+                    console.error('Error loading Menu Builder');
+                }
+
             },
 
             fetchFavorites: async (clientId) => {
