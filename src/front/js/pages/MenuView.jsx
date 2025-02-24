@@ -11,14 +11,16 @@ const MenuView = () => {
     const [menu, setMenu] = useState(null)
     const [dishes, setDishes] = useState(null)
 
-    const onLoad = async () => {
-        await actions.menuViewLoad(menuID)
-        setMenu(store.menu.menu)
-        setDishes(store.menu.dishes)
-    }
     useEffect(() => {
-        onLoad()
-    }, [])
+        const loadMenu = async () => {
+            const success = await actions.menuViewLoad(menuID);
+            if (success) {
+                setMenu(store.menu.menu);
+                setDishes(store.menu.dishes);
+            }
+        };
+        loadMenu();
+    }, [menuID, store.menu]); 
 
     return (
         <div>

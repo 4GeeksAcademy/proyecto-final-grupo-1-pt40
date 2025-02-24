@@ -289,23 +289,26 @@ def get_menu(menu_id):
 @api.route('/restaurants', methods=['GET'])
 def get_restaurants():
     try:
-        restaurants=Restaurant.query.all()
-        if restaurants:
-            res_list = [res.serialize() for res in restaurants]
-            menu_list=[]
-            for res in res_list:
-                menu = Menu.query.filter_by(restaurantID = res.id).first()
-                if menu:
-                    menu_list.append({'restaurant':res,'menu':menu})
-            return jsonify(menu_list),201
-        else:
-            return jsonify('Restaurants not found'),401
-    except DataError as e:
+        restaurants = Restaurant.query.all()
+        if not restaurants:
+            return jsonify({'message': 'Restaurants not found'}), 404
+
+        res_list = [res.serialize() for res in restaurants]
+        menu_list = []
+
+        for res in res_list:
+            menu = Menu.query.filter_by(restaurant_id=res["id"]).first() 
+            menu_data = menu.serialize() if menu else None
+            menu_list.append({'restaurant': res, 'menu': menu_data})
+
+        return jsonify(menu_list), 200  
+    except DataError:
         db.session.rollback()
-        return jsonify('Bad Request: Incorrect data format/type'),400
+        return jsonify({'message': 'Bad Request: Incorrect data format/type'}), 400
     except Exception as e:
-         db.session.rollback()
-         return jsonify('Server error: Failed to process request'), 500
+        db.session.rollback()
+        print("Error:", str(e)) 
+        return jsonify({'message': 'Server error: Failed to process request'}), 500
     
 @api.route('/favorites', methods=['POST'])
 def add_favorite():
