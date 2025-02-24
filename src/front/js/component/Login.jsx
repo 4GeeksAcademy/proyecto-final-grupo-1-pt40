@@ -1,18 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { Context } from "../store/appContext";
 import { Button, Form, Card } from "react-bootstrap";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { store, actions } = useContext(Context);
+
   const navigate = useNavigate();
 
-  const handleLogin = (role) => {
+  const handleLogin = async (role) => {
     if (email && password) {
-      if (role === "cliente") {
-        navigate("/dashboard-cliente");
-      } else if (role === "restaurante") {
-        navigate("/dashboard-restaurante");
+      const response = await actions.loginUser(role, email, password)
+      if (response) {
+        if (role === "client") {
+          navigate("/client-dahsboard");
+        } else if (role === "restaurante") {
+          navigate("/restaurant-dashboard");
+        }
       }
     } else {
       alert("Por favor, ingrese su email y contraseña.");
@@ -43,10 +49,10 @@ const Login = () => {
             />
           </Form.Group>
           <div className="d-flex justify-content-between">
-            <Button variant="primary" onClick={() => handleLogin("cliente")}>
+            <Button variant="primary" onClick={() => handleLogin("client")}>
               Cliente
             </Button>
-            <Button variant="success" onClick={() => handleLogin("restaurante")}>
+            <Button variant="success" onClick={() => handleLogin("restaurant")}>
               Restaurante
             </Button>
           </div>

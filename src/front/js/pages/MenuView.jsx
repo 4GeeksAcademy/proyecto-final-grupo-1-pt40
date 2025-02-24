@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Tabs, Tab, Card } from "react-bootstrap";
 import Spinner from 'react-bootstrap/Spinner';
+import { useParams } from 'react-router-dom';
 import { Context } from "../store/appContext";
 
 
 const MenuView = () => {
+    const { menuID } = useParams();
     const { store, actions } = useContext(Context);
     const [menu, setMenu] = useState(null)
     const [dishes, setDishes] = useState(null)
 
     const onLoad = async () => {
-        await actions.menuViewLoad(3)
+        await actions.menuViewLoad(menuID)
         setMenu(store.menu.menu)
         setDishes(store.menu.dishes)
     }

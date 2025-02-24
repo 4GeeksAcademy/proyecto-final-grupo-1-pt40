@@ -39,6 +39,14 @@ class Client(db.Model):
     
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    def serialize(self):
+        return{
+            'id':self.id,
+            'name':self.name,
+            'username':self.username,
+            'email':self.email
+        }
+
 class Restaurant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=True)

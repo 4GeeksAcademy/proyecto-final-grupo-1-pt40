@@ -47,7 +47,7 @@ def client_registration():
         new_client.set_password(password)
         db.session.add(new_client)
         db.session.commit()
-        return jsonify({"message":"User registered correctly"}), 201
+        return jsonify(new_client.serialize()), 201
     except DataError as e:
         db.session.rollback()
         return jsonify('Bad Request: Incorrect data format/type'),400
@@ -76,7 +76,7 @@ def restaurant_registration():
         new_restaurant.set_password(password)
         db.session.add(new_restaurant)
         db.session.commit()
-        return jsonify({"message":"Restaurant registered correctly"}), 201
+        return jsonify(new_restaurant.serialize()), 201
     except DataError as e:
         db.session.rollback()
         return jsonify('Bad Request: Incorrect data format/type'),400
@@ -101,7 +101,7 @@ def client_login():
         if client:
             login = client.check_password(password)
             if login:
-                return({"message":"Allowed"}), 201
+                return(jsonify(client.serialize())), 201
             else:
                 return({"message":"Check your username/email and password"}),400
         return ({"message":"Email/username not found"}),400
@@ -128,7 +128,7 @@ def restaurant_login():
         if restaurant:
             login = restaurant.check_password(password)
             if login:
-                return({"message":"Allowed"}), 201
+                return(jsonify(restaurant.serialize())), 201
             else:
                 return({"message":"Check your username/email and password"}),400
         return ({"message":"Email/username not found"}),400
@@ -292,7 +292,12 @@ def get_restaurants():
         restaurants=Restaurant.query.all()
         if restaurants:
             res_list = [res.serialize() for res in restaurants]
-            return jsonify(res_list),201
+            menu_list=[]
+            for res in res_list:
+                menu = Menu.query.filter_by(restaurantID = res.id).first()
+                if menu:
+                    menu_list.append({'restaurant':res,'menu':menu})
+            return jsonify(menu_list),201
         else:
             return jsonify('Restaurants not found'),401
     except DataError as e:

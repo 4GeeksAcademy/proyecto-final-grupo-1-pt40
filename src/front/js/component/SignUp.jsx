@@ -19,7 +19,7 @@ const SignUp = () => {
         e.preventDefault();
         if (userType && email && password && username && department && city) {
             const response = await actions.registerUser(userType, email, password, username, department, city);
-            console.log(userType, email, password, username, department, city);
+            if (response) navigate(`/${userType}-dashboard`)
         }
     };
 

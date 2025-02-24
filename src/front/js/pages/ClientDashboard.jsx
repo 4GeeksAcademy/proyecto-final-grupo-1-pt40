@@ -1,10 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { Context } from "../store/appContext";
+import Spinner from 'react-bootstrap/Spinner';
 
 const ClientDashboard = () => {
     const navigate = useNavigate();
     const [activeMenu, setActiveMenu] = useState("restaurants");
+    const { store, actions } = useContext(Context);
+
+    const onLoad = async () => {
+        await actions.getRestaurants();
+    }
+    useEffect(() => {
+        onLoad()
+    }, [])
+
 
     // Datos simulados de restaurantes
     const restaurantData = [
@@ -27,6 +37,8 @@ const ClientDashboard = () => {
             image: "https://via.placeholder.com/300x200?text=Restaurante+3"
         }
     ];
+
+
 
     // Renderiza el contenido según la opción del menú seleccionada
     const renderContent = () => {

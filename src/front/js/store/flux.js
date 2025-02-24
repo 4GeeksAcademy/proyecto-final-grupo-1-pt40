@@ -8,15 +8,12 @@ const getState = ({ getStore, getActions, setStore }) => {
             menuBuilder: {},
             menu: {},
             favorites: [],
+            menuList: [],
         },
         actions: {
             registerUser: async (userType, email, password, username, department, city) => {
-                console.log("Datos enviados:", userType, email, password, username, department, city);
-
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 const endpoint = `${backendUrl}/api/register/${userType}`.replace(/([^:]\/)\/+/g, "$1");
-
-                console.log("URL del backend:", endpoint);
 
                 try {
                     const response = await fetch(endpoint, {
@@ -34,7 +31,35 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
 
                     const data = await response.json();
-                    console.log("Registro exitoso:", data);
+                    localStorage.setItem(`${userType}`, data.id)
+                    return true;
+                } catch (error) {
+                    console.error("Error en la solicitud:", error.message);
+                    return false;
+                }
+            },
+
+            loginUser: async (userType, email, password) => {
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
+                const endpoint = `${backendUrl}/api/login/${userType}`.replace(/([^:]\/)\/+/g, "$1");
+
+                try {
+                    const response = await fetch(endpoint, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ email, password }),
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error(`Error en la solicitud: ${response.status} ${response.statusText}`, errorData);
+                        return false;
+                    }
+
+                    const data = await response.json();
+                    localStorage.setItem(`${userType}`, data.id)
                     return true;
                 } catch (error) {
                     console.error("Error en la solicitud:", error.message);
@@ -212,6 +237,22 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
+            getRestaurants: async () => {
+                const backendURL = process.env.BACKEND_URL
+                const store = getStore();
+                try {
+                    const response = await fetch(`${backendURL}api/restaurants`)
+                    if (!response.ok) {
+                        throw new Error(res.statusText);
+                    }
+
+                    const menus = await response.json()
+                    setStore({...store, menuList: menus})
+                } catch {
+                    console.error('Error loading Menu Builder');
+                }
+            },
+
             fetchFavorites: async (userId) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
@@ -227,7 +268,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error("Error al obtener favoritos:", error);
                 }
             },
-            
+
 
             addFavorite: async (userId, dishId) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
