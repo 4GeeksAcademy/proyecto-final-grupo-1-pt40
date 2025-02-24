@@ -12,7 +12,9 @@ import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
 import LoginPage from "./pages/LoginPage.jsx";
 import MenuView from "./pages/MenuView.jsx";
-
+import RestaurantDashboard from "./pages/RestaurantDashboard.jsx";
+import RestaurantProfile from "./pages/RestaurantProfile.jsx";
+import RestaurantForm from "./pages/RestaurantForm.jsx";
 
 
 //create your first component
@@ -37,6 +39,9 @@ const Layout = () => {
                         <Route element={<MenuBuilder />} path="/menu-builder" />
                         <Route element={<MenuView />} path="/menu/3" />
                         <Route element={<ClientDashboard />} path="/client-dashboard" />
+                        <Route element={<RestaurantDashboard />} path="/restaurant-dashboard" />
+                        <Route path="/restaurant-form" element={<RestaurantForm />} />
+                        <Route path="/restaurant-profile" element={<RestaurantProfile />} />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
 
