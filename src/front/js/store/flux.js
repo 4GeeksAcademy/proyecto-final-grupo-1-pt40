@@ -8,7 +8,6 @@ const getState = ({ getStore, getActions, setStore }) => {
             menuBuilder: {},
             menu: {},
             favorites: [],
-            editRequest: {}
         },
         actions: {
             registerUser: async (userType, email, password, username, department, city) => {
@@ -192,6 +191,24 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
                 catch (error) {
                     console.error('Error loading Menu Builder categories', error);
+                }
+            },
+
+            menuViewLoad: async (menuID) => {
+                const backendURL = process.env.BACKEND_URL
+                const store = getStore();
+                try {
+                    const response = await fetch(`${backendURL}api/menu/${menuID}`)
+                    if (!response.ok) {
+                        throw new Error(res.statusText);
+                    }
+                    const menu = await response.json()
+
+                    setStore({ ...store, menu: menu });
+                    return true
+                }
+                catch {
+                    console.error('Error loading Menu Builder');
                 }
             },
 

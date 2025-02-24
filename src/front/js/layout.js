@@ -11,6 +11,7 @@ import { Demo } from "./pages/demo";
 import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
 import LoginPage from "./pages/LoginPage.jsx";
+import MenuView from "./pages/MenuView.jsx";
 
 
 
@@ -30,10 +31,11 @@ const Layout = () => {
                     <Routes>
                         <Route element={<Home />} path="/" />
                         <Route element={<SignUpPage />} path="/signup" />
-                        <Route element={<LoginPage />}  path="/login" />
+                        <Route element={<LoginPage />} path="/login" />
                         <Route element={<Demo />} path="/demo" />
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<MenuBuilder />} path="/menu-builder" />
+                        <Route element={<MenuView />} path="/menu/3" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
 
