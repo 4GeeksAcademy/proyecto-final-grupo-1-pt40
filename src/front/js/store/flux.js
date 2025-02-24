@@ -270,7 +270,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
             getRestaurants: async () => {
-                const backendURL = process.env.BACKEND_URL
+                const backendURL = process.env.BACKEND_URL || "http://127.0.0.1:3001/";
                 const store = getStore();
                 try {
                     const response = await fetch(`${backendURL}api/restaurants`)
@@ -279,9 +279,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
 
                     const menus = await response.json()
-                    setStore({ ...store, menuList: menus })
-                } catch {
-                    console.error('Error loading Menu Builder');
+                    setStore({...store, menuList: menus})
+                } catch (error) {
+                    console.error('Error loading Menu Builder:',error);
                 }
             },
 
