@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom';
 const MenuBuilder = () => {
   const { menuID } = useParams();
   const { store, actions } = useContext(Context);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState(store.menuBuilder?.menu?.categories || []);
   const [newCategory, setNewCategory] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [dishes, setDishes] = useState(null);
@@ -19,16 +19,24 @@ const MenuBuilder = () => {
 
   const onLoad = async () => {
     if (await actions.menuBuilderLoad(menuID)) {
-      setCategories(store.menuBuilder.menu.categories)
+      console.log("Menú cargado:", store.menuBuilder.menu);
+      setCategories(store.menuBuilder.menu.categories || []);
     }
-  }
+  };
 
   const editCategories = async () => {
     await actions.menuBuilderCategories(menuID, categories)
   }
-
+  console.log("Categorías actuales:", categories);
   const addCategory = async () => {
-    if (newCategory && !categories.includes(newCategory)) {
+    if (!newCategory) return;
+
+    if (!Array.isArray(categories)) {
+      console.error("Error: categories no es un array", categories);
+      setCategories([]);
+    }
+
+    if (!categories.includes(newCategory)) {
       setCategories([...categories, newCategory]);
       setNewCategory("");
     }
@@ -55,10 +63,16 @@ const MenuBuilder = () => {
     setNewDish({ ...newDish, image: file.cdnUrl })
   }
 
-  const removeDish = async (dishID) => {
-    await actions.menuBuilderDeleteDish(id, dishID, selectedCategory)
-  };
+  const removeDish = (menuID, dishId, category) => {
+    console.log("Intentando eliminar:", { menuID, dishId, category });
 
+    if (!dishId || !menuID || !category) {
+        console.error("Error: Falta un parámetro", { menuID, dishId, category });
+        return;
+    }
+
+    actions.menuBuilderDeleteDish(menuID, dishId, category);
+};
   useEffect(() => {
     onLoad()
   }, [])
@@ -132,7 +146,9 @@ const MenuBuilder = () => {
                         <Card.Text>{dish.description}</Card.Text>
                         <Card.Text><strong>Precio:</strong> {dish.price}</Card.Text>
                         <EditModal dish={dish} />
-                        <Button variant="danger" size="sm" onClick={() => removeDish(dish.id)}>Eliminar</Button>
+                        <Button variant="danger" size="sm" onClick={() => removeDish(menuID, dish.id, dish.category)}>
+                          Eliminar
+                        </Button>
                       </Card.Body>
                     </Card>
                   ))

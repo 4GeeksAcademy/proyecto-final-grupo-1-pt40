@@ -46,7 +46,7 @@ const ClientDashboard = () => {
                     <div>
                         <h2>Opciones de Restaurante</h2>
                         <div className="row">
-                            {store.restaurants.length > 0 ? (
+                            {Array.isArray(store.restaurants) && store.restaurants.length > 0 ? (
                                 store.restaurants.map((restaurant) => (
                                     <div key={restaurant.id} className="col-md-4 mb-3">
                                         <div className="card">
@@ -60,7 +60,7 @@ const ClientDashboard = () => {
                                                 <p className="card-text">{restaurant.description}</p>
                                                 <button
                                                     className="btn btn-primary"
-                                                    onClick={() => navigate(`/menu/${restaurant.menuID}`)}
+                                                    onClick={() => navigate(`/menu/${restaurant.id}`)}
                                                 >
                                                     Ver Menú
                                                 </button>
@@ -68,7 +68,7 @@ const ClientDashboard = () => {
                                         </div>
                                     </div>
                                 ))
-                            ) : (
+                             ) : (
                                 <p>No hay restaurantes disponibles.</p>
                             )}
                         </div>

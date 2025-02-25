@@ -6,21 +6,20 @@ import { Context } from "../store/appContext";
 
 
 const MenuView = () => {
-    const { menuID } = useParams();
+    const { restaurantID } = useParams();
     const { store, actions } = useContext(Context);
     const [menu, setMenu] = useState(null)
     const [dishes, setDishes] = useState(null)
 
     useEffect(() => {
         const loadMenu = async () => {
-            const success = await actions.menuViewLoad(menuID);
+            const success = await actions.getMenuByRestaurant(restaurantID);
             if (success) {
-                setMenu(store.menu.menu);
-                setDishes(store.menu.dishes);
+                setMenu(store.menu);
             }
         };
         loadMenu();
-    }, [menuID, store.menu]); 
+    }, [restaurantID, store.menu]);
 
     return (
         <div>
