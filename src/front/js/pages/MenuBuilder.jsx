@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Button, Form, ListGroup, Card } from "react-bootstrap";
 import Spinner from 'react-bootstrap/Spinner';
 import { Context } from "../store/appContext";
@@ -10,7 +10,10 @@ import { useParams } from 'react-router-dom';
 const MenuBuilder = () => {
   const { menuID } = useParams();
   const { store, actions } = useContext(Context);
+
   const [categories, setCategories] = useState(store.menuBuilder?.menu?.categories || []);
+
+
   const [newCategory, setNewCategory] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [dishes, setDishes] = useState(null);
@@ -25,7 +28,9 @@ const MenuBuilder = () => {
   };
 
   const editCategories = async () => {
-    await actions.menuBuilderCategories(menuID, categories)
+    if (categories) {
+      await actions.menuBuilderCategories(menuID, categories)
+    }
   }
   console.log("Categorías actuales:", categories);
   const addCategory = async () => {
@@ -63,8 +68,10 @@ const MenuBuilder = () => {
     setNewDish({ ...newDish, image: file.cdnUrl })
   }
 
+
   const removeDish = (menuID, dishId, category) => {
     console.log("Intentando eliminar:", { menuID, dishId, category });
+
 
     if (!dishId || !menuID || !category) {
         console.error("Error: Falta un parámetro", { menuID, dishId, category });
@@ -83,11 +90,11 @@ const MenuBuilder = () => {
 
   return (
     <div className="d-flex">
-      {store.menuBuilder.menu.categories ? <div className="w-25 p-3 border-end">
+      {store.menuBuilder.menu && store.menuBuilder.menu.categories ? <div className="w-25 p-3 border-end">
         <h4>Categorías</h4>
-        {Array.isArray(store.menuBuilder.menu.categories) ?
+        {store.menuBuilder.menu.categories.length > 0 ?
           (<ListGroup>
-            {store.menuBuilder.menu.categories.map((category, index) => (
+            {store.menuBuilder.menu.categories?.map((category, index) => (
               <ListGroup.Item key={index} action onClick={() => setSelectedCategory(category)} className="d-flex justify-content-between align-items-center">
                 <span>{category}</span>
                 <Button variant="danger" size="sm" onClick={() => removeCategory(category)}>X</Button>

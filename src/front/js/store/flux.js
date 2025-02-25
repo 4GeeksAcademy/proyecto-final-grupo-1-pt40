@@ -1,11 +1,9 @@
-import { useParams } from "react-router-dom";
-
 const getState = ({ getStore, getActions, setStore }) => {
     return {
         store: {
             client: {},
             restaurant: {},
-            menuBuilder: { "menu": { "categories": [] } },
+            menuBuilder: {'menu':{'categories':[]}},
             menu: {},
             favorites: [],
             menuList: [],
@@ -80,6 +78,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
             menuBuilderLoad: async (menuID) => {
                 try {
+
                     const response = await fetch(`${process.env.BACKEND_URL}api/menu/${menuID}`);
                     if (!response.ok) throw new Error("Error al cargar el menú");
             
@@ -89,6 +88,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                 } catch (error) {
                     console.error("Error en menuBuilderLoad:", error);
                     return false;
+
+                    
+
                 }
             },
 
@@ -173,6 +175,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
                     setStore({
+                        ...store,
                         menuBuilder: {
                             ...store.menuBuilder,
                             dishes: updatedDishes,
@@ -264,6 +267,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             getRestaurants: async () => {
                 try {
+
                     const response = await fetch(process.env.BACKEND_URL + "api/restaurants");
                     if (!response.ok) throw new Error("Failed to fetch restaurants");
             
@@ -272,6 +276,8 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.log("Restaurantes obtenidos:", restaurants);
                 } catch (error) {
                     console.error("Error loading restaurants:", error);
+
+                   
                 }
             },
 
