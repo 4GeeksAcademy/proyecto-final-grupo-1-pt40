@@ -18,8 +18,12 @@ const RestaurantDashboard = () => {
     }
 
     const onLoad = async () => {
-        await actions.getRestaurantMenus(id)
-    }
+        if (await actions.getRestaurantMenus()) {
+            console.log("Menús cargados correctamente.");
+        } else {
+            console.error("Error al cargar los menús.");
+        }
+    };
 
     useEffect(() => {
         onLoad()

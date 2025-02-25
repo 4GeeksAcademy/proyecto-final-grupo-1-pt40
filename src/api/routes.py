@@ -164,9 +164,9 @@ def add_menu():
 def delete_menu(menu_id):
     try:
         if menu_id:
-            delete_menu = Menu.query.filter_by(id = menu_id).first()
+            delete_menu = Menu.query.filter_by(id=menu_id).first()
             if not delete_menu:
-                return jsonify('Bad Request: Menu not found'), 400
+                return jsonify({"error": "Menu not found"}), 400
             db.session.delete(delete_menu)
             db.session.commit()
             return jsonify('Successfully deleted menu'), 201
@@ -266,68 +266,46 @@ def menu_categories():
 def get_menu(menu_id):
     try:
         menu = Menu.query.filter_by(id=menu_id).first()
-        if menu:
-            categories = menu.get_categories()
-            if categories == 'No categories at the moment':
-                return jsonify(menu.serialize()), 201
-            menu_response = {"menu":menu.serialize()}
-            dish_list = {}
-            for category in categories:
-                dishes = Dish.query.filter_by(menuID=menu_id, category=category).order_by(Dish.id).all()
-                if dishes:
-                    dish_list[category] = [dish.serialize() for dish in dishes]
-                else:
-                    dish_list[category] = 'No dishes in this category'
-            return jsonify({**menu_response,**{'dishes':dish_list}}),201
-        else:
-            return jsonify('Menu ID not found'),401
-    except DataError as e:
-        db.session.rollback()
-        return jsonify('Bad Request: Incorrect data format/type'),400
+        if not menu:
+            return jsonify({'message': 'Menu ID not found'}), 404
+
+        categories = menu.get_categories()
+        menu_response = {"menu": menu.serialize()}
+        dish_list = {}
+
+        for category in categories:
+            dishes = Dish.query.filter_by(menuID=menu_id, category=category).order_by(Dish.id).all()
+            dish_list[category] = [dish.serialize() for dish in dishes] if dishes else 'No dishes in this category'
+
+        return jsonify({**menu_response, **{'dishes': dish_list}}), 200
     except Exception as e:
-         db.session.rollback()
-         return jsonify('Server error: Failed to process request'), 500
+        db.session.rollback()
+        return jsonify({'message': 'Server error: Failed to process request'}), 500
 
 @api.route('/restaurants', methods=['GET'])
 def get_restaurants():
     try:
         restaurants = Restaurant.query.all()
         if not restaurants:
-            return jsonify({'message': 'Restaurants not found'}), 404
-
-        res_list = [res.serialize() for res in restaurants]
-        menu_list = []
-
-        for res in res_list:
-            menu = Menu.query.filter_by(restaurant_id=res["id"]).first() 
-            menu_data = menu.serialize() if menu else None
-            menu_list.append({'restaurant': res, 'menu': menu_data})
-
-        return jsonify(menu_list), 200  
-    except DataError:
-        db.session.rollback()
-        return jsonify({'message': 'Bad Request: Incorrect data format/type'}), 400
+            return jsonify({'message': 'No restaurants found'}), 404
+        return jsonify([res.serialize() for res in restaurants]), 200  
     except Exception as e:
         db.session.rollback()
-        print("Error:", str(e)) 
         return jsonify({'message': 'Server error: Failed to process request'}), 500
+
     
 @api.route('/restaurant/menus/<int:restaurantID>', methods=['GET'])
 def get_restaurant(restaurantID):
     try:
-        menus=Menu.query.filter_by(restaurantID=restaurantID).order_by(Menu.id).all()
-        if menus:
-            menu_list = [menu.serialize() for menu in menus]
-            return jsonify(menu_list),201
-        else:
-            return jsonify('No menus at the moment'),201
-    except DataError as e:
-        db.session.rollback()
-        return jsonify('Bad Request: Incorrect data format/type'),400
+        menus = Menu.query.filter_by(restaurantID=restaurantID).order_by(Menu.id).all()
+        if not menus:
+            return jsonify({'message': 'No menus at the moment'}), 404
+        return jsonify([menu.serialize() for menu in menus]), 200
     except Exception as e:
-         db.session.rollback()
-         return jsonify('Server error: Failed to process request'), 500
+        db.session.rollback()
+        return jsonify({'message': 'Server error: Failed to process request'}), 500
     
+
 @api.route('/favorites', methods=['POST'])
 def add_favorite():
     data = request.json
@@ -352,7 +330,7 @@ def add_favorite():
 
 @api.route('/favorites/<int:favorite_id>', methods=['DELETE'])
 def remove_favorite(favorite_id):
-    favorite = Favorites.query.get(favorite_id)
+    favorite = Favorites.query.filter_by(id=favorite_id).first()
     if not favorite:
         return jsonify({"error": "Favorite not found"}), 404
 
@@ -362,6 +340,7 @@ def remove_favorite(favorite_id):
         return jsonify({"message": "Favorite removed"}), 200
     except Exception as e:
         db.session.rollback()
+        print(f"Error in remove_favorite: {e}") 
         return jsonify({"error": "Failed to remove favorite"}), 500       
 
 @api.route('/favorites/<int:client_id>', methods=['GET'])
