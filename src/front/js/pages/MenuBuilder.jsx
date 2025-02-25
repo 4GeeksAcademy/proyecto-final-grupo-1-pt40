@@ -46,7 +46,7 @@ const MenuBuilder = () => {
 
   const addDish = async () => {
     if (newDish.name && newDish.price && selectedCategory) {
-      await actions.menuBuilderAddDish(id, newDish, selectedCategory)
+      await actions.menuBuilderAddDish(menuID, newDish, selectedCategory)
       setNewDish({ name: "", description: "", price: "", category: "", image: "" });
     }
   };

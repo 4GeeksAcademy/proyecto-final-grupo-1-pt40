@@ -27,7 +27,7 @@ class Client(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=True)
     username = db.Column(db.String(80), unique=True, nullable=True)
-    password_hash = db.Column(db.String(256), nullable=True)
+    password_hash = db.Column(db.String(500), nullable=True)
     department = db.Column(db.String(100), nullable=True)
     city = db.Column(db.String(100), nullable=True)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
@@ -39,6 +39,7 @@ class Client(db.Model):
     
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
     def serialize(self):
         return{
             'id':self.id,

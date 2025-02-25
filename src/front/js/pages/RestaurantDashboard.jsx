@@ -57,7 +57,7 @@ const RestaurantDashboard = () => {
                                         <p>{`Creado: ${menu.created}`}</p>
                                         <p>{`Última actialización: ${menu.last_updated}`}</p>
                                     </Card.Text>
-                                    <Card.Link href="/menu-builder">Edit Menu</Card.Link>
+                                    <Card.Link href={`/menu-builder/${menu.id}`}>Edit Menu</Card.Link>
                                     <Card.Link href={`/menu/${menu.id}`}>View Menu</Card.Link>
                                 </Card.Body>
                             </Card>

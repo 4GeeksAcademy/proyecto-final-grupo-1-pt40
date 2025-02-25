@@ -25,6 +25,7 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
 @api.route('/register/client', methods=['POST'])
 def client_registration():
     data = request.json
@@ -47,7 +48,7 @@ def client_registration():
         new_client.set_password(password)
         db.session.add(new_client)
         db.session.commit()
-        return jsonify(new_client.serialize()), 201
+        return jsonify({"id":new_client.id}), 201
     except DataError as e:
         db.session.rollback()
         return jsonify('Bad Request: Incorrect data format/type'),400
@@ -63,6 +64,7 @@ def restaurant_registration():
     password = data.get('password')
     department = data.get('department')
     city = data.get('city')
+
     not_unique_email = Restaurant.query.filter_by(email=email).first()
     not_unique_username = Restaurant.query.filter_by(username=username).first()
 
@@ -101,7 +103,7 @@ def client_login():
         if client:
             login = client.check_password(password)
             if login:
-                return(jsonify(client.serialize())), 201
+                return({"id":client.id}), 201
             else:
                 return({"message":"Check your username/email and password"}),400
         return ({"message":"Email/username not found"}),400
@@ -128,7 +130,7 @@ def restaurant_login():
         if restaurant:
             login = restaurant.check_password(password)
             if login:
-                return(jsonify(restaurant.serialize())), 201
+                return(jsonify({"id":restaurant.id})), 201
             else:
                 return({"message":"Check your username/email and password"}),400
         return ({"message":"Email/username not found"}),400
