@@ -1,11 +1,9 @@
-import { useParams } from "react-router-dom";
-
 const getState = ({ getStore, getActions, setStore }) => {
     return {
         store: {
             client: {},
             restaurant: {},
-            menuBuilder: { "menu": { "categories": [] } },
+            menuBuilder: {'menu':{'categories':[]}},
             menu: {},
             favorites: [],
             menuList: [],
@@ -86,7 +84,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         throw new Error(res.statusText);
                     }
                     const menu = await response.json()
-
+                    console.log(menu)
                     setStore({ ...store, menuBuilder: menu });
                     return true
                 }
@@ -176,6 +174,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
                     setStore({
+                        ...store,
                         menuBuilder: {
                             ...store.menuBuilder,
                             dishes: updatedDishes,
@@ -279,9 +278,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
 
                     const menus = await response.json()
-                    setStore({...store, menuList: menus})
+                    setStore({ ...store, menuList: menus })
                 } catch (error) {
-                    console.error('Error loading Menu Builder:',error);
+                    console.error('Error loading Menu Builder:', error);
                 }
             },
 
