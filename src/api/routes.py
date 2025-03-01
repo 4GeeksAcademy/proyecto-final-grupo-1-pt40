@@ -1,13 +1,13 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from api.models import db, Client, Restaurant, Menu, Dish,Favorites
+from api.models import db, Client, Restaurant, Menu, Dish,Favorites,Admin
 from flask import Flask, request, jsonify, url_for, Blueprint, Response,send_file
 from werkzeug.utils import secure_filename
 from sqlalchemy.exc import DataError
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
-
+from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 
 api = Blueprint('api', __name__)
 
@@ -136,13 +136,12 @@ def client_login():
     else:
         return jsonify({"error":"Complete login information"}),400
     try:
-        if client:
-            login = client.check_password(password)
-            if login:
-                return({"id":client.id}), 201
-            else:
-                return({"message":"Check your username/email and password"}),400
-        return ({"message":"Email/username not found"}),400
+        if client and client.check_password(password):
+       
+            access_token = create_access_token(identity={"id": client.id, "role": "client"})
+            return jsonify({"token": access_token}), 200
+    
+        return jsonify({"message": "Check your username/email and password"}), 400
     except DataError as e:
         db.session.rollback()
         return jsonify('Bad Request: Incorrect data format/type'),400
@@ -163,13 +162,12 @@ def restaurant_login():
     else:
         return jsonify({"error":"Complete login information"}),400
     try:
-        if restaurant:
-            login = restaurant.check_password(password)
-            if login:
-                return(jsonify({"id":restaurant.id})), 201
-            else:
-                return({"message":"Check your username/email and password"}),400
-        return ({"message":"Email/username not found"}),400
+        if restaurant and restaurant.check_password(password):
+       
+            access_token = create_access_token(identity={"id": restaurant.id, "role": "restaurant"})
+            return jsonify({"token": access_token}), 200
+    
+        return jsonify({"message": "Check your username/email and password"}), 400
     except DataError as e:
         db.session.rollback()
         return jsonify('Bad Request: Incorrect data format/type'),400
@@ -178,23 +176,32 @@ def restaurant_login():
          return jsonify('Server error: Failed to process request'), 500
     
 @api.route('/new/menu', methods=['POST'])
+@jwt_required()
 def add_menu():
-    data = request.json
+    data = request.json()
+    if not data:
+        return jsonify({"error": "Invalid request, JSON body required"}), 400
+    
+    name = data.get("name")
+    currency = data.get("currency")
+    restaurant_identity = get_jwt_identity()  
+    restaurant_id = restaurant_identity.get("id")
+    role = restaurant_identity.get("role")
+
+    if role != "restaurant":
+            return jsonify({"error": "Unauthorized: Only restaurants can create menus"}), 403
     try:
-        if data["name"] and data["restaurantID"] and data['currency']:
-            new_menu = Menu(name=data["name"], restaurantID=data["restaurantID"], currency=data['currency'])
-            db.session.add(new_menu)
-            db.session.commit()
-            response = new_menu.serialize()
-            return jsonify(response), 201
-        else:
-             return jsonify('Bad Request: Request is missing data/fields'),400
+        new_menu = Menu(name=name, restaurant_id=restaurant_id, currency=currency)
+        db.session.add(new_menu)
+        db.session.commit()
+        return jsonify(new_menu.serialize()), 201
     except DataError as e:
         db.session.rollback()
-        return jsonify('Bad Request: Incorrect data format/type'),400
+        return jsonify({"error": f"Bad Request: {e.args[0]}"}), 400
     except Exception as e:
-         db.session.rollback()
-         return jsonify('Server error: Failed to process request'), 500
+        db.session.rollback()
+       
+        return jsonify({"error": "Server error: Failed to process request"}), 500
 
 @api.route('/publish/menu/<int:menuID>', methods=['PUT'])
 def publish_menu(menuID):
@@ -261,8 +268,8 @@ def add_dish():
     description = data.get('description',None)
     image_URL = data.get('image',None)
     try:
-        if data["name"] and data["category"] and data["price"] and data["menuID"]:
-            new_dish = Dish(name=data['name'], category=data['category'], price=float(data["price"]),menuID=data["menuID"],description=description, image_URL=image_URL)
+        if data["name"] and data["category"] and data["price"] and data["menu_id"]:
+            new_dish = Dish(name=data['name'], category=data['category'], price=float(data["price"]),menu_id=data["menu_id"],description=description, image_URL=image_URL)
             if new_dish:
                 db.session.add(new_dish)
                 db.session.commit()
@@ -324,7 +331,7 @@ def delete_dish_category():
 def edit_dish():
     data = request.get_json()
     try:
-        edit_dish = Dish.query.filter_by(id=data["dishID"]).first()
+        edit_dish = Dish.query.filter_by(id=data["dish_id"]).first()
         if edit_dish:
             for key, value in data.items():
                 if hasattr(edit_dish, key):
@@ -345,10 +352,10 @@ def edit_dish():
 @api.route('/menu/categories', methods=['PUT'])
 def menu_categories():
     data = request.get_json()
-    menuID = data.get('menuID')
+    menu_id = data.get('menu_id')
     categories_list = data.get('categories',None)
     try:
-        menu = Menu.query.filter_by(id=menuID).first()
+        menu = Menu.query.filter_by(id=menu_id).first()
         if menu:
             menu.set_categories(categories_list)
             db.session.commit()
@@ -374,7 +381,7 @@ def get_menu(menu_id):
         dish_list = {}
 
         for category in categories:
-            dishes = Dish.query.filter_by(menuID=menu_id, category=category).order_by(Dish.id).all()
+            dishes = Dish.query.filter_by(menu_id=menu_id, category=category).order_by(Dish.id).all()
             dish_list[category] = [dish.serialize() for dish in dishes] if dishes else 'No dishes in this category'
 
         return jsonify({**menu_response, **{'dishes': dish_list}}), 200
@@ -394,10 +401,10 @@ def get_restaurants():
         return jsonify({'message': 'Server error: Failed to process request'}), 500
 
     
-@api.route('/restaurant/menus/<int:restaurantID>', methods=['GET'])
-def get_restaurant(restaurantID):
+@api.route('/restaurant/menus/<int:restaurant_id>', methods=['GET'])
+def get_restaurant_menus(restaurant_id):
     try:
-        menus = Menu.query.filter_by(restaurantID=restaurantID).order_by(Menu.id).all()
+        menus = Menu.query.filter_by(restaurant_id=restaurant_id).order_by(Menu.id).all()
         if not menus:
             return jsonify({'message': 'No menus at the moment'}), 404
         
@@ -408,47 +415,109 @@ def get_restaurant(restaurantID):
     
 
 @api.route('/favorites', methods=['POST'])
+@jwt_required()
 def add_favorite():
-    data = request.json
-    client_id = data.get("client_id")
+   
+    data = request.get_json()
+    client_identity = get_jwt_identity()  
+    client_id = client_identity.get("id")  
+    menu_id = data.get("menu_id")
     dish_id = data.get("dish_id")
+    restaurant_id = data.get("restaurant_id")
 
-    if not client_id or not dish_id:
-        return jsonify({"error": "Missing client_id or dish_id"}), 400
+    if sum(bool(x) for x in [menu_id, dish_id, restaurant_id]) != 1:
+        return jsonify({"error": "Debes proporcionar SOLO un `menu_id`, `dish_id` o `restaurant_id`"}), 400
 
-    existing_favorite = Favorites.query.filter_by(client_id=client_id, dish_id=dish_id).first()
+    existing_favorite = Favorites.query.filter_by(client_id=client_id, menu_id=menu_id, dish_id=dish_id).first()
     if existing_favorite:
-        return jsonify({"message": "Dish is already in favorites"}), 400
+        return jsonify({"error": "Este elemento ya está en tus favoritos"}), 400
+    
+    existing_favorite = Favorites.query.filter_by(
+        client_id=client_id, menu_id=menu_id, dish_id=dish_id, restaurant_id=restaurant_id
+    ).first()
+
+    if existing_favorite:
+        return jsonify({"error": "Este elemento ya está en tus favoritos"}), 400
+   
 
     try:
-        new_favorite = Favorites(client_id=client_id, dish_id=dish_id)
+        new_favorite = Favorites(
+            client_id=client_id, 
+            menu_id=menu_id if menu_id else None, 
+            dish_id=dish_id if dish_id else None, 
+            restaurant_id=restaurant_id if restaurant_id else None
+        )
         db.session.add(new_favorite)
         db.session.commit()
-        return jsonify({"message": "Dish added to favorites"}), 201
+        return jsonify({"message": "Favorito agregado"}), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "Failed to add favorite"}), 500
 
 @api.route('/favorites/<int:favorite_id>', methods=['DELETE'])
 def remove_favorite(favorite_id):
-    favorite = Favorites.query.filter_by(id=favorite_id).first()
+    client_identity = get_jwt_identity()
+    client_id = client_identity.get("id")
+
+    favorite = Favorites.query.filter_by(id=favorite_id, client_id=client_id).first()
+
     if not favorite:
-        return jsonify({"error": "Favorite not found"}), 404
+        return jsonify({"error": "Favorito no encontrado"}), 404
 
     try:
         db.session.delete(favorite)
         db.session.commit()
-        return jsonify({"message": "Favorite removed"}), 200
+        return jsonify({"message": "Favorito eliminado"}), 200
     except Exception as e:
         db.session.rollback()
-        print(f"Error in remove_favorite: {e}") 
-        return jsonify({"error": "Failed to remove favorite"}), 500       
+        return jsonify({"error": "No se pudo eliminar el favorito"}), 500     
 
-@api.route('/favorites/<int:client_id>', methods=['GET'])
-def get_favorites(client_id):
+@api.route('/favorites', methods=['GET'])
+@jwt_required()
+def get_favorites(client_id): 
+    client_identity = get_jwt_identity()
+    client_id = client_identity.get("id")
+
     favorites = Favorites.query.filter_by(client_id=client_id).all()
+    
     if not favorites:
-        return jsonify({"message": "No favorites found"}), 200
+        return jsonify({"message": "No tienes favoritos aún"}), 200
 
-    favorite_dishes = [fav.serialize() for fav in favorites]
-    return jsonify(favorite_dishes), 200     
+    return jsonify([fav.serialize() for fav in favorites]), 200
+
+@api.route('/profile', methods=['GET'])
+@jwt_required()
+def profile():
+    current_user = get_jwt_identity()  
+    return jsonify({"user": current_user}), 200
+
+ADMIN_EMAILS = {"felipe@alpunto.com",
+"gloria@alpunto.com",
+"laura@alpunto.com",
+"maria@alpunto.com"}
+
+@api.route('/login/admin', methods=['POST'])
+def admin_login():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    admin = Admin.query.filter_by(email=email).first()
+
+    if admin and admin.check_password(password):
+        if email in ADMIN_EMAILS:  
+            access_token = create_access_token(identity={"id": admin.id, "role": "admin"})
+            return jsonify({"token": access_token}), 200
+        return jsonify({"error": "Unauthorized"}), 403
+    
+    return jsonify({"message": "Check your email and password"}), 400
+
+@api.route('/admin/dashboard', methods=['GET'])
+@jwt_required()
+def admin_dashboard():
+    user = get_jwt_identity()
+    
+    if user["role"] != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    return jsonify({"message": "Welcome, Admin!"}), 200
