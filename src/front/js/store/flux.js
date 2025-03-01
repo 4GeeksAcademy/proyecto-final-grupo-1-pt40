@@ -12,17 +12,18 @@ const getState = ({ getStore, getActions, setStore }) => {
             restaurants: []
         },
         actions: {
-            registerUser: async (userType, email, password, username, department, city) => {
+            registerRestaurant: async (userType, email, password, username, department, city, name, schedule, cuisine_type, exact_address, social_networks, phone, description,image) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 const endpoint = `${backendUrl}/api/register/${userType}`.replace(/([^:]\/)\/+/g, "$1");
 
                 try {
+                    console.log("Enviando horario al backend:", JSON.stringify(schedule));
                     const response = await fetch(endpoint, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
-                        body: JSON.stringify({ email, password, username, department, city }),
+                        body: JSON.stringify({ email, password, username, department, city, name, schedule, cuisine_type, exact_address, social_networks, phone, description,image }),
                     });
 
                     if (!response.ok) {
@@ -236,6 +237,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     if (!response.ok) throw new Error("Error al cargar la vista del menú");
 
                     const data = await response.json();
+                  
                     setStore({...store, menu: data });
                     return true;
                 } catch (error) {
@@ -448,6 +450,76 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
+            getRestaurantDetails: async (restaurantId) => {
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/restaurants/${restaurantId}`);
+                    
+                    if (!response.ok) {
+                        throw new Error("No se pudo obtener la información del restaurante");
+                    }
+                    
+                    const data = await response.json();
+                    console.log("Datos recibidos del backend:", data);
+                    setStore({ restaurantDetails: data });
+            
+                    return data;  
+                } catch (error) {
+                    console.log("Error al obtener los detalles del restaurante:", error);
+                    return null;
+                }
+            },
+                        
+            updateRestaurant: async (restaurantId, updatedData) => {
+                try {
+                    if (!process.env.BACKEND_URL) {
+                        console.error("Error: BACKEND_URL no está definido en las variables de entorno.");
+                        return false;
+                    }
+            
+                    const id = Number(restaurantId);
+                    if (isNaN(id) || id <= 0) {
+                        console.error("Error: restaurantId debe ser un número válido:", restaurantId);
+                        return false;
+                    }
+            
+                    if (!updatedData || typeof updatedData !== "object" || Array.isArray(updatedData)) {
+                        console.error("Error: updatedData debe ser un objeto JSON válido:", updatedData);
+                        return false;
+                    }
+            
+                    // ✅ Verifica si updatedData.schedule tiene el formato esperado
+                    if (updatedData.schedule && (!updatedData.schedule.week || !updatedData.schedule.weekend)) {
+                        console.error("❌ Error: El objeto 'schedule' no tiene la estructura correcta.");
+                        return false;
+                    }
+            
+                    // ✅ Construcción segura de la URL
+                    const url = `${process.env.BACKEND_URL.replace(/\/$/, "")}/api/restaurants/${id}`;
+                    console.log("URL de la solicitud PUT:", url);
+            
+                    // ✅ Enviar la petición
+                    const response = await fetch(url, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(updatedData)
+                    });
+            
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error(`Error en la API (${response.status}):`, errorText);
+                        return false;
+                    }
+            
+                    console.log("✅ Restaurante actualizado correctamente.");
+                    return true;
+                } catch (error) {
+                    console.error("❌ Error actualizando restaurante:", error);
+                    return false;
+                }
+            },
+            
+            
+            
         }
     }
 

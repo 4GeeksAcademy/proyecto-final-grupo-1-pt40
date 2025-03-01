@@ -63,8 +63,8 @@ class Restaurant(db.Model):
     phone = db.Column(db.String(20), nullable=True)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     description = db.Column(db.Text, nullable=True)
-    image_URL = db.Column(db.String(255), nullable=True)
-
+    image = db.Column(db.String(255), nullable=True)
+    
     menus = relationship('Menu', back_populates='restaurant')
     notifications = relationship('RestaurantNotifications', back_populates='restaurant')
     favorites = relationship('Favorites', back_populates='restaurant')
@@ -82,7 +82,8 @@ class Restaurant(db.Model):
             'name':self.name,
             'username':self.username,
             'email':self.email,
-            'image_URL':self.image_URL,
+            'schedule': self.schedule,
+            'image': self.image
             'department':self.department,
             'city':self.city,
             'schedule':self.schedule,
@@ -91,7 +92,6 @@ class Restaurant(db.Model):
             'social_networks':self.social_networks,
             'phone': self.phone,
             'description':self.description,
-            'image_URL':self.image_URL
         }
 
 class Menu(db.Model):

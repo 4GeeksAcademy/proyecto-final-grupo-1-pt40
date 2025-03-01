@@ -61,7 +61,7 @@ const RestaurantDashboard = () => {
                                 <Link className="nav-link" to="/restaurant-form">Agregar Información</Link>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link" to="/restaurant-profile">Mi Perfil</Link>
+                            <Link className="nav-link" to={`/restaurant-profile/${id}`}>Mi Perfil</Link>
                             </li>
                         </ul>
                     </div>

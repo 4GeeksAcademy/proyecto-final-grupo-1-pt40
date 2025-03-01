@@ -8,6 +8,8 @@ from sqlalchemy.exc import DataError
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
+import json
+
 
 api = Blueprint('api', __name__)
 
@@ -59,11 +61,21 @@ def client_registration():
 @api.route('/register/restaurant', methods=['POST'])
 def restaurant_registration():
     data = request.json
+    print("🔹 Datos recibidos en Flask:", data)  # 🔍 Verifica si llega bien
+    print("🔹 Horario recibido:", data.get("schedule"))  # 🔍 Verifica si el horario llega con el formato correcto
     email = data.get('email')
     username =  data.get('username')
     password = data.get('password')
     department = data.get('department')
     city = data.get('city')
+    name = data.get('name')
+    schedule = data.get('schedule')
+    cuisine_type = data.get('cuisine_type')
+    exact_address = data.get('exact_address')
+    social_networks = data.get('social_networks')
+    phone = data.get('phone')
+    description = data.get('description')
+    image = data.get('image')
 
     not_unique_email = Restaurant.query.filter_by(email=email).first()
     not_unique_username = Restaurant.query.filter_by(username=username).first()
@@ -74,7 +86,7 @@ def restaurant_registration():
         return jsonify({"error":'Username is already in use'}),400
     
     try:
-        new_restaurant = Restaurant(email=email, username=username, department=department,city=city)
+        new_restaurant = Restaurant(email=email, username=username, department=department,city=city, name=name, schedule=schedule, cuisine_type=cuisine_type, exact_address=exact_address, social_networks=social_networks, phone=phone, description=description, image=image)
         new_restaurant.set_password(password)
         db.session.add(new_restaurant)
         db.session.commit()
@@ -479,11 +491,11 @@ def get_favorites(client_id):
     client_id = client_identity.get("id")
 
     favorites = Favorites.query.filter_by(client_id=client_id).all()
-    
     if not favorites:
         return jsonify({"message": "No tienes favoritos aún"}), 200
-
-    return jsonify([fav.serialize() for fav in favorites]), 200
+      
+    favorite_dishes = [fav.serialize() for fav in favorites]
+    return jsonify(favorite_dishes), 200    
 
 @api.route('/profile', methods=['GET'])
 @jwt_required()
@@ -516,8 +528,69 @@ def admin_login():
 @jwt_required()
 def admin_dashboard():
     user = get_jwt_identity()
-    
     if user["role"] != "admin":
         return jsonify({"error": "Unauthorized"}), 403
-
     return jsonify({"message": "Welcome, Admin!"}), 200
+
+
+
+@api.route('/restaurants/<int:restaurant_id>', methods=['GET'])
+def get_restaurant_by_id(restaurant_id):
+    restaurant = Restaurant.query.get(restaurant_id)
+    
+    if restaurant is None:
+        return jsonify({'error': 'Restaurant not found'}), 404
+
+    return jsonify({
+        'id': restaurant.id,
+        'email': restaurant.email,
+        'username': restaurant.username,
+        'name': restaurant.name,
+        'department': restaurant.department,
+        'city': restaurant.city,
+        'schedule': restaurant.schedule, 
+        'cuisine_type': restaurant.cuisine_type,
+        'exact_address': restaurant.exact_address,
+        'social_networks': restaurant.social_networks,
+        'phone': restaurant.phone,
+        'description': restaurant.description,
+        'image': restaurant.image
+        # 'menus': [menu.name for menu in restaurant.menus],  # Listado de menús
+        # 'notifications': [notif.message for notif in restaurant.notifications]  # Mensajes de notificación
+    })
+
+
+@api.route('/restaurants/<int:restaurant_id>', methods=['PUT'])
+def update_restaurant(restaurant_id):
+    try:
+        restaurant = Restaurant.query.get(restaurant_id)
+        if not restaurant:
+            return jsonify({"msg": "Restaurante no encontrado"}), 404
+
+        data = request.get_json() 
+
+        if not data:
+            return jsonify({"msg": "Datos inválidos"}), 400
+
+        restaurant.email = data.get('email', restaurant.email)
+        restaurant.username = data.get('username', restaurant.username)
+        restaurant.city = data.get('city', restaurant.city)
+        restaurant.department = data.get('department', restaurant.department)
+        restaurant.name = data.get('name', restaurant.name)
+        restaurant.schedule = data.get('schedule', restaurant.schedule)
+        restaurant.cuisine_type = data.get('cuisine_type', restaurant.cuisine_type)
+        restaurant.exact_address = data.get('exact_address', restaurant.exact_address)
+        restaurant.social_networks = data.get('social_networks', restaurant.social_networks)
+        restaurant.phone = data.get('phone', restaurant.phone)
+        restaurant.description = data.get('description', restaurant.description)
+
+        db.session.commit()
+
+        return jsonify({
+            "msg": "Restaurante actualizado correctamente",
+            "restaurant": restaurant.serialize() 
+        }), 200
+
+    except Exception as e:
+        db.session.rollback() 
+        return jsonify({"msg": "Error al actualizar el restaurante", "error": str(e)}), 500
