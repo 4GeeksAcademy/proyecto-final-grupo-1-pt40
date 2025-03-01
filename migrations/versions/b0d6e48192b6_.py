@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 41aadf70d33e
+Revision ID: b0d6e48192b6
 Revises: 
-Create Date: 2025-02-25 04:03:55.520514
+Create Date: 2025-03-01 02:33:47.756138
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '41aadf70d33e'
+revision = 'b0d6e48192b6'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -78,12 +78,12 @@ def upgrade():
     )
     op.create_table('menu',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=100), nullable=False),
+    sa.Column('name', sa.String(length=120), nullable=False),
     sa.Column('created', sa.DateTime(), nullable=True),
     sa.Column('last_updated', sa.DateTime(), nullable=True),
     sa.Column('categories', sa.Text(), nullable=True),
-    sa.Column('restaurantID', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['restaurantID'], ['restaurant.id'], ),
+    sa.Column('restaurant_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['restaurant_id'], ['restaurant.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('restaurant_notifications',
@@ -99,23 +99,25 @@ def upgrade():
     )
     op.create_table('dish',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('menuID', sa.Integer(), nullable=False),
+    sa.Column('menu_id', sa.Integer(), nullable=False),
     sa.Column('category', sa.String(length=100), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('price', sa.Float(), nullable=False),
     sa.Column('description', sa.String(length=255), nullable=True),
     sa.Column('image_URL', sa.String(length=255), nullable=True),
-    sa.ForeignKeyConstraint(['menuID'], ['menu.id'], ),
+    sa.ForeignKeyConstraint(['menu_id'], ['menu.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('favorites',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('menu_id', sa.Integer(), nullable=True),
-    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('client_id', sa.Integer(), nullable=False),
     sa.Column('dish_id', sa.Integer(), nullable=True),
+    sa.Column('restaurant_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['client_id'], ['client.id'], ),
     sa.ForeignKeyConstraint(['dish_id'], ['dish.id'], ),
     sa.ForeignKeyConstraint(['menu_id'], ['menu.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['client.id'], ),
+    sa.ForeignKeyConstraint(['restaurant_id'], ['restaurant.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

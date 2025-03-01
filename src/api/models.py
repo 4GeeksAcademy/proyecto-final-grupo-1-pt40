@@ -43,9 +43,9 @@ class Client(db.Model):
     def serialize(self):
         return{
             'id':self.id,
-            'name':self.name,
             'username':self.username,
             'email':self.email
+            
         }
 
 class Restaurant(db.Model):
@@ -66,6 +66,8 @@ class Restaurant(db.Model):
 
     menus = relationship('Menu', back_populates='restaurant')
     notifications = relationship('RestaurantNotifications', back_populates='restaurant')
+    favorites = relationship('Favorites', back_populates='restaurant')
+
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -83,11 +85,12 @@ class Restaurant(db.Model):
 
 class Menu(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(120), nullable=False)
     created = db.Column(db.DateTime,default=db.func.now())
     last_updated = db.Column(db.DateTime, default=db.func.now(),onupdate=db.func.now())
     categories = db.Column(db.Text, nullable=True)
-    restaurantID = db.Column(db.Integer, ForeignKey('restaurant.id'), nullable=False)
+    restaurant_id = db.Column(db.Integer, ForeignKey('restaurant.id'), nullable=False)
+    
 
     restaurant = relationship('Restaurant', back_populates='menus')
     dishes = relationship('Dish', back_populates='menu')
@@ -105,7 +108,7 @@ class Menu(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "restaurantID":self.restaurantID,
+            "restaurant_id":self.restaurant_id,
             "created":self.created,
             "last_updated":self.last_updated,
             "categories": self.get_categories()
@@ -113,7 +116,7 @@ class Menu(db.Model):
     
 class Dish(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    menuID = db.Column(db.Integer, ForeignKey('menu.id'), nullable=False)
+    menu_id = db.Column(db.Integer, ForeignKey('menu.id'), nullable=False)
     category = db.Column(db.String(100), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
@@ -121,13 +124,14 @@ class Dish(db.Model):
     image_URL = db.Column(db.String(255), nullable=True)
 
     menu = relationship('Menu', back_populates='dishes')
+    favorites = relationship('Favorites', back_populates='dish')
 
     def serialize(self):
         return {
             "id":self.id,
             "name": self.name,
             "description":self.description,
-            "menuID": self.menuID,
+            "menu_id": self.menu_id,
             "category": self.category,
             "price": float(self.price),
             "image":self.image_URL,
@@ -136,13 +140,24 @@ class Dish(db.Model):
 
 class Favorites(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    menu_id = db.Column(db.Integer, ForeignKey('menu.id'))
-    user_id = db.Column(db.Integer, ForeignKey('client.id'))
-    dish_id = db.Column(db.Integer, ForeignKey('dish.id'))
+    menu_id = db.Column(db.Integer, ForeignKey('menu.id'),nullable=True)
+    client_id = db.Column(db.Integer, ForeignKey('client.id'),nullable=False)
+    dish_id = db.Column(db.Integer, ForeignKey('dish.id'),nullable=True)
+    restaurant_id=db.Column(db.Integer,ForeignKey('restaurant.id'),nullable=True)
 
     client = relationship('Client', back_populates='favorites')
     menu = relationship('Menu', back_populates='favorites')
-    dish = relationship('Dish')
+    dish = relationship('Dish', back_populates='favorites')
+    restaurant =relationship('Restaurant',back_populates='favorites')
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "client_id": self.client_id,
+            "menu": self.menu.serialize() if self.menu else None,
+            "dish": self.dish.serialize() if self.dish else None,
+            "restaurant_id": self.restaurant_id
+        }
 
 class RestaurantNotifications(db.Model):
     id = db.Column(db.Integer, primary_key=True)
