@@ -7,6 +7,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             menu: {},
             favorites: [],
             menuList: [],
+            restaurantMenu: [],
             menuRestaurant: [],
             restaurants: []
         },
@@ -40,7 +41,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            loginUser: async (userType, email, password, navigate) => {
+            loginUser: async (userType, email, password) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 const endpoint = `${backendUrl}/api/login/${userType}`.replace(/([^:]\/)\/+/g, "$1");
 
@@ -78,20 +79,17 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
             menuBuilderLoad: async (menuID) => {
+                const store = getStore()
                 try {
-
                     const response = await fetch(`${process.env.BACKEND_URL}api/menu/${menuID}`);
                     if (!response.ok) throw new Error("Error al cargar el menú");
 
                     const data = await response.json();
-                    setStore({ menuBuilder: { ...getStore().menuBuilder, menu: data } });
+                    setStore({ ...store, menuBuilder: data });
                     return true;
                 } catch (error) {
                     console.error("Error en menuBuilderLoad:", error);
                     return false;
-
-
-
                 }
             },
 
@@ -111,9 +109,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
                     const menuDetails = await response.json()
                     setStore({ ...store, menuBuilder: { ...store.menuBuilder, menu: menuDetails } });
+                    return true
                 }
-                catch {
-                    console.error('Error loading Menu Builder categories');
+                catch (error) {
+                    console.error('Error loading Menu Builder categories', error);
+                    return false
                 }
             },
 
@@ -157,7 +157,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            menuBuilderDeleteDish: async (menuID, dishID, category) => {
+            menuBuilderDeleteDish: async (dishID, category) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
@@ -231,12 +231,14 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
             menuViewLoad: async (menuID) => {
+                const store = getStore();
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}api/menu/view/${menuID}`);
+                    const response = await fetch(`${process.env.BACKEND_URL}api/menu/${menuID}`);
                     if (!response.ok) throw new Error("Error al cargar la vista del menú");
 
                     const data = await response.json();
-                    setStore({ menuView: data });
+                  
+                    setStore({...store, menu: data });
                     return true;
                 } catch (error) {
                     console.error("Error en menuViewLoad:", error);
@@ -244,14 +246,14 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            createMenu: async (name, restaurantID) => {
+            createMenu: async (menuInfo) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
                     const response = await fetch(`${backendURL}api/new/menu`, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ name: name, restaurantID: restaurantID })
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
+                        body: JSON.stringify({ name: menuInfo['name'], currency: menuInfo['currency'] })
                     }
                     )
                     if (!response.ok) {
@@ -261,8 +263,71 @@ const getState = ({ getStore, getActions, setStore }) => {
                     localStorage.setItem('menuID', data.id)
                     return data
                 }
+                catch (error) {
+                    console.error('Error creating menu', error);
+                }
+            },
+
+            deleteMenu: async (menuID) => {
+                const backendURL = process.env.BACKEND_URL
+                const store = getStore();
+                try {
+                    const response = await fetch(`${backendURL}api/delete/menu/${menuID}`,
+                        {
+                            method: "DELETE",
+                            headers: { "Content-Type": "application/json" }
+                        })
+
+                    if (!response.ok) {
+                        throw new Error(res.statusText);
+                    }
+
+                    return true
+                }
                 catch {
-                    console.error('Error creating menu');
+                    console.error('Error deleting Menu ')
+                }
+            },
+
+            publishMenu: async (menuID) => {
+                const backendURL = process.env.BACKEND_URL
+                const store = getStore();
+                try {
+                    const response = await fetch(`${backendURL}api/publish/menu/${menuID}`,
+                        {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" }
+                        })
+
+                    if (!response.ok) {
+                        throw new Error(res.statusText);
+                    }
+
+                    return true
+                }
+                catch {
+                    console.error('Error publishing Menu');
+                }
+            },
+
+            unpublishMenu: async (menuID) => {
+                const backendURL = process.env.BACKEND_URL
+                const store = getStore();
+                try {
+                    const response = await fetch(`${backendURL}api/unpublish/menu/${menuID}`,
+                        {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" }
+                        })
+
+                    if (!response.ok) {
+                        throw new Error(res.statusText);
+                    }
+
+                    return true
+                }
+                catch {
+                    console.error('Error publishing Menu');
                 }
             },
 
@@ -282,13 +347,14 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            getRestaurantMenus: async () => {
+            getRestaurantMenus: async (id) => {
+                const store = getStore()
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}api/restaurant/menus`);
+                    const response = await fetch(`${process.env.BACKEND_URL}api/restaurant/menus/${id}`);
                     if (!response.ok) throw new Error("Error al obtener los menús");
 
                     const data = await response.json();
-                    setStore({ restaurantMenus: data });
+                    setStore({ ...store, restaurantMenus: data });
                     return true;
                 } catch (error) {
                     console.error("Error en getRestaurantMenus:", error);
@@ -343,14 +409,15 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
             addFavorite: async (clientId, dishId) => {
+                //Corregir para que vaya acorder con el nuevo endpoint, acepta dish, menu y restaurante
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
                     const response = await fetch(`${backendUrl}/api/favorites`, {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json",
+                            "Content-Type": "application/json",'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                         },
-                        body: JSON.stringify({ client_id: clientId, dish_id: dishId }),
+                        body: JSON.stringify({dish_id: dishId }),
                     });
 
                     if (!response.ok) {
