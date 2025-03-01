@@ -3,10 +3,11 @@ const getState = ({ getStore, getActions, setStore }) => {
         store: {
             client: {},
             restaurant: {},
-            menuBuilder: {'menu':{'categories':[]}},
+            menuBuilder: { 'menu': { 'categories': [] } },
             menu: {},
             favorites: [],
             menuList: [],
+            restaurantMenu: [],
             menuRestaurant: [],
             restaurants: []
         },
@@ -77,20 +78,17 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
             menuBuilderLoad: async (menuID) => {
+                const store = getStore()
                 try {
-
                     const response = await fetch(`${process.env.BACKEND_URL}api/menu/${menuID}`);
                     if (!response.ok) throw new Error("Error al cargar el menú");
-            
+
                     const data = await response.json();
-                    setStore({ menuBuilder: { ...getStore().menuBuilder, menu: data } });
-                    return true; 
+                    setStore({ ...store, menuBuilder: data });
+                    return true;
                 } catch (error) {
                     console.error("Error en menuBuilderLoad:", error);
                     return false;
-
-                    
-
                 }
             },
 
@@ -110,9 +108,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
                     const menuDetails = await response.json()
                     setStore({ ...store, menuBuilder: { ...store.menuBuilder, menu: menuDetails } });
+                    return true
                 }
-                catch {
-                    console.error('Error loading Menu Builder categories');
+                catch (error) {
+                    console.error('Error loading Menu Builder categories', error);
+                    return false
                 }
             },
 
@@ -156,7 +156,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            menuBuilderDeleteDish: async (menuID, dishID, category) => {
+            menuBuilderDeleteDish: async (dishID, category) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
@@ -230,27 +230,28 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
             menuViewLoad: async (menuID) => {
+                const store = getStore();
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}api/menu/view/${menuID}`);
+                    const response = await fetch(`${process.env.BACKEND_URL}api/menu/${menuID}`);
                     if (!response.ok) throw new Error("Error al cargar la vista del menú");
-            
+
                     const data = await response.json();
-                    setStore({ menuView: data });
-                    return true; 
+                    setStore({...store, menu: data });
+                    return true;
                 } catch (error) {
                     console.error("Error en menuViewLoad:", error);
-                    return false; 
+                    return false;
                 }
             },
 
-            createMenu: async (name, restaurantID) => {
+            createMenu: async (menuInfo) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
                     const response = await fetch(`${backendURL}api/new/menu`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ name: name, restaurantID: restaurantID })
+                        body: JSON.stringify({ name: menuInfo['name'], restaurantID: menuInfo['restaurantID'], currency: menuInfo['currency'] })
                     }
                     )
                     if (!response.ok) {
@@ -260,8 +261,71 @@ const getState = ({ getStore, getActions, setStore }) => {
                     localStorage.setItem('menuID', data.id)
                     return data
                 }
+                catch (error) {
+                    console.error('Error creating menu', error);
+                }
+            },
+
+            deleteMenu: async (menuID) => {
+                const backendURL = process.env.BACKEND_URL
+                const store = getStore();
+                try {
+                    const response = await fetch(`${backendURL}api/delete/menu/${menuID}`,
+                        {
+                            method: "DELETE",
+                            headers: { "Content-Type": "application/json" }
+                        })
+
+                    if (!response.ok) {
+                        throw new Error(res.statusText);
+                    }
+
+                    return true
+                }
                 catch {
-                    console.error('Error creating menu');
+                    console.error('Error deleting Menu ')
+                }
+            },
+
+            publishMenu: async (menuID) => {
+                const backendURL = process.env.BACKEND_URL
+                const store = getStore();
+                try {
+                    const response = await fetch(`${backendURL}api/publish/menu/${menuID}`,
+                        {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" }
+                        })
+
+                    if (!response.ok) {
+                        throw new Error(res.statusText);
+                    }
+
+                    return true
+                }
+                catch {
+                    console.error('Error publishing Menu');
+                }
+            },
+
+            unpublishMenu: async (menuID) => {
+                const backendURL = process.env.BACKEND_URL
+                const store = getStore();
+                try {
+                    const response = await fetch(`${backendURL}api/unpublish/menu/${menuID}`,
+                        {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" }
+                        })
+
+                    if (!response.ok) {
+                        throw new Error(res.statusText);
+                    }
+
+                    return true
+                }
+                catch {
+                    console.error('Error publishing Menu');
                 }
             },
 
@@ -270,24 +334,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 
                     const response = await fetch(process.env.BACKEND_URL + "api/restaurants");
                     if (!response.ok) throw new Error("Failed to fetch restaurants");
-            
+
                     const restaurants = await response.json();
                     setStore({ ...getStore(), restaurants });
                     console.log("Restaurantes obtenidos:", restaurants);
                 } catch (error) {
                     console.error("Error loading restaurants:", error);
 
-                   
+
                 }
             },
 
-            getRestaurantMenus: async () => {
+            getRestaurantMenus: async (id) => {
+                const store = getStore()
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}api/restaurant/menus`);
+                    const response = await fetch(`${process.env.BACKEND_URL}api/restaurant/menus/${id}`);
                     if (!response.ok) throw new Error("Error al obtener los menús");
-            
+
                     const data = await response.json();
-                    setStore({ restaurantMenus: data });
+                    setStore({ ...store, restaurantMenus: data });
                     return true;
                 } catch (error) {
                     console.error("Error en getRestaurantMenus:", error);
@@ -300,11 +365,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error("Error: restaurantId es undefined");
                     return;
                 }
-            
+
                 try {
                     const response = await fetch(`${process.env.BACKEND_URL}/api/restaurant/menus/${restaurantId}`);
                     if (!response.ok) throw new Error("Error al obtener el menú");
-            
+
                     const data = await response.json();
                     setStore({ menuRestaurant: data });
                 } catch (error) {
@@ -316,7 +381,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 try {
                     const response = await fetch(process.env.BACKEND_URL + `/api/menus/${menuID}`);
                     if (!response.ok) throw new Error("Failed to fetch menu details");
-            
+
                     const menuDetails = await response.json();
                     setStore({ ...getStore(), currentMenuDetails: menuDetails });
                 } catch (error) {
