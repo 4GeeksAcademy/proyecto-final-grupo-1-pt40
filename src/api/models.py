@@ -63,6 +63,7 @@ class Restaurant(db.Model):
     phone = db.Column(db.String(20), nullable=True)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     description = db.Column(db.Text, nullable=True)
+    image_URL = db.Column(db.String(255), nullable=True)
 
     menus = relationship('Menu', back_populates='restaurant')
     notifications = relationship('RestaurantNotifications', back_populates='restaurant')
@@ -78,7 +79,17 @@ class Restaurant(db.Model):
             'id':self.id,
             'name':self.name,
             'username':self.username,
-            'email':self.email
+            'email':self.email,
+            'image_URL':self.image_URL,
+            'department':self.department,
+            'city':self.city,
+            'schedule':self.schedule,
+            'cuisine_type':self.cuisine_type,
+            'exact_address':self.exact_address,
+            'social_networks':self.social_networks,
+            'phone': self.phone,
+            'description':self.description,
+            'image_URL':self.image_URL
         }
 
 class Menu(db.Model):
@@ -88,9 +99,11 @@ class Menu(db.Model):
     last_updated = db.Column(db.DateTime, default=db.func.now(),onupdate=db.func.now())
     categories = db.Column(db.Text, nullable=True)
     restaurantID = db.Column(db.Integer, ForeignKey('restaurant.id'), nullable=False)
+    currency = db.Column(db.String(10),nullable=True, default='COP')
+    is_active = db.Column(db.Boolean, nullable=True, default=False)
 
     restaurant = relationship('Restaurant', back_populates='menus')
-    dishes = relationship('Dish', back_populates='menu')
+    dishes = relationship('Dish', back_populates='menu', cascade='all, delete-orphan')
     favorites = relationship('Favorites', back_populates='menu')
 
     def set_categories(self, categories_list):
@@ -99,7 +112,7 @@ class Menu(db.Model):
     def get_categories(self):
        if self.categories:
         return json.loads(self.categories)
-       return 'No categories at the moment'
+       return []
     
     def serialize(self):
         return {
@@ -108,7 +121,9 @@ class Menu(db.Model):
             "restaurantID":self.restaurantID,
             "created":self.created,
             "last_updated":self.last_updated,
-            "categories": self.get_categories()
+            "categories": self.get_categories(),
+            "currency":self.currency,
+            "is_active":self.is_active
         }
     
 class Dish(db.Model):

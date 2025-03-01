@@ -86,6 +86,42 @@ def restaurant_registration():
          db.session.rollback()
          return jsonify('Server error: Failed to process request'), 500
 
+@api.route('/modify/registration/restaurant', methods=['PUT'])
+def modify_restaurant_registration():
+    data = request.json
+    restaurantID = data['restaurantID']
+    try:
+        if restaurantID:
+            restaurant = Restaurant.query.filter_by(id=restaurantID).first()
+            if restaurant:
+                for key, value in data.items():
+                    if hasattr(restaurant, key):
+                        if value:
+                            setattr(restaurant,key,value)
+                db.session.commit()
+  
+        return jsonify(restaurant.serialize()), 201
+    except DataError as e:
+        db.session.rollback()
+        return jsonify('Bad Request: Incorrect data format/type'),400
+    except Exception as e:
+         db.session.rollback()
+         return jsonify('Server error: Failed to process request'), 500
+
+@api.route('/registration/restaurant/<int:restaurantID>', methods=['GET'])
+def get_restaurant_registration(restaurantID):
+    try:
+        restaurant = Restaurant.query.filter_by(id=restaurantID).first()
+        if restaurant:
+            return jsonify(restaurant.serialize()), 201
+        else:
+            return jsonify({"error":"Restaurant not found"}),404
+    except DataError as e:
+        db.session.rollback()
+        return jsonify('Bad Request: Incorrect data format/type'),400
+    except Exception as e:
+         db.session.rollback()
+         return jsonify('Server error: Failed to process request'), 500
 
 @api.route('/login/client', methods=['POST'])
 def client_login(): 
@@ -145,14 +181,54 @@ def restaurant_login():
 def add_menu():
     data = request.json
     try:
-        if data["name"] and data["restaurantID"]:
-            new_menu = Menu(name=data["name"], restaurantID=data["restaurantID"])
+        if data["name"] and data["restaurantID"] and data['currency']:
+            new_menu = Menu(name=data["name"], restaurantID=data["restaurantID"], currency=data['currency'])
             db.session.add(new_menu)
             db.session.commit()
             response = new_menu.serialize()
             return jsonify(response), 201
         else:
              return jsonify('Bad Request: Request is missing data/fields'),400
+    except DataError as e:
+        db.session.rollback()
+        return jsonify('Bad Request: Incorrect data format/type'),400
+    except Exception as e:
+         db.session.rollback()
+         return jsonify('Server error: Failed to process request'), 500
+
+@api.route('/publish/menu/<int:menuID>', methods=['PUT'])
+def publish_menu(menuID):
+    try:
+        if menuID:
+            menu = Menu.query.filter_by(id=menuID).first()
+            if menu:
+                menu.is_active = True
+                db.session.commit()
+                return jsonify({'message':'Menu published successfully'}), 201
+            else:
+                return jsonify({'message':'Menu not found in database'}), 404
+        else:
+            return jsonify('Bad Request: Request is missing data/fields'),400
+    except DataError as e:
+        db.session.rollback()
+        return jsonify('Bad Request: Incorrect data format/type'),400
+    except Exception as e:
+         db.session.rollback()
+         return jsonify('Server error: Failed to process request'), 500
+    
+@api.route('/unpublish/menu/<int:menuID>', methods=['PUT'])
+def unpublish_menu(menuID):
+    try:
+        if menuID:
+            menu = Menu.query.filter_by(id=menuID).first()
+            if menu:
+                menu.is_active = False
+                db.session.commit()
+                return jsonify({'message':'Menu unpublished successfully'}), 201
+            else:
+                return jsonify({'message':'Menu not found in database'}), 404
+        else:
+            return jsonify('Bad Request: Request is missing data/fields'),400
     except DataError as e:
         db.session.rollback()
         return jsonify('Bad Request: Incorrect data format/type'),400
@@ -211,6 +287,30 @@ def delete_dish(dish_id):
                 return jsonify('Dish has been deleted'), 201
             else:
                 return jsonify('Dish not found'), 400
+        else:
+             return jsonify('Bad Request: Request is missing data/fields'),400
+    except DataError as e:
+        db.session.rollback()
+        return jsonify('Bad Request: Incorrect data format/type'),400
+    except Exception as e:
+         db.session.rollback()
+         return jsonify('Server error: Failed to process request'), 500
+    
+
+@api.route('/delete/dish/category', methods=['DELETE'])
+def delete_dish_category():
+    data = request.get_json()
+    category = data['category']
+    menuID = data['menuID']
+    try:
+        if category and menuID:
+            delete_dish_category = Dish.query.filter_by(category=category,menuID=menuID).all()
+            if len(delete_dish_category)>0:
+                for dish in delete_dish_category:
+                    db.session.delete(dish)
+                db.session.commit()
+            else:
+                return jsonify('No dishes in this category'), 400
         else:
              return jsonify('Bad Request: Request is missing data/fields'),400
     except DataError as e:
@@ -300,6 +400,7 @@ def get_restaurant(restaurantID):
         menus = Menu.query.filter_by(restaurantID=restaurantID).order_by(Menu.id).all()
         if not menus:
             return jsonify({'message': 'No menus at the moment'}), 404
+        
         return jsonify([menu.serialize() for menu in menus]), 200
     except Exception as e:
         db.session.rollback()

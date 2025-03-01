@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { Button, Form, ListGroup, Card } from "react-bootstrap";
 import Spinner from 'react-bootstrap/Spinner';
 import { Context } from "../store/appContext";
@@ -10,57 +10,41 @@ import { useParams } from 'react-router-dom';
 const MenuBuilder = () => {
   const { menuID } = useParams();
   const { store, actions } = useContext(Context);
-
-  const [categories, setCategories] = useState(store.menuBuilder?.menu?.categories || []);
-
-
+  const [widgetKey, setWidgetKey] = useState(1)
+  const [categories, setCategories] = useState(null);
   const [newCategory, setNewCategory] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [dishes, setDishes] = useState(null);
-  const [newDish, setNewDish] = useState({ name: "", description: "", price: "", category: "", image: "" });
-
+  const [newDish, setNewDish] = useState({ name: "", description: "", price: "", category: "", image: null });
+  const [loaded, setLoaded] = useState(false);
 
   const onLoad = async () => {
     if (await actions.menuBuilderLoad(menuID)) {
-      console.log("Menú cargado:", store.menuBuilder.menu);
-      setCategories(store.menuBuilder.menu.categories || []);
+      setLoaded(true)
+      setCategories(store.menuBuilder.menu.categories);
     }
   };
 
-  const editCategories = async () => {
-    if (categories) {
-      await actions.menuBuilderCategories(menuID, categories)
-    }
+  const updateCategories = async () => {
+    await actions.menuBuilderCategories(menuID, categories)
   }
-  console.log("Categorías actuales:", categories);
+
   const addCategory = async () => {
-    if (!newCategory) return;
-
-    if (!Array.isArray(categories)) {
-      console.error("Error: categories no es un array", categories);
-      setCategories([]);
-    }
-
-    if (!categories.includes(newCategory)) {
-      setCategories([...categories, newCategory]);
-      setNewCategory("");
-    }
+    if (!newCategory || categories.includes(newCategory)) return;
+    setCategories([...categories, newCategory]);
+    setNewCategory("");
   };
 
   const removeCategory = async (category) => {
     setCategories(categories.filter(cat => cat !== category));
-    setDishes(prevCat => {
-      const newCat = { ...prevCat }
-      delete newCat[category]
-      return newCat
-    });
     if (selectedCategory === category) setSelectedCategory(null);
   };
+
 
   const addDish = async () => {
     if (newDish.name && newDish.price && selectedCategory) {
       await actions.menuBuilderAddDish(menuID, newDish, selectedCategory)
-      setNewDish({ name: "", description: "", price: "", category: "", image: "" });
+      setNewDish({ name: "", description: "", price: "", category: "", image: null });
+      setWidgetKey(prev => prev + 1)
     }
   };
 
@@ -68,29 +52,30 @@ const MenuBuilder = () => {
     setNewDish({ ...newDish, image: file.cdnUrl })
   }
 
-
-  const removeDish = (menuID, dishId, category) => {
+  const removeDish = async (menuID, dishId, category) => {
     console.log("Intentando eliminar:", { menuID, dishId, category });
-
-
     if (!dishId || !menuID || !category) {
-        console.error("Error: Falta un parámetro", { menuID, dishId, category });
-        return;
+      console.error("Error: Falta un parámetro", { menuID, dishId, category });
+      return;
     }
-
-    actions.menuBuilderDeleteDish(menuID, dishId, category);
-};
+    await actions.menuBuilderDeleteDish(dishId, category);
+  };
   useEffect(() => {
     onLoad()
   }, [])
 
   useEffect(() => {
-    if (categories) editCategories();
+    if (loaded) updateCategories()
   }, [categories])
+
+  useEffect(() => {
+    setNewDish({ name: "", description: "", price: "", category: "", image: null })
+    setWidgetKey(prev => 1 + prev)
+  }, [selectedCategory])
 
   return (
     <div className="d-flex">
-      {store.menuBuilder.menu && store.menuBuilder.menu.categories ? <div className="w-25 p-3 border-end">
+      {Object.keys(store.menuBuilder).length > 0 && store.menuBuilder.menu.categories ? <div className="w-25 p-3 border-end">
         <h4>Categorías</h4>
         {store.menuBuilder.menu.categories.length > 0 ?
           (<ListGroup>
@@ -120,7 +105,7 @@ const MenuBuilder = () => {
               value={newDish.name}
               onChange={(e) => setNewDish({ ...newDish, name: e.target.value })}
             />
-            <Widget publicKey='47bd03853371888b5541' onChange={handleFileChange} />
+            <Widget publicKey='47bd03853371888b5541' onChange={handleFileChange} key={widgetKey} />
             <Form.Control
               as="textarea"
               placeholder="Descripción del Platillo"
@@ -151,7 +136,7 @@ const MenuBuilder = () => {
                       <Card.Body>
                         <Card.Title>{dish.name}</Card.Title>
                         <Card.Text>{dish.description}</Card.Text>
-                        <Card.Text><strong>Precio:</strong> {dish.price}</Card.Text>
+                        <Card.Text><strong>Precio:</strong> {`${dish.price} ${store.menuBuilder.menu.currency}`}</Card.Text>
                         <EditModal dish={dish} />
                         <Button variant="danger" size="sm" onClick={() => removeDish(menuID, dish.id, dish.category)}>
                           Eliminar
