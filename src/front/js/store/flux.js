@@ -40,7 +40,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            loginUser: async (userType, email, password, navigate) => {
+            loginUser: async (userType, email, password) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 const endpoint = `${backendUrl}/api/login/${userType}`.replace(/([^:]\/)\/+/g, "$1");
 
@@ -250,8 +250,8 @@ const getState = ({ getStore, getActions, setStore }) => {
                 try {
                     const response = await fetch(`${backendURL}api/new/menu`, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ name: menuInfo['name'], restaurantID: menuInfo['restaurantID'], currency: menuInfo['currency'] })
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
+                        body: JSON.stringify({ name: menuInfo['name'], currency: menuInfo['currency'] })
                     }
                     )
                     if (!response.ok) {
@@ -407,14 +407,15 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
             addFavorite: async (clientId, dishId) => {
+                //Corregir para que vaya acorder con el nuevo endpoint, acepta dish, menu y restaurante
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
                     const response = await fetch(`${backendUrl}/api/favorites`, {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json",
+                            "Content-Type": "application/json",'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                         },
-                        body: JSON.stringify({ client_id: clientId, dish_id: dishId }),
+                        body: JSON.stringify({dish_id: dishId }),
                     });
 
                     if (!response.ok) {
