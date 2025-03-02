@@ -3,7 +3,7 @@ const getState = ({ getStore, getActions, setStore }) => {
         store: {
             client: {},
             restaurant: {},
-            menuBuilder: { 'menu': { 'categories': [] } },
+            menuBuilder: {},
             menu: {},
             favorites: [],
             menuList: [],
@@ -12,7 +12,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             restaurants: []
         },
         actions: {
-            registerRestaurant: async (userType, email, password, username, department, city, name, schedule, cuisine_type, exact_address, social_networks, phone, description,image) => {
+            registerRestaurant: async (userType, email, password, username, department, city, name, schedule, cuisine_type, exact_address, social_networks, phone, description, image) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 const endpoint = `${backendUrl}/api/register/${userType}`.replace(/([^:]\/)\/+/g, "$1");
 
@@ -23,7 +23,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         headers: {
                             "Content-Type": "application/json",
                         },
-                        body: JSON.stringify({ email, password, username, department, city, name, schedule, cuisine_type, exact_address, social_networks, phone, description,image }),
+                        body: JSON.stringify({ email, password, username, department, city, name, schedule, cuisine_type, exact_address, social_networks, phone, description, image }),
                     });
 
                     if (!response.ok) {
@@ -33,7 +33,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
 
                     const data = await response.json();
-                    localStorage.setItem(`${userType}`, data.id)
+                    sessionStorage.setItem('token', data.token)
                     return true;
                 } catch (error) {
                     console.error("Error en la solicitud:", error.message);
@@ -62,16 +62,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
                     const data = await response.json();
 
-
                     sessionStorage.setItem("token", data.token);
-                    sessionStorage.setItem("userRole", userType);
-
-                    if (userType === "client") {
-                        sessionStorage.setItem("client", data.id);
-                    } else if (userType === "restaurant") {
-                        sessionStorage.setItem("restaurant", data.id);
-                    }
-
                     return true;
                 } catch (error) {
                     console.error("Error en la solicitud:", error.message);
@@ -101,7 +92,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ 'menuID': menuID, 'categories': categories })
+                            body: JSON.stringify({ 'menu_id': menuID, 'categories': categories })
                         })
 
                     if (!response.ok) {
@@ -130,7 +121,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
-                                'menuID': menuID, 'category': category,
+                                'menu_id': menuID, 'category': category,
                                 'name': name, 'description': description, 'price': price, 'image': image
                             })
                         })
@@ -174,17 +165,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const updatedDishes = { ...store.menuBuilder.dishes };
                     updatedDishes[category] = updatedDishes[category].filter(dish => dish.id !== dishID);
 
-
-                    setStore({
-                        ...store,
-                        menuBuilder: {
-                            ...store.menuBuilder,
-                            dishes: updatedDishes,
-                        },
-                    });
+                    setStore({ ...store, menuBuilder: { ...store.menuBuilder, dishes: updatedDishes } });
                 }
-                catch {
-                    console.error('Error deleting Menu Builder dish');
+                catch (error) {
+                    console.error('Error deleting Menu Builder dish', error);
                 }
             },
 
@@ -218,12 +202,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         dish.id === dishID ? updatedDish : dish
                     );
 
-                    setStore({
-                        menuBuilder: {
-                            ...store.menuBuilder,
-                            dishes: updatedDishes,
-                        },
-                    });
+                    setStore({ ...store, menuBuilder: { ...store.menuBuilder, dishes: updatedDishes } });
                 }
                 catch (error) {
                     console.error('Error loading Menu Builder categories', error);
@@ -237,8 +216,8 @@ const getState = ({ getStore, getActions, setStore }) => {
                     if (!response.ok) throw new Error("Error al cargar la vista del menú");
 
                     const data = await response.json();
-                  
-                    setStore({...store, menu: data });
+
+                    setStore({ ...store, menu: data });
                     return true;
                 } catch (error) {
                     console.error("Error en menuViewLoad:", error);
@@ -260,7 +239,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                         throw new Error(res.statusText);
                     }
                     const data = await response.json()
-                    localStorage.setItem('menuID', data.id)
                     return data
                 }
                 catch (error) {
@@ -281,11 +259,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                     if (!response.ok) {
                         throw new Error(res.statusText);
                     }
-
                     return true
                 }
-                catch {
-                    console.error('Error deleting Menu ')
+                catch (error) {
+                    console.error('Error deleting Menu', error)
                 }
             },
 
@@ -326,8 +303,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 
                     return true
                 }
-                catch {
-                    console.error('Error publishing Menu');
+                catch (error) {
+                    console.error('Error publishing Menu', error);
                 }
             },
 
@@ -347,12 +324,14 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            getRestaurantMenus: async (id) => {
+            getRestaurantMenus: async () => {
                 const store = getStore()
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}api/restaurant/menus/${id}`);
+                    const response = await fetch(`${process.env.BACKEND_URL}api/restaurant/menus`, {
+                        method: 'GET',
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` }
+                    });
                     if (!response.ok) throw new Error("Error al obtener los menús");
-
                     const data = await response.json();
                     setStore({ ...store, restaurantMenus: data });
                     return true;
@@ -415,9 +394,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const response = await fetch(`${backendUrl}/api/favorites`, {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json",'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+                            "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                         },
-                        body: JSON.stringify({dish_id: dishId }),
+                        body: JSON.stringify({ dish_id: dishId }),
                     });
 
                     if (!response.ok) {
@@ -453,63 +432,63 @@ const getState = ({ getStore, getActions, setStore }) => {
             getRestaurantDetails: async (restaurantId) => {
                 try {
                     const response = await fetch(`${process.env.BACKEND_URL}/api/restaurants/${restaurantId}`);
-                    
+
                     if (!response.ok) {
                         throw new Error("No se pudo obtener la información del restaurante");
                     }
-                    
+
                     const data = await response.json();
                     console.log("Datos recibidos del backend:", data);
                     setStore({ restaurantDetails: data });
-            
-                    return data;  
+
+                    return data;
                 } catch (error) {
                     console.log("Error al obtener los detalles del restaurante:", error);
                     return null;
                 }
             },
-                        
+
             updateRestaurant: async (restaurantId, updatedData) => {
                 try {
                     if (!process.env.BACKEND_URL) {
                         console.error("Error: BACKEND_URL no está definido en las variables de entorno.");
                         return false;
                     }
-            
+
                     const id = Number(restaurantId);
                     if (isNaN(id) || id <= 0) {
                         console.error("Error: restaurantId debe ser un número válido:", restaurantId);
                         return false;
                     }
-            
+
                     if (!updatedData || typeof updatedData !== "object" || Array.isArray(updatedData)) {
                         console.error("Error: updatedData debe ser un objeto JSON válido:", updatedData);
                         return false;
                     }
-            
+
                     // ✅ Verifica si updatedData.schedule tiene el formato esperado
                     if (updatedData.schedule && (!updatedData.schedule.week || !updatedData.schedule.weekend)) {
                         console.error("❌ Error: El objeto 'schedule' no tiene la estructura correcta.");
                         return false;
                     }
-            
+
                     // ✅ Construcción segura de la URL
                     const url = `${process.env.BACKEND_URL.replace(/\/$/, "")}/api/restaurants/${id}`;
                     console.log("URL de la solicitud PUT:", url);
-            
+
                     // ✅ Enviar la petición
                     const response = await fetch(url, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(updatedData)
                     });
-            
+
                     if (!response.ok) {
                         const errorText = await response.text();
                         console.error(`Error en la API (${response.status}):`, errorText);
                         return false;
                     }
-            
+
                     console.log("✅ Restaurante actualizado correctamente.");
                     return true;
                 } catch (error) {
@@ -517,9 +496,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return false;
                 }
             },
-            
-            
-            
+
+            //Actions para explora y descrubre
+
+            //Agrega actions despues de esta linea
+
         }
     }
 
