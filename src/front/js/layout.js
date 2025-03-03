@@ -39,15 +39,15 @@ const Layout = () => {
                         <Route element={<LoginPage />} path="/login" />
                         <Route element={<Demo />} path="/demo" />
                         <Route element={<Single />} path="/single/:theid" />
-                        <Route element={<MenuBuilder />} path="/menu-builder/:menuID" />
-                        <Route element={<MenuView />} path="/menu/:menuID" />
+                        <Route element={<MenuBuilder />} path="/menu-builder/:menu_id" />
+                        <Route element={<MenuView />} path="/menu/:menu_id" />
                         <Route element={<ClientDashboard />} path="/client-dashboard" />
                         <Route element={<AdminDashboard />} path="/admin-dashboard" />
                         <Route element={<FavoritePage />} path="/favorites" />
                         <Route element={<RestaurantDashboard />} path="/restaurant-dashboard" />
                         <Route element={<RestaurantForm />} path="/restaurant-form" />
-                        <Route element={<RestaurantProfile />} path="/restaurant-profile/:restaurantId" />
-                        <Route path="/edit-restaurant/:restaurantId" element={<EditRestaurantForm />} />
+                        <Route element={<RestaurantProfile />} path="/restaurant-profile/:restaurant_id" />
+                        <Route path="/edit-restaurant/:restaurant_id" element={<EditRestaurantForm />} />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
 

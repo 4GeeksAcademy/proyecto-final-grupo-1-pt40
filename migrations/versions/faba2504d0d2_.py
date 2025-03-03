@@ -83,8 +83,8 @@ def upgrade():
     sa.Column('created', sa.DateTime(), nullable=True),
     sa.Column('last_updated', sa.DateTime(), nullable=True),
     sa.Column('categories', sa.Text(), nullable=True),
-    sa.Column('restaurantID', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['restaurantID'], ['restaurant.id'], ),
+    sa.Column('restaurant_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['restaurant_id'], ['restaurant.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('restaurant_notifications',
@@ -100,13 +100,13 @@ def upgrade():
     )
     op.create_table('dish',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('menuID', sa.Integer(), nullable=False),
+    sa.Column('menu_id', sa.Integer(), nullable=False),
     sa.Column('category', sa.String(length=100), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('price', sa.Float(), nullable=False),
     sa.Column('description', sa.String(length=255), nullable=True),
     sa.Column('image_URL', sa.String(length=255), nullable=True),
-    sa.ForeignKeyConstraint(['menuID'], ['menu.id'], ),
+    sa.ForeignKeyConstraint(['menu_id'], ['menu.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('favorites',

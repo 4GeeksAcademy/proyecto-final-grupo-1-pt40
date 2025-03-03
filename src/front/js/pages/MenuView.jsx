@@ -6,14 +6,14 @@ import { Context } from "../store/appContext";
 
 
 const MenuView = () => {
-    const { menuID } = useParams();
+    const { menu_id } = useParams();
     const { store, actions } = useContext(Context);
     const [menu, setMenu] = useState(null)
     const [dishes, setDishes] = useState(null)
     const [like, setLike] = useState(false)
 
     const onLoad = async () => {
-        const response = await actions.menuViewLoad(menuID)
+        const response = await actions.menuViewLoad(menu_id)
         if (response) {
             setMenu(store.menu.menu)
             console.log(store.menu.menu)
@@ -44,6 +44,7 @@ const MenuView = () => {
                                                         <Card.Title>{dish.name}</Card.Title>
                                                         <Card.Text>{dish.description}</Card.Text>
                                                         <Card.Text><strong>Precio:</strong> {`${dish.price} ${menu.currency}`}</Card.Text>
+                                                        <FavoriteButton dish_id={dish.dish_id} />
                                                     </Card.Body>
                                                 </Card>
                                             ))

@@ -5,11 +5,11 @@ import { Context } from "../store/appContext";
 const RestaurantProfile = () => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate();
-    const { restaurantId } = useParams();
+    const { restaurant_id } = useParams();
 
     useEffect(() => {
-        actions.getRestaurantDetails(restaurantId);
-    }, [restaurantId]);
+        actions.getRestaurantDetails(restaurant_id);
+    }, [restaurant_id]);
 
     const profile = store.restaurantDetails;
 
@@ -81,7 +81,7 @@ const RestaurantProfile = () => {
                     <button className="btn btn-primary me-3" onClick={() => navigate("/add-menu")}>
                         Añadir menú
                     </button>
-                    <button className="btn btn-success" onClick={() => navigate(`/edit-restaurant/${restaurantId}`)}>
+                    <button className="btn btn-success" onClick={() => navigate(`/edit-restaurant/${restaurant_id}`)}>
                         Editar perfil
                     </button>
                 </div>

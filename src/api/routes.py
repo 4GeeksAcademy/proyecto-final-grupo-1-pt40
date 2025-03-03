@@ -101,10 +101,10 @@ def restaurant_registration():
 @api.route('/modify/registration/restaurant', methods=['PUT'])
 def modify_restaurant_registration():
     data = request.json
-    restaurantID = data['restaurantID']
+    restaurant_id = data['restaurant_id']
     try:
-        if restaurantID:
-            restaurant = Restaurant.query.filter_by(id=restaurantID).first()
+        if restaurant_id:
+            restaurant = Restaurant.query.filter_by(id=restaurant_id).first()
             if restaurant:
                 for key, value in data.items():
                     if hasattr(restaurant, key):
@@ -120,10 +120,10 @@ def modify_restaurant_registration():
          db.session.rollback()
          return jsonify('Server error: Failed to process request'), 500
 
-@api.route('/registration/restaurant/<int:restaurantID>', methods=['GET'])
-def get_restaurant_registration(restaurantID):
+@api.route('/registration/restaurant/<int:restaurant_id>', methods=['GET'])
+def get_restaurant_registration(restaurant_id):
     try:
-        restaurant = Restaurant.query.filter_by(id=restaurantID).first()
+        restaurant = Restaurant.query.filter_by(id=restaurant_id).first()
         if restaurant:
             return jsonify(restaurant.serialize()), 201
         else:
@@ -215,11 +215,11 @@ def add_menu():
        
         return jsonify({"error": "Server error: Failed to process request"}), 500
 
-@api.route('/publish/menu/<int:menuID>', methods=['PUT'])
-def publish_menu(menuID):
+@api.route('/publish/menu/<int:menu_id>', methods=['PUT'])
+def publish_menu(menu_id):
     try:
-        if menuID:
-            menu = Menu.query.filter_by(id=menuID).first()
+        if menu_id:
+            menu = Menu.query.filter_by(id=menu_id).first()
             if menu:
                 menu.is_active = True
                 db.session.commit()
@@ -235,11 +235,11 @@ def publish_menu(menuID):
          db.session.rollback()
          return jsonify('Server error: Failed to process request'), 500
     
-@api.route('/unpublish/menu/<int:menuID>', methods=['PUT'])
-def unpublish_menu(menuID):
+@api.route('/unpublish/menu/<int:menu_id>', methods=['PUT'])
+def unpublish_menu(menu_id):
     try:
-        if menuID:
-            menu = Menu.query.filter_by(id=menuID).first()
+        if menu_id:
+            menu = Menu.query.filter_by(id=menu_id).first()
             if menu:
                 menu.is_active = False
                 db.session.commit()
@@ -320,10 +320,10 @@ def delete_dish(dish_id):
 def delete_dish_category():
     data = request.get_json()
     category = data['category']
-    menuID = data['menuID']
+    menu_id = data['menu_id']
     try:
-        if category and menuID:
-            delete_dish_category = Dish.query.filter_by(category=category,menuID=menuID).all()
+        if category and menu_id:
+            delete_dish_category = Dish.query.filter_by(category=category,menu_id=menu_id).all()
             if len(delete_dish_category)>0:
                 for dish in delete_dish_category:
                     db.session.delete(dish)

@@ -31,14 +31,16 @@ const RestaurantDashboard = () => {
 
     const handlePublish = async (id) => {
         const response = await actions.publishMenu(id)
-        if (response) {setAlert('Public')
+        if (response) {
+            setAlert('Public')
             onLoad()
         }
     }
 
     const handleUnpublish = async (id) => {
         const response = await actions.unpublishMenu(id)
-        if (response) {setAlert('Private')
+        if (response) {
+            setAlert('Private')
             onLoad()
         }
     }
@@ -55,13 +57,13 @@ const RestaurantDashboard = () => {
                     <div className="collapse navbar-collapse">
                         <ul className="navbar-nav ms-auto">
                             <li className="nav-item">
-                                <CreateMenuModal restaurantID={id} />
+                                <CreateMenuModal restaurant_id={id} />
                             </li>
                             <li className="nav-item">
                                 <Link className="nav-link" to="/restaurant-form">Agregar Información</Link>
                             </li>
                             <li className="nav-item">
-                            <Link className="nav-link" to={`/restaurant-profile/${id}`}>Mi Perfil</Link>
+                                <Link className="nav-link" to={`/restaurant-profile/${id}`}>Mi Perfil</Link>
                             </li>
                         </ul>
                     </div>

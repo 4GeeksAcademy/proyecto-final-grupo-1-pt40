@@ -12,7 +12,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             restaurants: []
         },
         actions: {
-            registerRestaurant: async (userType, email, password, username, department, city, name, schedule, cuisine_type, exact_address, social_networks, phone, description,image) => {
+            registerRestaurant: async (userType, email, password, username, department, city, name, schedule, cuisine_type, exact_address, social_networks, phone, description, image) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 const endpoint = `${backendUrl}/api/register/${userType}`.replace(/([^:]\/)\/+/g, "$1");
 
@@ -23,7 +23,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         headers: {
                             "Content-Type": "application/json",
                         },
-                        body: JSON.stringify({ email, password, username, department, city, name, schedule, cuisine_type, exact_address, social_networks, phone, description,image }),
+                        body: JSON.stringify({ email, password, username, department, city, name, schedule, cuisine_type, exact_address, social_networks, phone, description, image }),
                     });
 
                     if (!response.ok) {
@@ -78,10 +78,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return false;
                 }
             },
-            menuBuilderLoad: async (menuID) => {
+            menuBuilderLoad: async (menu_id) => {
                 const store = getStore()
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}api/menu/${menuID}`);
+                    const response = await fetch(`${process.env.BACKEND_URL}api/menu/${menu_id}`);
                     if (!response.ok) throw new Error("Error al cargar el menú");
 
                     const data = await response.json();
@@ -93,7 +93,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            menuBuilderCategories: async (menuID, categories) => {
+            menuBuilderCategories: async (menu_id, categories) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
@@ -101,7 +101,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ 'menuID': menuID, 'categories': categories })
+                            body: JSON.stringify({ 'menu_id': menu_id, 'categories': categories })
                         })
 
                     if (!response.ok) {
@@ -117,7 +117,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            menuBuilderAddDish: async (menuID, dishInfo, category) => {
+            menuBuilderAddDish: async (menu_id, dishInfo, category) => {
                 const name = dishInfo['name']
                 const description = dishInfo['description']
                 const price = dishInfo['price']
@@ -130,7 +130,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
-                                'menuID': menuID, 'category': category,
+                                'menu_id': menu_id, 'category': category,
                                 'name': name, 'description': description, 'price': price, 'image': image
                             })
                         })
@@ -157,11 +157,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            menuBuilderDeleteDish: async (dishID, category) => {
+            menuBuilderDeleteDish: async (dish_id, category) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
-                    const response = await fetch(`${backendURL}api/delete/dish/${dishID}`,
+                    const response = await fetch(`${backendURL}api/delete/dish/${dish_id}`,
                         {
                             method: "DELETE",
                             headers: { "Content-Type": "application/json" }
@@ -172,7 +172,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
 
                     const updatedDishes = { ...store.menuBuilder.dishes };
-                    updatedDishes[category] = updatedDishes[category].filter(dish => dish.id !== dishID);
+                    updatedDishes[category] = updatedDishes[category].filter(dish => dish.id !== dish_id);
 
 
                     setStore({
@@ -188,7 +188,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            menuBuilderEditDish: async (dishID, dishInfo, category) => {
+            menuBuilderEditDish: async (dish_id, dishInfo, category) => {
                 const backendURL = process.env.BACKEND_URL
                 const name = dishInfo['name']
                 const description = dishInfo['description']
@@ -201,7 +201,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
-                                'dishID': dishID, 'categories': category,
+                                'dish_id': dish_id, 'categories': category,
                                 'name': name, 'description': description, 'price': price, 'image_URL': image
                             })
                         })
@@ -215,7 +215,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const updatedDishes = { ...store.menuBuilder.dishes };
 
                     updatedDishes[category] = updatedDishes[category].map(dish =>
-                        dish.id === dishID ? updatedDish : dish
+                        dish.id === dish_id ? updatedDish : dish
                     );
 
                     setStore({
@@ -230,15 +230,15 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            menuViewLoad: async (menuID) => {
+            menuViewLoad: async (menu_id) => {
                 const store = getStore();
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}api/menu/${menuID}`);
+                    const response = await fetch(`${process.env.BACKEND_URL}api/menu/${menu_id}`);
                     if (!response.ok) throw new Error("Error al cargar la vista del menú");
 
                     const data = await response.json();
-                  
-                    setStore({...store, menu: data });
+
+                    setStore({ ...store, menu: data });
                     return true;
                 } catch (error) {
                     console.error("Error en menuViewLoad:", error);
@@ -260,7 +260,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         throw new Error(res.statusText);
                     }
                     const data = await response.json()
-                    localStorage.setItem('menuID', data.id)
+                    localStorage.setItem('menu_id', data.id)
                     return data
                 }
                 catch (error) {
@@ -268,11 +268,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            deleteMenu: async (menuID) => {
+            deleteMenu: async (menu_id) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
-                    const response = await fetch(`${backendURL}api/delete/menu/${menuID}`,
+                    const response = await fetch(`${backendURL}api/delete/menu/${menu_id}`,
                         {
                             method: "DELETE",
                             headers: { "Content-Type": "application/json" }
@@ -289,11 +289,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            publishMenu: async (menuID) => {
+            publishMenu: async (menu_id) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
-                    const response = await fetch(`${backendURL}api/publish/menu/${menuID}`,
+                    const response = await fetch(`${backendURL}api/publish/menu/${menu_id}`,
                         {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" }
@@ -310,11 +310,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            unpublishMenu: async (menuID) => {
+            unpublishMenu: async (menu_id) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
-                    const response = await fetch(`${backendURL}api/unpublish/menu/${menuID}`,
+                    const response = await fetch(`${backendURL}api/unpublish/menu/${menu_id}`,
                         {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" }
@@ -362,14 +362,14 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            getMenuByRestaurant: async (restaurantId) => {
-                if (!restaurantId) {
-                    console.error("Error: restaurantId es undefined");
+            getMenuByRestaurant: async (restaurant_id) => {
+                if (!restaurant_id) {
+                    console.error("Error: restaurant_id es undefined");
                     return;
                 }
 
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}/api/restaurant/menus/${restaurantId}`);
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/restaurant/menus/${restaurant_id}`);
                     if (!response.ok) throw new Error("Error al obtener el menú");
 
                     const data = await response.json();
@@ -379,9 +379,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            getMenuDetails: async (menuID) => {
+            getMenuDetails: async (menu_id) => {
                 try {
-                    const response = await fetch(process.env.BACKEND_URL + `/api/menus/${menuID}`);
+                    const response = await fetch(process.env.BACKEND_URL + `/api/menus/${menu_id}`);
                     if (!response.ok) throw new Error("Failed to fetch menu details");
 
                     const menuDetails = await response.json();
@@ -391,10 +391,14 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            fetchFavorites: async (clientId) => {
+            fetchFavorites: async (client_id) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
-                    const response = await fetch(`${backendUrl}/api/favorites/${clientId}`);
+                    const response = await fetch(`${backendUrl}/api/favorites/${client_id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                        }
+                    });
 
                     if (!response.ok) {
                         throw new Error(`Error en la solicitud: ${response.status}`);
@@ -408,16 +412,16 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
 
-            addFavorite: async (clientId, dishId) => {
-                //Corregir para que vaya acorder con el nuevo endpoint, acepta dish, menu y restaurante
+            addFavorite: async (client_id, menu_id, dish_id, restaurant_id) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
                     const response = await fetch(`${backendUrl}/api/favorites`, {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json",'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${sessionStorage.getItem('token')}`,
                         },
-                        body: JSON.stringify({dish_id: dishId }),
+                        body: JSON.stringify({ client_id, menu_id, dish_id, restaurant_id }),
                     });
 
                     if (!response.ok) {
@@ -432,11 +436,16 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            removeFavorite: async (favoriteId) => {
+            removeFavorite: async (client_id, menu_id, dish_id, restaurant_id) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
-                    const response = await fetch(`${backendUrl}/api/favorites/${favoriteId}`, {
+                    const response = await fetch(`${backendUrl}/api/favorites`, {
                         method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${sessionStorage.getItem('token')}`,
+                        },
+                        body: JSON.stringify({ client_id, menu_id, dish_id, restaurant_id }),
                     });
 
                     if (!response.ok) {
@@ -444,72 +453,78 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
 
                     const store = getStore();
-                    setStore({ favorites: store.favorites.filter(fav => fav.id !== favoriteId) });
+                    setStore({
+                        favorites: store.favorites.filter(fav =>
+                            fav.menu_id !== menu_id &&
+                            fav.dish_id !== dish_id &&
+                            fav.restaurant_id !== restaurant_id
+                        )
+                    });
                 } catch (error) {
                     console.error("Error al eliminar favorito:", error);
                 }
             },
 
-            getRestaurantDetails: async (restaurantId) => {
+            getRestaurantDetails: async (restaurant_id) => {
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}/api/restaurants/${restaurantId}`);
-                    
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/restaurants/${restaurant_id}`);
+
                     if (!response.ok) {
                         throw new Error("No se pudo obtener la información del restaurante");
                     }
-                    
+
                     const data = await response.json();
                     console.log("Datos recibidos del backend:", data);
                     setStore({ restaurantDetails: data });
-            
-                    return data;  
+
+                    return data;
                 } catch (error) {
                     console.log("Error al obtener los detalles del restaurante:", error);
                     return null;
                 }
             },
-                        
-            updateRestaurant: async (restaurantId, updatedData) => {
+
+            updateRestaurant: async (restaurant_id, updatedData) => {
                 try {
                     if (!process.env.BACKEND_URL) {
                         console.error("Error: BACKEND_URL no está definido en las variables de entorno.");
                         return false;
                     }
-            
-                    const id = Number(restaurantId);
+
+                    const id = Number(restaurant_id);
                     if (isNaN(id) || id <= 0) {
-                        console.error("Error: restaurantId debe ser un número válido:", restaurantId);
+                        console.error("Error: restaurant_id debe ser un número válido:", restaurant_id);
                         return false;
                     }
-            
+
                     if (!updatedData || typeof updatedData !== "object" || Array.isArray(updatedData)) {
                         console.error("Error: updatedData debe ser un objeto JSON válido:", updatedData);
                         return false;
                     }
-            
+
                     // ✅ Verifica si updatedData.schedule tiene el formato esperado
                     if (updatedData.schedule && (!updatedData.schedule.week || !updatedData.schedule.weekend)) {
                         console.error("❌ Error: El objeto 'schedule' no tiene la estructura correcta.");
                         return false;
                     }
-            
+
                     // ✅ Construcción segura de la URL
                     const url = `${process.env.BACKEND_URL.replace(/\/$/, "")}/api/restaurants/${id}`;
                     console.log("URL de la solicitud PUT:", url);
-            
+
                     // ✅ Enviar la petición
                     const response = await fetch(url, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(updatedData)
                     });
-            
+
                     if (!response.ok) {
                         const errorText = await response.text();
                         console.error(`Error en la API (${response.status}):`, errorText);
                         return false;
                     }
-            
+
                     console.log("✅ Restaurante actualizado correctamente.");
                     return true;
                 } catch (error) {
@@ -517,9 +532,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return false;
                 }
             },
-            
-            
-            
+
+
+
         }
     }
 

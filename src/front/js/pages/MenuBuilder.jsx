@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom';
 
 
 const MenuBuilder = () => {
-  const { menuID } = useParams();
+  const { menu_id } = useParams();
   const { store, actions } = useContext(Context);
   const [widgetKey, setWidgetKey] = useState(1)
   const [categories, setCategories] = useState(null);
@@ -18,14 +18,14 @@ const MenuBuilder = () => {
   const [loaded, setLoaded] = useState(false);
 
   const onLoad = async () => {
-    if (await actions.menuBuilderLoad(menuID)) {
+    if (await actions.menuBuilderLoad(menu_id)) {
       setLoaded(true)
       setCategories(store.menuBuilder.menu.categories);
     }
   };
 
   const updateCategories = async () => {
-    await actions.menuBuilderCategories(menuID, categories)
+    await actions.menuBuilderCategories(menu_id, categories)
   }
 
   const addCategory = async () => {
@@ -42,7 +42,7 @@ const MenuBuilder = () => {
 
   const addDish = async () => {
     if (newDish.name && newDish.price && selectedCategory) {
-      await actions.menuBuilderAddDish(menuID, newDish, selectedCategory)
+      await actions.menuBuilderAddDish(menu_id, newDish, selectedCategory)
       setNewDish({ name: "", description: "", price: "", category: "", image: null });
       setWidgetKey(prev => prev + 1)
     }
@@ -52,13 +52,13 @@ const MenuBuilder = () => {
     setNewDish({ ...newDish, image: file.cdnUrl })
   }
 
-  const removeDish = async (menuID, dishId, category) => {
-    console.log("Intentando eliminar:", { menuID, dishId, category });
-    if (!dishId || !menuID || !category) {
-      console.error("Error: Falta un parámetro", { menuID, dishId, category });
+  const removeDish = async (menu_id, dish_id, category) => {
+    console.log("Intentando eliminar:", { menu_id, dish_id, category });
+    if (!dish_id || !menu_id || !category) {
+      console.error("Error: Falta un parámetro", { menu_id, dish_id, category });
       return;
     }
-    await actions.menuBuilderDeleteDish(dishId, category);
+    await actions.menuBuilderDeleteDish(dish_id, category);
   };
   useEffect(() => {
     onLoad()
@@ -138,7 +138,7 @@ const MenuBuilder = () => {
                         <Card.Text>{dish.description}</Card.Text>
                         <Card.Text><strong>Precio:</strong> {`${dish.price} ${store.menuBuilder.menu.currency}`}</Card.Text>
                         <EditModal dish={dish} />
-                        <Button variant="danger" size="sm" onClick={() => removeDish(menuID, dish.id, dish.category)}>
+                        <Button variant="danger" size="sm" onClick={() => removeDish(menu_id, dish.id, dish.category)}>
                           Eliminar
                         </Button>
                       </Card.Body>
