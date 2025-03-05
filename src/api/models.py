@@ -83,7 +83,7 @@ class Restaurant(db.Model):
             'username':self.username,
             'email':self.email,
             'schedule': self.schedule,
-            'image': self.image
+            'image': self.image,
             'department':self.department,
             'city':self.city,
             'schedule':self.schedule,

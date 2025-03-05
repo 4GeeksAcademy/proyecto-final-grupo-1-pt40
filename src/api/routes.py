@@ -7,7 +7,8 @@ from werkzeug.utils import secure_filename
 from sqlalchemy.exc import DataError
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
-from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity,get_jwt
+from flask_jwt_extended import JWTManager
 import json
 
 
@@ -50,13 +51,17 @@ def client_registration():
         new_client.set_password(password)
         db.session.add(new_client)
         db.session.commit()
-        return jsonify({"id":new_client.id}), 201
+        try:
+            access_token = create_access_token(identity=str(new_client.id), additional_claims={"role":"client"})
+            return jsonify({'token':access_token})
+        except Exception as e:
+            return jsonify({"error":str(e)})
     except DataError as e:
         db.session.rollback()
         return jsonify('Bad Request: Incorrect data format/type'),400
     except Exception as e:
          db.session.rollback()
-         return jsonify('Server error: Failed to process request'), 500
+         return jsonify('Server error: Failed to process request',e), 500
     
 @api.route('/register/restaurant', methods=['POST'])
 def restaurant_registration():
@@ -90,7 +95,8 @@ def restaurant_registration():
         new_restaurant.set_password(password)
         db.session.add(new_restaurant)
         db.session.commit()
-        return jsonify(new_restaurant.serialize()), 201
+        access_token = create_access_token(identity=str(new_restaurant.id), additional_claims={"role":"restaurant"})
+        return jsonify({'token':access_token}), 201
     except DataError as e:
         db.session.rollback()
         return jsonify('Bad Request: Incorrect data format/type'),400
@@ -150,16 +156,16 @@ def client_login():
     try:
         if client and client.check_password(password):
        
-            access_token = create_access_token(identity={"id": client.id, "role": "client"})
+            access_token = create_access_token(identity=str(client.id), additional_claims={"role":"client"})
             return jsonify({"token": access_token}), 200
     
         return jsonify({"message": "Check your username/email and password"}), 400
     except DataError as e:
         db.session.rollback()
-        return jsonify('Bad Request: Incorrect data format/type'),400
+        return jsonify('error: Incorrect data format/type'),400
     except Exception as e:
          db.session.rollback()
-         return jsonify('Server error: Failed to process request'), 500
+         return jsonify('error: Failed to process request'), 500
     
 @api.route('/login/restaurant', methods=['POST'])
 def restaurant_login():
@@ -176,7 +182,7 @@ def restaurant_login():
     try:
         if restaurant and restaurant.check_password(password):
        
-            access_token = create_access_token(identity={"id": restaurant.id, "role": "restaurant"})
+            access_token = create_access_token(identity=str(restaurant.id), additional_claims={"role":"restaurant"})
             return jsonify({"token": access_token}), 200
     
         return jsonify({"message": "Check your username/email and password"}), 400
@@ -190,15 +196,15 @@ def restaurant_login():
 @api.route('/new/menu', methods=['POST'])
 @jwt_required()
 def add_menu():
-    data = request.json()
+    data = request.json
     if not data:
         return jsonify({"error": "Invalid request, JSON body required"}), 400
-    
+
     name = data.get("name")
     currency = data.get("currency")
-    restaurant_identity = get_jwt_identity()  
-    restaurant_id = restaurant_identity.get("id")
-    role = restaurant_identity.get("role")
+    restaurant_id = get_jwt_identity() 
+    claims = get_jwt() 
+    role = claims.get("role")
 
     if role != "restaurant":
             return jsonify({"error": "Unauthorized: Only restaurants can create menus"}), 403
@@ -212,7 +218,6 @@ def add_menu():
         return jsonify({"error": f"Bad Request: {e.args[0]}"}), 400
     except Exception as e:
         db.session.rollback()
-       
         return jsonify({"error": "Server error: Failed to process request"}), 500
 
 @api.route('/publish/menu/<int:menuID>', methods=['PUT'])
@@ -320,10 +325,10 @@ def delete_dish(dish_id):
 def delete_dish_category():
     data = request.get_json()
     category = data['category']
-    menuID = data['menuID']
+    menuID = data['menu_id']
     try:
         if category and menuID:
-            delete_dish_category = Dish.query.filter_by(category=category,menuID=menuID).all()
+            delete_dish_category = Dish.query.filter_by(category=category,menu_id=menuID).all()
             if len(delete_dish_category)>0:
                 for dish in delete_dish_category:
                     db.session.delete(dish)
@@ -413,12 +418,18 @@ def get_restaurants():
         return jsonify({'message': 'Server error: Failed to process request'}), 500
 
     
-@api.route('/restaurant/menus/<int:restaurant_id>', methods=['GET'])
-def get_restaurant_menus(restaurant_id):
+@api.route('/restaurant/menus', methods=['GET'])
+@jwt_required()
+def get_restaurant_menus():
+    restaurant_id = get_jwt_identity()  
+    claims = get_jwt()
+    role = claims.get('role')
+    if role != "restaurant":
+            return jsonify({"error": "Unauthorized: Only restaurants can create menus"}), 403
     try:
         menus = Menu.query.filter_by(restaurant_id=restaurant_id).order_by(Menu.id).all()
         if not menus:
-            return jsonify({'message': 'No menus at the moment'}), 404
+            return jsonify({'message': 'No menus at the moment'}), 200
         
         return jsonify([menu.serialize() for menu in menus]), 200
     except Exception as e:
@@ -594,3 +605,7 @@ def update_restaurant(restaurant_id):
     except Exception as e:
         db.session.rollback() 
         return jsonify({"msg": "Error al actualizar el restaurante", "error": str(e)}), 500
+    
+    #Rutas para Explora y Descubre
+
+    #Termina rutas para explora y descrubre, puedes continuar agregando despues de esta linea
