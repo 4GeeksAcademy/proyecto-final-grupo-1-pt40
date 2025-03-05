@@ -4,6 +4,7 @@ import { Context } from "../store/appContext";
 import Spinner from 'react-bootstrap/Spinner';
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
+import FavoriteButton from "../component/FavoriteButton.jsx";
 
 const ClientDashboard = () => {
     const navigate = useNavigate();

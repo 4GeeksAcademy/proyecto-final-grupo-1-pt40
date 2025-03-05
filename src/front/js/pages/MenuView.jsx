@@ -3,6 +3,7 @@ import { Tabs, Tab, Card, Button } from "react-bootstrap";
 import Spinner from 'react-bootstrap/Spinner';
 import { useParams } from 'react-router-dom';
 import { Context } from "../store/appContext";
+import FavoriteButton from "../component/FavoriteButton.jsx";
 
 
 const MenuView = () => {
