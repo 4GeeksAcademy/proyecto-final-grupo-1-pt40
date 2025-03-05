@@ -8,7 +8,7 @@ import { Widget } from "@uploadcare/react-widget";
 const EditRestaurantForm = () => {
   const { store, actions } = useContext(Context);
   const navigate = useNavigate();
-  const { restaurantId } = useParams();
+  const { restaurant_id } = useParams();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -38,7 +38,7 @@ const EditRestaurantForm = () => {
     const fetchRestaurantData = async () => {
       try {
         setLoading(true);
-        const data = await actions.getRestaurantDetails(restaurantId);
+        const data = await actions.getRestaurantDetails(restaurant_id);
         if (data) {
           let parsedSchedule = data.schedule;
           if (typeof data.schedule === "string") {
@@ -73,7 +73,7 @@ const EditRestaurantForm = () => {
     };
   
     fetchRestaurantData();
-  }, [restaurantId]); 
+  }, [restaurant_id]); 
 
   // Obtener lista de departamentos
   useEffect(() => {
@@ -143,10 +143,10 @@ const EditRestaurantForm = () => {
       city: cityName
     };
     try {
-      const success = await actions.updateRestaurant(restaurantId, formData, updatedData);
+      const success = await actions.updateRestaurant(restaurant_id, formData, updatedData);
       if (success) {
         alert("Perfil actualizado con éxito");
-        navigate(`/restaurant-profile/${restaurantId}`);
+        navigate(`/restaurant-profile/${restaurant_id}`);
       } else {
         alert("Hubo un error al actualizar el perfil");
       }
@@ -230,7 +230,7 @@ const EditRestaurantForm = () => {
         </div>
 
         <button type="submit" className="btn btn-success">Actualizar</button>
-        <button type="button" className="btn btn-secondary ms-2" onClick={() => navigate(`/restaurant-profile/${restaurantId}`)}>Cancelar</button>
+        <button type="button" className="btn btn-secondary ms-2" onClick={() => navigate(`/restaurant-profile/${restaurant_id}`)}>Cancelar</button>
       </form>
     </div>
   );

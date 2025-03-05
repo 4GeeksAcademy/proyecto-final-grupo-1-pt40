@@ -497,7 +497,7 @@ def remove_favorite(favorite_id):
 
 @api.route('/favorites', methods=['GET'])
 @jwt_required()
-def get_favorites(client_id): 
+def get_favorites(): 
     client_identity = get_jwt_identity()
     client_id = client_identity.get("id")
 

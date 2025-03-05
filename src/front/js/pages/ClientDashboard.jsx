@@ -48,7 +48,7 @@ const ClientDashboard = () => {
                         <div className="row">
                             {Array.isArray(store.restaurants) && store.restaurants.length > 0 ? (
                                 store.restaurants.map((restaurant) => (
-                                    <div key={restaurant.id} className="col-md-4 mb-3">
+                                    <div key={restaurant_id} className="col-md-4 mb-3">
                                         <div className="card">
                                             <img
                                                 src={restaurant.image || "https://via.placeholder.com/300x200?text=Restaurante"}
@@ -60,7 +60,7 @@ const ClientDashboard = () => {
                                                 <p className="card-text">{restaurant.description}</p>
                                                 <button
                                                     className="btn btn-primary"
-                                                    onClick={() => navigate(`/menu/${restaurant.id}`)}
+                                                    onClick={() => navigate(`/menu/${restaurant_id}`)}
                                                 >
                                                     Ver Menú
                                                 </button>
