@@ -1,12 +1,18 @@
 import React from "react";
-import SignUp from "../component/SignUp.jsx";
+import { Tabs, Tab } from 'react-bootstrap'
+import SignUpRestaurant from "../component/SignUpRestaurant.jsx";
+import SignUpClient from "../component/SignUpClient.jsx";
 
 const SignUpPage = () => {
   return (
-    <div className="login-container">
-      <h2>Página de Sign Up</h2>
-      <SignUp/>
-    </div>
+    <Tabs defaultActiveKey="client" id="fill-tab-example" className="mb-3" fill>
+      <Tab eventKey='client' title='Registrarte como Cliente' key='client'>
+        <SignUpClient />
+      </Tab>
+      <Tab eventKey='restaurant' title='Registrar Restaurante' key='restaurant'>
+        <SignUpRestaurant />
+      </Tab>
+    </Tabs>
   );
 };
 

@@ -1,18 +1,28 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Context } from "../store/appContext";
 
 const RestaurantProfile = () => {
     const { store, actions } = useContext(Context);
+    const [profile, setProfile] = useState(null)
     const navigate = useNavigate();
-    const { restaurantId } = useParams();
-
+    
+    const onLoad = async ()=>{
+        const response = await actions.getRestaurantDetails()
+        if (response)setProfile(response)
+    }
     useEffect(() => {
-        actions.getRestaurantDetails(restaurantId);
-    }, [restaurantId]);
+        onLoad()
+    }, []);
 
-    const profile = store.restaurantDetails;
-
+   
+    const convertToAmPm = (time) => {
+        if (!time) return "";
+        const [hour, minute] = time.split(":").map(Number);
+        const ampm = hour >= 12 ? "PM" : "AM";
+        const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
+        return `${formattedHour}:${minute.toString().padStart(2, "0")} ${ampm}`
+    }
     useEffect(() => {
         console.log("Perfil recibido:", profile);
     }, [profile]);
@@ -48,13 +58,12 @@ const RestaurantProfile = () => {
                                     <strong className="pb-1">Horario de Atención</strong>
                                 </p>
 
-                                <p>
-                                    <strong>Entre semana:</strong> {profile.schedule.week.open} - {profile.schedule.week.close}
-                                </p>
-                                <p>
-                                    <strong>Fines de semana:</strong> {profile.schedule.weekend.open} - {profile.schedule.weekend.close}
-                                </p>
+                                <div>
+                                    {profile.schedule.map((day, index) => (
+                                        <div className="p-0" key={index}>{`${day.day}: ${day.isClosed ? 'Cerrado' : `${convertToAmPm(day.open)} - ${convertToAmPm(day.close)}`}`}</div>
+                                    ))}
 
+                                </div>
 
 
                             </div>
@@ -78,10 +87,7 @@ const RestaurantProfile = () => {
                 </div>
 
                 <div className="mt-4">
-                    <button className="btn btn-primary me-3" onClick={() => navigate("/add-menu")}>
-                        Añadir menú
-                    </button>
-                    <button className="btn btn-success" onClick={() => navigate(`/edit-restaurant/${restaurantId}`)}>
+                    <button className="btn btn-success" onClick={() => navigate(`/edit-restaurant/`)}>
                         Editar perfil
                     </button>
                 </div>
