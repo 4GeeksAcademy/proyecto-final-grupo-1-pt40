@@ -69,10 +69,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return false;
                 }
             },
-            menuBuilderLoad: async (menuID) => {
+            menuBuilderLoad: async (menu_id) => {
                 const store = getStore()
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}api/menu/${menuID}`);
+                    const response = await fetch(`${process.env.BACKEND_URL}api/menu/${menu_id}`);
                     if (!response.ok) throw new Error("Error al cargar el menú");
 
                     const data = await response.json();
@@ -84,7 +84,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            menuBuilderCategories: async (menuID, categories) => {
+            menuBuilderCategories: async (menu_id, categories) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
@@ -92,7 +92,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ 'menu_id': menuID, 'categories': categories })
+                            body: JSON.stringify({ 'menu_id': menu_id, 'categories': categories })
                         })
 
                     if (!response.ok) {
@@ -108,7 +108,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            menuBuilderAddDish: async (menuID, dishInfo, category) => {
+            menuBuilderAddDish: async (menu_id, dishInfo, category) => {
                 const name = dishInfo['name']
                 const description = dishInfo['description']
                 const price = dishInfo['price']
@@ -121,7 +121,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
-                                'menu_id': menuID, 'category': category,
+                                'menu_id': menu_id, 'category': category,
                                 'name': name, 'description': description, 'price': price, 'image': image
                             })
                         })
@@ -148,11 +148,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            menuBuilderDeleteDish: async (dishID, category) => {
+            menuBuilderDeleteDish: async (dish_id, category) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
-                    const response = await fetch(`${backendURL}api/delete/dish/${dishID}`,
+                    const response = await fetch(`${backendURL}api/delete/dish/${dish_id}`,
                         {
                             method: "DELETE",
                             headers: { "Content-Type": "application/json" }
@@ -163,7 +163,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
 
                     const updatedDishes = { ...store.menuBuilder.dishes };
-                    updatedDishes[category] = updatedDishes[category].filter(dish => dish.id !== dishID);
+                    updatedDishes[category] = updatedDishes[category].filter(dish => dish.id !== dish_id);
 
                     setStore({ ...store, menuBuilder: { ...store.menuBuilder, dishes: updatedDishes } });
                 }
@@ -172,7 +172,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            menuBuilderEditDish: async (dishID, dishInfo, category) => {
+            menuBuilderEditDish: async (dish_id, dishInfo, category) => {
                 const backendURL = process.env.BACKEND_URL
                 const name = dishInfo['name']
                 const description = dishInfo['description']
@@ -185,7 +185,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
-                                'dishID': dishID, 'categories': category,
+                                'dish_id': dish_id, 'categories': category,
                                 'name': name, 'description': description, 'price': price, 'image_URL': image
                             })
                         })
@@ -199,7 +199,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const updatedDishes = { ...store.menuBuilder.dishes };
 
                     updatedDishes[category] = updatedDishes[category].map(dish =>
-                        dish.id === dishID ? updatedDish : dish
+                        dish.id === dish_id ? updatedDish : dish
                     );
 
                     setStore({ ...store, menuBuilder: { ...store.menuBuilder, dishes: updatedDishes } });
@@ -209,10 +209,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            menuViewLoad: async (menuID) => {
+            menuViewLoad: async (menu_id) => {
                 const store = getStore();
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}api/menu/${menuID}`);
+                    const response = await fetch(`${process.env.BACKEND_URL}api/menu/${menu_id}`);
                     if (!response.ok) throw new Error("Error al cargar la vista del menú");
 
                     const data = await response.json();
@@ -246,11 +246,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            deleteMenu: async (menuID) => {
+            deleteMenu: async (menu_id) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
-                    const response = await fetch(`${backendURL}api/delete/menu/${menuID}`,
+                    const response = await fetch(`${backendURL}api/delete/menu/${menu_id}`,
                         {
                             method: "DELETE",
                             headers: { "Content-Type": "application/json" }
@@ -266,11 +266,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            publishMenu: async (menuID) => {
+            publishMenu: async (menu_id) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
-                    const response = await fetch(`${backendURL}api/publish/menu/${menuID}`,
+                    const response = await fetch(`${backendURL}api/publish/menu/${menu_id}`,
                         {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" }
@@ -287,11 +287,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            unpublishMenu: async (menuID) => {
+            unpublishMenu: async (menu_id) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
-                    const response = await fetch(`${backendURL}api/unpublish/menu/${menuID}`,
+                    const response = await fetch(`${backendURL}api/unpublish/menu/${menu_id}`,
                         {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" }
@@ -341,14 +341,14 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            getMenuByRestaurant: async (restaurantId) => {
-                if (!restaurantId) {
-                    console.error("Error: restaurantId es undefined");
+            getMenuByRestaurant: async (restaurant_id) => {
+                if (!restaurant_id) {
+                    console.error("Error: restaurant_id es undefined");
                     return;
                 }
 
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}/api/restaurant/menus/${restaurantId}`);
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/restaurant/menus/${restaurant_id}`);
                     if (!response.ok) throw new Error("Error al obtener el menú");
 
                     const data = await response.json();
@@ -358,9 +358,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            getMenuDetails: async (menuID) => {
+            getMenuDetails: async (menu_id) => {
                 try {
-                    const response = await fetch(process.env.BACKEND_URL + `/api/menus/${menuID}`);
+                    const response = await fetch(process.env.BACKEND_URL + `/api/menus/${menu_id}`);
                     if (!response.ok) throw new Error("Failed to fetch menu details");
 
                     const menuDetails = await response.json();
@@ -370,10 +370,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            fetchFavorites: async (clientId) => {
+            fetchFavorites: async (client_id) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
-                    const response = await fetch(`${backendUrl}/api/favorites/${clientId}`);
+                    const response = await fetch(`${backendUrl}/api/favorites/${client_id}`);
 
                     if (!response.ok) {
                         throw new Error(`Error en la solicitud: ${response.status}`);
@@ -387,7 +387,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
 
-            addFavorite: async (clientId, dishId) => {
+            addFavorite: async (client_id, dish_id) => {
                 //Corregir para que vaya acorder con el nuevo endpoint, acepta dish, menu y restaurante
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
@@ -396,7 +396,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         headers: {
                             "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                         },
-                        body: JSON.stringify({ dish_id: dishId }),
+                        body: JSON.stringify({ dish_id: dish_id }),
                     });
 
                     if (!response.ok) {
@@ -429,9 +429,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            getRestaurantDetails: async (restaurantId) => {
+            getRestaurantDetails: async (restaurant_id) => {
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}/api/restaurants/${restaurantId}`);
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/restaurants/${restaurant_id}`);
 
                     if (!response.ok) {
                         throw new Error("No se pudo obtener la información del restaurante");
@@ -448,16 +448,16 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            updateRestaurant: async (restaurantId, updatedData) => {
+            updateRestaurant: async (restaurant_id, updatedData) => {
                 try {
                     if (!process.env.BACKEND_URL) {
                         console.error("Error: BACKEND_URL no está definido en las variables de entorno.");
                         return false;
                     }
 
-                    const id = Number(restaurantId);
+                    const id = Number(restaurant_id);
                     if (isNaN(id) || id <= 0) {
-                        console.error("Error: restaurantId debe ser un número válido:", restaurantId);
+                        console.error("Error: restaurant_id debe ser un número válido:", restaurant_id);
                         return false;
                     }
 
