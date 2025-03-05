@@ -42,7 +42,7 @@ class Client(db.Model):
     
     def serialize(self):
         return{
-            'id':self.id,
+            'client_id':self.id,
             'username':self.username,
             'email':self.email
             
@@ -78,7 +78,7 @@ class Restaurant(db.Model):
     
     def serialize(self):
         return{
-            'id':self.id,
+            'restaurant_id':self.id,
             'name':self.name,
             'username':self.username,
             'email':self.email,
@@ -118,7 +118,7 @@ class Menu(db.Model):
     
     def serialize(self):
         return {
-            "id": self.id,
+            "menu_id": self.id,
             "name": self.name,
             "restaurant_id":self.restaurant_id,
             "created":self.created,
@@ -142,7 +142,7 @@ class Dish(db.Model):
 
     def serialize(self):
         return {
-            "id":self.id,
+            "dish_id":self.id,
             "name": self.name,
             "description":self.description,
             "menu_id": self.menu_id,
@@ -168,8 +168,8 @@ class Favorites(db.Model):
         return {
             "id": self.id,
             "client_id": self.client_id,
-            "menu": self.menu.serialize() if self.menu else None,
-            "dish": self.dish.serialize() if self.dish else None,
+            "menu_id": self.menu.serialize() if self.menu else None,
+            "dish_id": self.dish.serialize() if self.dish else None,
             "restaurant_id": self.restaurant_id
         }
 

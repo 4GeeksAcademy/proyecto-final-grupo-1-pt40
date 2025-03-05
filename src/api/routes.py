@@ -52,7 +52,8 @@ def client_registration():
         db.session.add(new_client)
         db.session.commit()
         try:
-            access_token = create_access_token(identity=str(new_client.id), additional_claims={"role":"client"})
+            access_token = create_access_token(identity=new_client.id, additional_claims={"client_id": new_client.id,"role":"client"})
+
             return jsonify({'token':access_token})
         except Exception as e:
             return jsonify({"error":str(e)})
@@ -95,7 +96,8 @@ def restaurant_registration():
         new_restaurant.set_password(password)
         db.session.add(new_restaurant)
         db.session.commit()
-        access_token = create_access_token(identity=str(new_restaurant.id), additional_claims={"role":"restaurant"})
+        access_token = create_access_token(identity=new_restaurant.id, additional_claims={"restaurant_id": new_restaurant.id,"role":"restaurant"})
+
         return jsonify({'token':access_token}), 201
     except DataError as e:
         db.session.rollback()
@@ -156,7 +158,7 @@ def client_login():
     try:
         if client and client.check_password(password):
        
-            access_token = create_access_token(identity=str(client.id), additional_claims={"role":"client"})
+            access_token = create_access_token(identity=str(client.id), additional_claims={"client_id": client.id,"role":"client"})
             return jsonify({"token": access_token}), 200
     
         return jsonify({"message": "Check your username/email and password"}), 400
@@ -182,7 +184,7 @@ def restaurant_login():
     try:
         if restaurant and restaurant.check_password(password):
        
-            access_token = create_access_token(identity=str(restaurant.id), additional_claims={"role":"restaurant"})
+            access_token = create_access_token(identity=str(restaurant.id), additional_claims={"restaurant_id": restaurant.id,"role":"restaurant"})
             return jsonify({"token": access_token}), 200
     
         return jsonify({"message": "Check your username/email and password"}), 400
