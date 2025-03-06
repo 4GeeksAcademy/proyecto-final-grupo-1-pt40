@@ -102,13 +102,14 @@ const Dashboard = () => {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto">
               <li className="nav-item">
-                <button className="btn btn-link nav-link position-relative">
-                  <i className="bi bi-bell"></i>
-                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    3
-                  </span>
-                </button>
+                <form class="form-inline my-2 my-lg-0">
+                  <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"/>
+                </form>
               </li>
+              <form class="form-inline my-2 my-lg-0 px-1">
+              <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+            
               <li className="nav-item dropdown">
                 <button
                   className="btn btn-link nav-link dropdown-toggle"
