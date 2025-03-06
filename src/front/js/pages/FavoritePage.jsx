@@ -21,7 +21,7 @@ const FavoriteView = () => {
                     {store.favorites.map((fav) => {
                         const dish = store.dishes.find((d) => d.id === fav.dish_id);
                         return (
-                            <Col key={fav.id} md={4} className="mb-4">
+                            <Col key={fav.id || fav.dish_id ||  fav.restaurant_id} md={4} className="mb-4">
                                 <Card>
                                     <Card.Img
                                         variant="top"
