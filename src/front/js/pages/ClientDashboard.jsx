@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import FavoritePage from "./FavoritePage.jsx";
+import ExplorePage from "./ExplorePage.jsx";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 
@@ -35,6 +36,8 @@ const ClientDashboard = () => {
                         <p>¿Necesitas asistencia? Consulta nuestras preguntas frecuentes o contáctanos.</p>
                     </div>
                 );
+            case "explore":
+                return <ExplorePage />
 
             default:
                 return (
@@ -55,7 +58,7 @@ const ClientDashboard = () => {
                                                 <p className="card-text">{restaurant.description}</p>
                                                 <button
                                                     className="btn btn-primary"
-                                                    onClick={() => navigate(`/menu/${restaurant.id}`)}
+                                                    onClick={() => navigate(`/menu/1`)}
                                                 >
                                                     Ver Menú
                                                 </button>
@@ -81,6 +84,9 @@ const ClientDashboard = () => {
                     <Nav className="ml-auto">
                         <Nav.Link onClick={() => setActiveMenu("restaurants")} active={activeMenu === "restaurants"}>
                             Restaurantes
+                        </Nav.Link>
+                        <Nav.Link onClick={() => setActiveMenu("explore")} active={activeMenu === "explore"}>
+                            Explora
                         </Nav.Link>
                         <Nav.Link onClick={() => setActiveMenu("perfil")} active={activeMenu === "perfil"}>
                             Perfil

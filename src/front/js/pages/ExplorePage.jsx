@@ -161,7 +161,7 @@ const ExplorePage = () => {
         <Container>
             <h1>Top 10 en Cali</h1>
             <Row className="flex-nowrap overflow-auto p-3" style={{ whiteSpace: 'nowrap' }}>
-                {top.map((res, index) => (
+                {top?.map((res, index) => (
                     <Col key={index} className="d-inline-block">
                         <Card style={{ width: '250px', height: '200px' }}>
                             <Card.Img variant="top" src={res.image} alt={res.name} />

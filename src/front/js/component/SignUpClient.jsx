@@ -50,7 +50,7 @@ const SignUpClient = () => {
     const handleSubmission = async (e) => {
         e.preventDefault();
         const response = await actions.registerUser('client', registration)
-        if (response) navigate(`/restaurant-dashboard`)
+        if (response) navigate(`/client-dashboard`)
     }
 
 
