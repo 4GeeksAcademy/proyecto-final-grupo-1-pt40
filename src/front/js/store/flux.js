@@ -570,7 +570,25 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
 
             },
-            //Agrega actions despues de esta linea
+
+        // Acción para eliminar un restaurante (o producto)
+        deleteRestaurant: async (restaurantId) => {
+            const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
+            try {
+              const response = await fetch(`${backendUrl}/api/restaurants/${restaurantId}`, {
+                method: "DELETE"
+              });
+              if (!response.ok) throw new Error("Failed to delete restaurant");
+              const store = getStore();
+              const updatedRestaurants = store.restaurants.filter(r => r.id !== restaurantId);
+              setStore({ ...store, restaurants: updatedRestaurants });
+              return true;
+            } catch (error) {
+              console.error("Error deleting restaurant:", error);
+              return false;
+            }
+          },
+          //Agrega actions despues de esta linea
 
         }
     }
