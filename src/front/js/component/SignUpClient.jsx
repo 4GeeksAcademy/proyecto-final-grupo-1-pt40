@@ -6,6 +6,7 @@ import { Form, Button } from "react-bootstrap";
 const SignUpClient = () => {
 
     const { store, actions } = useContext(Context);
+    const navigate = useNavigate();
     const [deparments, setDepartments] = useState([])
     const [cities, setCities] = useState([])
 
