@@ -5,6 +5,7 @@ from api.models import db, Client, Restaurant, Menu, Dish,Favorites,Admin
 from flask import Flask, request, jsonify, url_for, Blueprint, Response,send_file
 from werkzeug.utils import secure_filename
 from sqlalchemy.exc import DataError
+from sqlalchemy import or_
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity,get_jwt
@@ -66,8 +67,6 @@ def client_registration():
 @api.route('/register/restaurant', methods=['POST'])
 def restaurant_registration():
     data = request.json
-    print("🔹 Datos recibidos en Flask:", data)  # 🔍 Verifica si llega bien
-    print("🔹 Horario recibido:", data.get("schedule"))  # 🔍 Verifica si el horario llega con el formato correcto
     email = data.get('email')
     username =  data.get('username')
     password = data.get('password')
@@ -105,9 +104,15 @@ def restaurant_registration():
          return jsonify('Server error: Failed to process request'), 500
 
 @api.route('/modify/registration/restaurant', methods=['PUT'])
+@jwt_required()
 def modify_restaurant_registration():
     data = request.json
-    restaurant_id = data['restaurant_id']
+    restaurant_id = get_jwt_identity() 
+    claims = get_jwt() 
+    role = claims.get("role")
+
+    if role != "restaurant":
+            return jsonify({"error": "Unauthorized: Login failed, not authorized to modify registration"}), 403
     try:
         if restaurant_id:
             restaurant = Restaurant.query.filter_by(id=restaurant_id).first()
@@ -545,8 +550,16 @@ def admin_dashboard():
 
 
 
-@api.route('/restaurants/<int:restaurant_id>', methods=['GET'])
-def get_restaurant_by_id(restaurant_id):
+@api.route('/restaurant/profile', methods=['GET'])
+@jwt_required()
+def get_restaurant_by_id():
+    restaurant_id = get_jwt_identity()  
+    claims = get_jwt()
+    role = claims.get('role')
+
+    if role != "restaurant":
+            return jsonify({"error": "Unauthorized: Not authorized to view profile"}), 403
+
     restaurant = Restaurant.query.get(restaurant_id)
     
     if restaurant is None:
@@ -571,8 +584,16 @@ def get_restaurant_by_id(restaurant_id):
     })
 
 
-@api.route('/restaurants/<int:restaurant_id>', methods=['PUT'])
-def update_restaurant(restaurant_id):
+@api.route('/restaurant/profile', methods=['PUT'])
+@jwt_required()
+def update_restaurant():
+    restaurant_id = get_jwt_identity()  
+    claims = get_jwt()
+    role = claims.get('role')
+
+    if role != "restaurant":
+            return jsonify({"error": "Unauthorized: Not authorized to view profile"}), 403
+    
     try:
         restaurant = Restaurant.query.get(restaurant_id)
         if not restaurant:
@@ -607,5 +628,45 @@ def update_restaurant(restaurant_id):
         return jsonify({"msg": "Error al actualizar el restaurante", "error": str(e)}), 500
     
     #Rutas para Explora y Descubre
+@api.route('/search', methods=['POST'])
+def search():
+    data = request.json
+    department = data.get('department',None)
+    city = data.get('city',None)
+    cuisine = data.get('cuisine',None)
+    keyword = data.get('keyword',None)
+    query = Restaurant.query
+    try:
+        if department:
+            query = query.filter_by(department=department)
+        if city:
+            query = query.filter_by(city=city)
+        if cuisine:
+            query = query.filter_by(cuisine_type=cuisine)
+        if keyword:
+            keyword_filter = '%{}%'.format(keyword)
+            query =query.filter(or_(Restaurant.name.ilike(keyword_filter), Restaurant.description.ilike(keyword_filter)))
+        
+        restaurants = query.all()
+        result = [restaurant.serialize() for restaurant in restaurants]
+        return jsonify(result),200
+    except Exception as e:
+        db.session.rollback() 
+        return jsonify({"msg": "Error al buscar restaurantes", "error": str(e)}), 500
 
+@api.route('/top-restaurants/<city>', methods=['GET'])
+def top_restaurants(city):
+    if not city:
+        return jsonify({'error':'Missing city parameter'}), 400
+    try:
+        top_restaurants = db.session.query(Restaurant, db.func.count(Favorites.id).label('likes')
+        ).join(Favorites, Restaurant.id == Favorites.restaurant_id).filter(Restaurant.city == city).group_by(Restaurant.id).order_by(db.desc('likes')).limit(10).all()
+
+        if not top_restaurants:
+            return jsonify({'message':'No restaurants found'}),404
+        result = [restaurant[0].serialize() for restaurant in top_restaurants]
+        return jsonify(result),200
+    except Exception as e:
+        db.session.rollback() 
+        return jsonify({"msg": "Error al buscar restaurantes", "error": str(e)}), 500
     #Termina rutas para explora y descrubre, puedes continuar agregando despues de esta linea

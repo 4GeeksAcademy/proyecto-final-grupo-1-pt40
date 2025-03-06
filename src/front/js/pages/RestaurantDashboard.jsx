@@ -9,12 +9,11 @@ import DeleteMenuModal from "../component/DeleteMenuModal.jsx"
 
 const RestaurantDashboard = () => {
     const { store, actions } = useContext(Context);
-    const id = localStorage.getItem('restaurant')
     const [alert, setAlert] = useState(null)
     const navigate = useNavigate()
 
     const onLoad = async () => {
-        if (await actions.getRestaurantMenus(id)) {
+        if (await actions.getRestaurantMenus()) {
             console.log("Menús cargados correctamente.");
         } else {
             console.error("Error al cargar los menús.");
@@ -55,13 +54,13 @@ const RestaurantDashboard = () => {
                     <div className="collapse navbar-collapse">
                         <ul className="navbar-nav ms-auto">
                             <li className="nav-item">
-                                <CreateMenuModal restaurantID={id} />
+                                <CreateMenuModal />
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link" to="/restaurant-form">Agregar Información</Link>
+                                <Link className="nav-link" to="/edit-restaurant/">Agregar Información</Link>
                             </li>
                             <li className="nav-item">
-                            <Link className="nav-link" to={`/restaurant-profile/${id}`}>Mi Perfil</Link>
+                            <Link className="nav-link" to={`/restaurant-profile/`}>Mi Perfil</Link>
                             </li>
                         </ul>
                     </div>
@@ -82,7 +81,7 @@ const RestaurantDashboard = () => {
                     store.restaurantMenus.length > 0 ? (
                         <Accordion className="w-100">
                             {store.restaurantMenus.map((menu) => (
-                                <Accordion.Item eventKey={menu.id} key={menu.id}>
+                                <Accordion.Item eventKey={menu.menu_id} key={menu.menu_id}>
                                     <Accordion.Header>{menu.name}</Accordion.Header>
                                     <Accordion.Body>
                                         <p>{`Creado: ${menu.created}`}</p>
@@ -90,10 +89,10 @@ const RestaurantDashboard = () => {
                                         <p>{`Moneda: ${menu.currency}`}</p>
                                         <p>{`Estatus: ${menu.is_active ? "Público" : 'Privado'}`}</p>
                                         <div className="d-flex justify-content-between w-50">
-                                            <Button variant="light" onClick={() => handleView(menu.id)}>Ver</Button>
-                                            <Button variant="primary" onClick={() => handleEdit(menu.id)}>Editar</Button>
-                                            <Button variant="success" onClick={() => handlePublish(menu.id)}>Publicar</Button>
-                                            <Button variant="warning" onClick={() => handleUnpublish(menu.id)}>Privatizar</Button>
+                                            <Button variant="light" onClick={() => handleView(menu.menu_id)}>Ver</Button>
+                                            <Button variant="primary" onClick={() => handleEdit(menu.menu_id)}>Editar</Button>
+                                            <Button variant="success" onClick={() => handlePublish(menu.menu_id)}>Publicar</Button>
+                                            <Button variant="warning" onClick={() => handleUnpublish(menu.menu_id)}>Privatizar</Button>
                                             <DeleteMenuModal data={menu} />
                                         </div>
                                     </Accordion.Body>

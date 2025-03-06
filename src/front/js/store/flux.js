@@ -9,21 +9,22 @@ const getState = ({ getStore, getActions, setStore }) => {
             menuList: [],
             restaurantMenu: [],
             menuRestaurant: [],
-            restaurants: []
+            restaurants: [],
+            top: [],
+            searchL: []
         },
         actions: {
-            registerRestaurant: async (userType, email, password, username, department, city, name, schedule, cuisine_type, exact_address, social_networks, phone, description, image) => {
+            registerUser: async (userType, registration) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
-                const endpoint = `${backendUrl}/api/register/${userType}`.replace(/([^:]\/)\/+/g, "$1");
+                const endpoint = `${backendUrl}api/register/${userType}`;
 
                 try {
-                    console.log("Enviando horario al backend:", JSON.stringify(schedule));
                     const response = await fetch(endpoint, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
-                        body: JSON.stringify({ email, password, username, department, city, name, schedule, cuisine_type, exact_address, social_networks, phone, description, image }),
+                        body: JSON.stringify({ ...registration, department: registration.department.name, city: registration.city.name }),
                     });
 
                     if (!response.ok) {
@@ -387,16 +388,17 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
 
-            addFavorite: async (client_id, dish_id) => {
+            addFavorite: async (client_id,dish_id,restaurant_id) => {
                 //Corregir para que vaya acorder con el nuevo endpoint, acepta dish, menu y restaurante
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
+                    console.log("Datos enviados al backend:", { client_id, dish_id, restaurant_id });
                     const response = await fetch(`${backendUrl}/api/favorites`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                         },
-                        body: JSON.stringify({ dish_id: dish_id }),
+                        body: JSON.stringify({ dish_id: dish_id,restaurant_id:restaurant_id}),
                     });
 
                     if (!response.ok) {
@@ -404,6 +406,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
 
                     const newFavorite = await response.json();
+                    console.log("Favorito agregado:", newFavorite);
                     const store = getStore();
                     setStore({ favorites: [...store.favorites, newFavorite] });
                 } catch (error) {
@@ -429,9 +432,13 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            getRestaurantDetails: async (restaurant_id) => {
+            getRestaurantDetails: async () => {
+                const store = getStore()
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}/api/restaurants/${restaurant_id}`);
+                    const response = await fetch(`${process.env.BACKEND_URL}api/restaurant/profile`, {
+                        method: 'GET',
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` }
+                    });
 
                     if (!response.ok) {
                         throw new Error("No se pudo obtener la información del restaurante");
@@ -439,7 +446,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
                     const data = await response.json();
                     console.log("Datos recibidos del backend:", data);
-                    setStore({ restaurantDetails: data });
+                    setStore({ ...store, restaurantDetails: data });
 
                     return data;
                 } catch (error) {
@@ -448,39 +455,20 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            updateRestaurant: async (restaurant_id, updatedData) => {
+            updateRestaurant: async (registration) => {
                 try {
                     if (!process.env.BACKEND_URL) {
                         console.error("Error: BACKEND_URL no está definido en las variables de entorno.");
                         return false;
                     }
 
-                    const id = Number(restaurant_id);
-                    if (isNaN(id) || id <= 0) {
-                        console.error("Error: restaurant_id debe ser un número válido:", restaurant_id);
-                        return false;
-                    }
-
-                    if (!updatedData || typeof updatedData !== "object" || Array.isArray(updatedData)) {
-                        console.error("Error: updatedData debe ser un objeto JSON válido:", updatedData);
-                        return false;
-                    }
-
-                    // ✅ Verifica si updatedData.schedule tiene el formato esperado
-                    if (updatedData.schedule && (!updatedData.schedule.week || !updatedData.schedule.weekend)) {
-                        console.error("❌ Error: El objeto 'schedule' no tiene la estructura correcta.");
-                        return false;
-                    }
-
-                    // ✅ Construcción segura de la URL
-                    const url = `${process.env.BACKEND_URL.replace(/\/$/, "")}/api/restaurants/${id}`;
+                    const url = `${process.env.BACKEND_URL}api/restaurant/profile`;
                     console.log("URL de la solicitud PUT:", url);
 
-                    // ✅ Enviar la petición
                     const response = await fetch(url, {
                         method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(updatedData)
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
+                        body: JSON.stringify({ ...registration, department: registration.department.name, city: registration.city.name })
                     });
 
                     if (!response.ok) {
@@ -488,17 +476,100 @@ const getState = ({ getStore, getActions, setStore }) => {
                         console.error(`Error en la API (${response.status}):`, errorText);
                         return false;
                     }
-
-                    console.log("✅ Restaurante actualizado correctamente.");
+                    console.log(" Restaurante actualizado correctamente.");
                     return true;
                 } catch (error) {
-                    console.error("❌ Error actualizando restaurante:", error);
+                    console.error("Error actualizando restaurante:", error);
                     return false;
                 }
             },
 
             //Actions para explora y descrubre
+            getDepartments: async () => {
+                try {
+                    const response = await fetch('https://api-colombia.com/api/v1/Department')
 
+                    if (!response.ok) {
+                        throw new Error(response.statusText);
+                    }
+
+                    const data = await response.json()
+
+                    const departments = data.map(element => {
+                        return { 'name': element.name, 'id': element.id }
+                    });
+
+                    return departments
+                } catch (error) {
+                    console.error("Error fetching departments", error);
+                }
+            },
+
+            getCities: async (department_id) => {
+                try {
+                    const response = await fetch(`https://api-colombia.com/api/v1/Department/${department_id}/cities`)
+
+                    if (!response.ok) {
+                        throw new Error(response.statusText);
+                    }
+                    const data = await response.json()
+                    const cities = data.map(element => {
+                        return { 'name': element.name, 'id': element.id }
+                    });
+
+                    return cities
+                } catch (error) {
+                    console.error("Error fetching cities", error);
+                }
+
+            },
+
+            searchRequest: async (search) => {
+                const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/search`, {
+                        method: 'POST',
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ ...search, department: search.department.name, city: search.city.name })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(response.statusText);
+                    }
+                    const data = await response.json()
+                    setStore({ ...store, search: data });
+                    return true
+                } catch (error) {
+                    console.error("Error with search query", error);
+                }
+
+            },
+
+
+            resetSearch: () => {
+                const store = getStore()
+                setStore({ ...store, search: [] })
+
+            },
+
+            topRestaurants: async (city) => {
+                const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/top-restaurants/${city}`, {
+                        method: 'GET',
+                        headers: { "Content-Type": "application/json" },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(response.statusText);
+                    }
+                    const data = await response.json()
+                    return data;
+                } catch (error) {
+                    console.error("Error with search query", error);
+                }
+
+            },
             //Agrega actions despues de esta linea
 
         }

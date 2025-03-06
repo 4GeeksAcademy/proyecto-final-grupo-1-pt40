@@ -86,7 +86,6 @@ class Restaurant(db.Model):
             'image': self.image,
             'department':self.department,
             'city':self.city,
-            'schedule':self.schedule,
             'cuisine_type':self.cuisine_type,
             'exact_address':self.exact_address,
             'social_networks':self.social_networks,

@@ -18,6 +18,7 @@ import RestaurantForm from "./pages/RestaurantForm.jsx";
 import FavoritePage from "./pages/FavoritePage.jsx";
 import EditRestaurantForm from "./component/EditRestaurantForm.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
+import RestaurantProfileEdit from "./pages/RestaurantProfileEdit.jsx";
 
 
 //create your first component
@@ -37,17 +38,20 @@ const Layout = () => {
                         <Route element={<Home />} path="/" />
                         <Route element={<SignUpPage />} path="/signup" />
                         <Route element={<LoginPage />} path="/login" />
-                        <Route element={<Demo />} path="/demo" />
-                        <Route element={<Single />} path="/single/:theid" />
-                        <Route element={<MenuBuilder />} path="/menu-builder/:menuID" />
                         <Route element={<MenuView />} path="/menu/:menuID" />
+
                         <Route element={<ClientDashboard />} path="/client-dashboard" />
-                        <Route element={<AdminDashboard />} path="/admin-dashboard" />
                         <Route element={<FavoritePage />} path="/favorites" />
+
+                        <Route element={<AdminDashboard />} path="/admin-dashboard" />
+
                         <Route element={<RestaurantDashboard />} path="/restaurant-dashboard" />
+                        <Route element={<MenuBuilder />} path="/menu-builder/:menuID" />
                         <Route element={<RestaurantForm />} path="/restaurant-form" />
-                        <Route element={<RestaurantProfile />} path="/restaurant-profile/:restaurantId" />
-                        <Route path="/edit-restaurant/:restaurantId" element={<EditRestaurantForm />} />
+                        <Route element={<RestaurantProfile />} path="/restaurant-profile" />
+                        <Route element={<RestaurantProfileEdit />} path="/edit-restaurant" />
+
+
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
 

@@ -3,6 +3,7 @@ import { Tabs, Tab, Card, Button } from "react-bootstrap";
 import Spinner from 'react-bootstrap/Spinner';
 import { useParams } from 'react-router-dom';
 import { Context } from "../store/appContext";
+import FavoriteButton from "../component/FavoriteButton.jsx"
 
 
 const MenuView = () => {
@@ -44,6 +45,7 @@ const MenuView = () => {
                                                         <Card.Title>{dish.name}</Card.Title>
                                                         <Card.Text>{dish.description}</Card.Text>
                                                         <Card.Text><strong>Precio:</strong> {`${dish.price} ${menu.currency}`}</Card.Text>
+                                                        <FavoriteButton dish_id={dish.id} />
                                                     </Card.Body>
                                                 </Card>
                                             ))

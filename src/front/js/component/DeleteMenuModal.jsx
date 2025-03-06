@@ -8,21 +8,20 @@ import { useNavigate } from "react-router-dom";
 function CreateMenuModal({ data }) {
     const { store, actions } = useContext(Context);
     const [show, setShow] = useState(false);
-    const id = localStorage.getItem('restaurant')
     const navigate = useNavigate()
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
     const onLoad = async () => {
-        if (await actions.getRestaurantMenus(id)) {
+        if (await actions.getRestaurantMenus()) {
             console.log("Menús cargados correctamente.");
         } else {
             console.error("Error al cargar los menús.");
         }
     };
     const handleDelete = async () => {
-        const response = await actions.deleteMenu(data.id)
+        const response = await actions.deleteMenu(data.menu_id)
         setShow(false)
     }
 

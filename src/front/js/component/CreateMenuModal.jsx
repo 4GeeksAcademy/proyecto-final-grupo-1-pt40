@@ -5,10 +5,10 @@ import { Form, Dropdown, DropdownButton } from "react-bootstrap";
 import Modal from 'react-bootstrap/Modal';
 import { useNavigate } from "react-router-dom";
 
-function CreateMenuModal({restaurant_id}) {
+function CreateMenuModal() {
     const { store, actions } = useContext(Context);
     const [show, setShow] = useState(false);
-    const [newMenu, setNewMenu] = useState({ 'name': '', 'restaurant_id': restaurant_id, 'currency': 'Selecciona una moneda' });
+    const [newMenu, setNewMenu] = useState({ 'name': '', 'currency': 'Selecciona una moneda' });
     const navigate = useNavigate()
 
     const handleClose = () => setShow(false);
@@ -21,7 +21,7 @@ function CreateMenuModal({restaurant_id}) {
         }
         const response = await actions.createMenu(newMenu)
         if (response) {
-            navigate(`/menu-builder/${response.id}`)
+            navigate(`/menu-builder/${response.menu_id}`)
             setShow(false)
         }
     }
