@@ -5,6 +5,7 @@ import FavoritePage from "./FavoritePage.jsx";
 import ExplorePage from "./ExplorePage.jsx";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
+import FavoriteButton from "../component/FavoriteButton.jsx"
 
 const ClientDashboard = () => {
     const navigate = useNavigate();
@@ -62,6 +63,7 @@ const ClientDashboard = () => {
                                                 >
                                                     Ver Menú
                                                 </button>
+                                                <FavoriteButton restaurant_id={restaurant.id} />
                                             </div>
                                         </div>
                                     </div>

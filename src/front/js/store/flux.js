@@ -388,16 +388,17 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
 
-            addFavorite: async (client_id, dish_id) => {
+            addFavorite: async (client_id,dish_id,restaurant_id) => {
                 //Corregir para que vaya acorder con el nuevo endpoint, acepta dish, menu y restaurante
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
+                    console.log("Datos enviados al backend:", { client_id, dish_id, restaurant_id });
                     const response = await fetch(`${backendUrl}/api/favorites`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                         },
-                        body: JSON.stringify({ dish_id: dish_id }),
+                        body: JSON.stringify({ dish_id: dish_id,restaurant_id:restaurant_id}),
                     });
 
                     if (!response.ok) {
@@ -405,6 +406,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
 
                     const newFavorite = await response.json();
+                    console.log("Favorito agregado:", newFavorite);
                     const store = getStore();
                     setStore({ favorites: [...store.favorites, newFavorite] });
                 } catch (error) {
