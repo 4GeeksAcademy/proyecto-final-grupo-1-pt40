@@ -572,6 +572,73 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
             //Agrega actions despues de esta linea
 
+            getClientDetails: async () => {
+                const store = getStore();
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/client/profile`, {
+                        method: 'GET',
+                        headers: { 
+                            "Content-Type": "application/json", 
+                            'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                        }
+                    });
+            
+                    if (!response.ok) {
+                        throw new Error("No se pudo obtener la información del cliente");
+                    }
+            
+                    const data = await response.json();
+                    console.log("Datos del cliente recibidos del backend:", data);
+                    setStore({ ...store, clientDetails: data });
+            
+                    return data;
+                } catch (error) {
+                    console.log("Error al obtener los detalles del cliente:", error);
+                    return null;
+                }
+            },
+
+            updateClient: async (registration) => {
+                try {
+                  if (!process.env.BACKEND_URL) {
+                    console.error("Error: BACKEND_URL no está definido en las variables de entorno.");
+                    return false;
+                  }
+              
+                  const url = `${process.env.BACKEND_URL}api/client/profile`;
+                  console.log("URL de la solicitud PUT:", url);
+              
+                  // Prepare data to send, excluding password if empty
+                  const dataToSend = {
+                    department: registration.department,
+                    city: registration.city,
+                  };
+                  if (registration.password) {
+                    dataToSend.password = registration.password;
+                  }
+              
+                  const response = await fetch(url, {
+                    method: "PUT",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+                    },
+                    body: JSON.stringify(dataToSend),
+                  });
+              
+                  if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`Error en la API (${response.status}):`, errorText);
+                    return false;
+                  }
+                  console.log("Cliente actualizado correctamente.");
+                  return true;
+                } catch (error) {
+                  console.error("Error actualizando cliente:", error);
+                  return false;
+                }
+              },
+
         }
     }
 

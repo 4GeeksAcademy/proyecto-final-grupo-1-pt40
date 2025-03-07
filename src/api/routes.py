@@ -670,3 +670,66 @@ def top_restaurants(city):
         db.session.rollback() 
         return jsonify({"msg": "Error al buscar restaurantes", "error": str(e)}), 500
     #Termina rutas para explora y descrubre, puedes continuar agregando despues de esta linea
+
+@api.route('/client/profile', methods=['GET'])
+@jwt_required()
+def get_client_by_id():
+    client_id = get_jwt_identity()  
+    claims = get_jwt()
+    role = claims.get('role')
+
+    if role != "client":
+        return jsonify({"error": "Unauthorized: Not authorized to view profile"}), 403
+
+    client = Client.query.get(client_id)
+    
+    if client is None:
+        return jsonify({'error': 'Client not found'}), 404
+
+    return jsonify({
+        'client_id': client.id,
+        'email': client.email,
+        'username': client.username,
+        'department': client.department,
+        'city': client.city,
+        'is_active': client.is_active
+    })
+
+@api.route('/client/profile', methods=['PUT'])
+@jwt_required()
+def update_client():
+    client_id = get_jwt_identity()  # Get client ID from JWT token
+    claims = get_jwt()
+    role = claims.get('role')
+
+    # Check if the user is a client
+    if role != "client":
+        return jsonify({"error": "Unauthorized: Not authorized to update client profile"}), 403
+
+    try:
+        client = Client.query.get(client_id)
+        if not client:
+            return jsonify({"msg": "Cliente no encontrado"}), 404
+
+        data = request.get_json()
+        if not data:
+            return jsonify({"msg": "Datos inválidos"}), 400
+
+        # Update only the fields provided in the request
+        if 'department' in data:
+            client.department = data['department']
+        if 'city' in data:
+            client.city = data['city']
+        if 'password' in data and data['password']:
+            client.set_password(data['password'])  # Hash the password using the model's method
+
+        db.session.commit()
+
+        return jsonify({
+            "msg": "Cliente actualizado correctamente",
+            "client": client.serialize()
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al actualizar el cliente", "error": str(e)}), 500    
