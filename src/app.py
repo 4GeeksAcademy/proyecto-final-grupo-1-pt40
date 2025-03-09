@@ -11,11 +11,20 @@ from api.models import db
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
+from dotenv import load_dotenv
+import paypalrestsdk
 
+load_dotenv()
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "my-secret-key"  
 jwt = JWTManager(app)
 # from models import Person
+
+paypalrestsdk.configure({
+    "mode": "sandbox",  # sandbox or live
+    "client_id": os.getenv("PAYPAL_CLIENT_ID"),
+    "client_secret": os.getenv("PAYPAL_CLIENT_SECRET")
+})
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(

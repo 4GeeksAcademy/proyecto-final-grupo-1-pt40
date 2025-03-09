@@ -11,12 +11,17 @@ from flask_cors import CORS
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity,get_jwt
 from flask_jwt_extended import JWTManager
 import json
+import os
+from dotenv import load_dotenv
+import paypalrestsdk
 
 
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
 CORS(api)
+load_dotenv()
+FRONTEND_URL = os.getenv('FRONTEND_URL')
 
 
 
@@ -670,3 +675,97 @@ def top_restaurants(city):
         db.session.rollback() 
         return jsonify({"msg": "Error al buscar restaurantes", "error": str(e)}), 500
     #Termina rutas para explora y descrubre, puedes continuar agregando despues de esta linea
+
+
+@api.route('/admin/delete/restaurant', methods=['DELETE'])
+def admin_delete_restaurant():
+    data = request.json
+    restaurant_id = data.get('restaurant_id', None)
+    if not restaurant_id:
+        return jsonify({'error':'Missing restaurant id'}), 400
+    try:
+       restaurant = Restaurant.query.get(restaurant_id)
+       if not restaurant:
+            return jsonify({'error': 'Client not found'}), 404
+       db.session.delete(restaurant)
+       db.session.commit()
+       return jsonify({'message':'Restaurant deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'Server error: Failed to process request'}), 500
+    
+@api.route('/admin/delete/client', methods=['DELETE'])
+def admin_delete_client():
+    data = request.json
+    client_id = data.get('client_id', None)
+    if not client_id:
+        return jsonify({'error':'Missing client id'}), 400
+    try:
+       client = Client.query.get(client_id)
+       if not client:
+            return jsonify({'error': 'Client not found'}), 404
+       db.session.delete(client)
+       db.session.commit()
+       return jsonify({'message':'Client deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'Server error: Failed to process request'}), 500
+
+@api.route('/orders', methods=['POST'])
+def create_order():
+    request_body = request.get_json()
+    cart = request_body['cart']  # Use the cart information as needed
+    payment = paypalrestsdk.Payment({
+        "intent": "sale",
+        "payer": {
+            "payment_method": "paypal"
+        },
+        "redirect_urls": {
+            "return_url": f"{os.getenv('FRONTEND_URL')}restaurant-dashboard",
+            "cancel_url": f"{os.getenv('FRONTEND_URL')}restaurant-dashboard"
+        },
+        "transactions": [{
+            "item_list": {
+                "items": [{
+                    "name": "test item",
+                    "sku": "item",
+                    "price": "10.00",
+                    "currency": "USD",
+                    "quantity": 1
+                }]
+            },
+            "amount": {
+                "total": "10.00",
+                "currency": "USD"
+            },
+            "description": "This is the payment transaction description."
+        }]
+    })
+
+    if payment.create():
+        for link in payment.links:
+            if link.rel == "approval_url":
+                approval_url = link.href
+                token = approval_url.split('token=')[1] 
+                return jsonify({'approval_url': approval_url, 'order_id': payment.id, 'token':token})
+    else:
+        return jsonify({'error': payment.error}), 400
+
+@api.route('orders/<order_id>/capture', methods=['POST'])
+def capture_order(order_id):
+    try:
+        data = request.json
+        orderID = data.get('orderID')
+        payment = paypalrestsdk.Payment.find(orderID)
+        if payment:
+            if payment.execute({"payer_id": payment.payer.payer_info.payer_id}):
+                    captured_payment = payment.to_dict()
+                    return jsonify(captured_payment), 200
+            else:
+                return jsonify({'error': payment.error}), 400
+        else:
+            return jsonify({'error': 'Payment not found'}), 404
+    except paypalrestsdk.exceptions.ResourceNotFound as e:
+        return jsonify({'error': 'Resource not found', 'details': str(e)}), 404
+    except Exception as e:
+         return jsonify({'error': str(e)}), 500

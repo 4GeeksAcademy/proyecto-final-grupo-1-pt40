@@ -7,7 +7,6 @@ import MenuBuilder from "./pages/MenuBuilder.jsx";
 import SignUpPage from './pages/SignUpPage.jsx';
 import ClientDashboard from "./pages/ClientDashboard.jsx";
 import { Home } from "./pages/home";
-import { Demo } from "./pages/demo";
 import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
 import LoginPage from "./pages/LoginPage.jsx";
@@ -50,8 +49,7 @@ const Layout = () => {
                         <Route element={<RestaurantForm />} path="/restaurant-form" />
                         <Route element={<RestaurantProfile />} path="/restaurant-profile" />
                         <Route element={<RestaurantProfileEdit />} path="/edit-restaurant" />
-
-
+                        <Route element={<Single />} path="/payment" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
 
