@@ -8,9 +8,9 @@ const containerStyle = {
 
 const GoogleMaps = ({ plusCode }) => {
     const [location, setLocation] = useState(null)
-
+    const KEY= process.env.MAP_API
     const getLocation = async (plusCode) => {
-        const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${plusCode}&key=AIzaSyBsYRr1wlZA0mJtjBUL8vo5_L9RsYiVrFg`)
+        const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${plusCode}&key=${KEY}`)
         const data = await response.json()
         console.log(data)
         if (data.results.length > 0) {
@@ -28,7 +28,7 @@ const GoogleMaps = ({ plusCode }) => {
         )
     }
     return (
-        <LoadScript googleMapsApiKey="AIzaSyBsYRr1wlZA0mJtjBUL8vo5_L9RsYiVrFg">
+        <LoadScript googleMapsApiKey={KEY}>
             <GoogleMap mapContainerStyle={containerStyle} center={location} zoom={15} mapId={'9b9f62a2055159bc'}>
                 <Marker position={location} />
             </GoogleMap>
