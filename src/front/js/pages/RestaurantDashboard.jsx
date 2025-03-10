@@ -21,7 +21,7 @@ const RestaurantDashboard = () => {
     };
 
     const handleView = (id) => {
-        navigate(`/restaurant/donpepeburger/${id}`)
+        navigate(`/menu/${id}`)
     }
 
     const handleEdit = (id) => {
