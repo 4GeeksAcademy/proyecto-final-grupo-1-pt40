@@ -13,10 +13,10 @@ const getState = ({ getStore, getActions, setStore }) => {
             top: [],
             search: [],
             notificaciones: [
-        "Nueva reserva en Restaurante A",
-        "Restaurante B ha actualizado su menú",
-        "Nuevo comentario en Restaurante A",
-      ],
+                "Nueva reserva en Restaurante A",
+                "Restaurante B ha actualizado su menú",
+                "Nuevo comentario en Restaurante A",
+            ],
             notificacionesSeleccionadas: [],
             solicitudes: [], // Lista de solicitudes (reportes)
         },
@@ -395,7 +395,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
 
-            addFavorite: async (client_id,dish_id,restaurant_id) => {
+            addFavorite: async (client_id, dish_id, restaurant_id) => {
                 //Corregir para que vaya acorder con el nuevo endpoint, acepta dish, menu y restaurante
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
@@ -405,7 +405,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         headers: {
                             "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                         },
-                        body: JSON.stringify({ dish_id: dish_id,restaurant_id:restaurant_id}),
+                        body: JSON.stringify({ dish_id: dish_id, restaurant_id: restaurant_id }),
                     });
 
                     if (!response.ok) {
@@ -578,44 +578,44 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             },
 
-        // Acción para eliminar un restaurante (o producto)
-        deleteRestaurant: async (restaurantId) => {
-            const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
-            try {
-              const response = await fetch(`${backendUrl}/api/restaurants/${restaurantId}`, {
-                method: "DELETE"
-              });
-              if (!response.ok) throw new Error("Failed to delete restaurant");
-              const store = getStore();
-              const updatedRestaurants = store.restaurants.filter(r => r.id !== restaurantId);
-              setStore({ ...store, restaurants: updatedRestaurants });
-              return true;
-            } catch (error) {
-              console.error("Error deleting restaurant:", error);
-              return false;
-            }
-          },
-          //Agrega actions despues de esta linea
+            // Acción para eliminar un restaurante (o producto)
+            deleteRestaurant: async (restaurantId) => {
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
+                try {
+                    const response = await fetch(`${backendUrl}/api/restaurants/${restaurantId}`, {
+                        method: "DELETE"
+                    });
+                    if (!response.ok) throw new Error("Failed to delete restaurant");
+                    const store = getStore();
+                    const updatedRestaurants = store.restaurants.filter(r => r.id !== restaurantId);
+                    setStore({ ...store, restaurants: updatedRestaurants });
+                    return true;
+                } catch (error) {
+                    console.error("Error deleting restaurant:", error);
+                    return false;
+                }
+            },
+            //Agrega actions despues de esta linea
 
             getClientDetails: async () => {
                 const store = getStore();
                 try {
                     const response = await fetch(`${process.env.BACKEND_URL}api/client/profile`, {
                         method: 'GET',
-                        headers: { 
-                            "Content-Type": "application/json", 
+                        headers: {
+                            "Content-Type": "application/json",
                             'Authorization': `Bearer ${sessionStorage.getItem('token')}`
                         }
                     });
-            
+
                     if (!response.ok) {
                         throw new Error("No se pudo obtener la información del cliente");
                     }
-            
+
                     const data = await response.json();
                     console.log("Datos del cliente recibidos del backend:", data);
                     setStore({ ...store, clientDetails: data });
-            
+
                     return data;
                 } catch (error) {
                     console.log("Error al obtener los detalles del cliente:", error);
@@ -625,94 +625,96 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             updateClient: async (registration) => {
                 try {
-                  if (!process.env.BACKEND_URL) {
-                    console.error("Error: BACKEND_URL no está definido en las variables de entorno.");
-                    return false;
-                  }
-              
-                  const url = `${process.env.BACKEND_URL}api/client/profile`;
-                  console.log("URL de la solicitud PUT:", url);
-              
-                  // Prepare data to send, excluding password if empty
-                  const dataToSend = {
-                    department: registration.department,
-                    city: registration.city,
-                  };
-                  if (registration.password) {
-                    dataToSend.password = registration.password;
-                  }
-              
-                  const response = await fetch(url, {
-                    method: "PUT",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-                    },
-                    body: JSON.stringify(dataToSend),
-                  });
-              
-                  if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error(`Error en la API (${response.status}):`, errorText);
-                    return false;
-                  }
-                  console.log("Cliente actualizado correctamente.");
-                  return true;
+                    if (!process.env.BACKEND_URL) {
+                        console.error("Error: BACKEND_URL no está definido en las variables de entorno.");
+                        return false;
+                    }
+
+                    const url = `${process.env.BACKEND_URL}api/client/profile`;
+                    console.log("URL de la solicitud PUT:", url);
+
+                    // Prepare data to send, excluding password if empty
+                    const dataToSend = {
+                        department: registration.department,
+                        city: registration.city,
+                    };
+                    if (registration.password) {
+                        dataToSend.password = registration.password;
+                    }
+
+                    const response = await fetch(url, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+                        },
+                        body: JSON.stringify(dataToSend),
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error(`Error en la API (${response.status}):`, errorText);
+                        return false;
+                    }
+                    console.log("Cliente actualizado correctamente.");
+                    return true;
                 } catch (error) {
-                  console.error("Error actualizando cliente:", error);
-                  return false;
+                    console.error("Error actualizando cliente:", error);
+                    return false;
                 }
-              },
-        
-        manejarSeleccionNotificacion: (index) => {
-        const store = getStore();
-        if (store.notificacionesSeleccionadas.includes(index)) {
-          // Si ya está seleccionada, la eliminamos
-          setStore({
-            notificacionesSeleccionadas: store.notificacionesSeleccionadas.filter((i) => i !== index),
-          });
-        } else {
-          // Si no está seleccionada, la agregamos
-          setStore({
-            notificacionesSeleccionadas: [...store.notificacionesSeleccionadas, index],
-          })
-        },
+            },
 
-      // Acción para agregar una nueva solicitud (reporte)
-      agregarSolicitud: (destinatario, mensaje) => {
-        const store = getStore();
-        const nuevaSolicitud = {
-          id: store.solicitudes.length + 1,
-          destinatario,
-          mensaje,
-          fecha: new Date().toLocaleString(),
-        };
-        setStore({
-          solicitudes: [...store.solicitudes, nuevaSolicitud],
-        });
-      },
+            manejarSeleccionNotificacion: (index) => {
+                const store = getStore();
+                if (store.notificacionesSeleccionadas.includes(index)) {
+                    // Si ya está seleccionada, la eliminamos
+                    setStore({
+                        notificacionesSeleccionadas: store.notificacionesSeleccionadas.filter((i) => i !== index),
+                    });
+                } else {
+                    // Si no está seleccionada, la agregamos
+                    setStore({
+                        notificacionesSeleccionadas: [...store.notificacionesSeleccionadas, index]
+                    })
+                }
+            },
 
-      // Acción para eliminar una notificación
-      eliminarNotificacion: (index) => {
-        const store = getStore();
-        const nuevasNotificaciones = store.notificaciones.filter((_, i) => i !== index);
-        setStore({
-          notificaciones: nuevasNotificaciones,
-        });
-      },
+            // Acción para agregar una nueva solicitud (reporte)
+            agregarSolicitud: (destinatario, mensaje) => {
+                const store = getStore();
+                const nuevaSolicitud = {
+                    id: store.solicitudes.length + 1,
+                    destinatario,
+                    mensaje,
+                    fecha: new Date().toLocaleString(),
+                };
+                setStore({
+                    solicitudes: [...store.solicitudes, nuevaSolicitud],
+                });
+            },
 
-      // Acción para marcar una notificación como leída
-      marcarNotificacionComoLeida: (index) => {
-        const store = getStore();
-        const notificacionesActualizadas = store.notificaciones.map((notificacion, i) =>
-          i === index ? `✅ ${notificacion}` : notificacion
-        );
-        setStore({
-          notificaciones: notificacionesActualizadas,
-        });
-      },
-      }
+            // Acción para eliminar una notificación
+            eliminarNotificacion: (index) => {
+                const store = getStore();
+                const nuevasNotificaciones = store.notificaciones.filter((_, i) => i !== index);
+                setStore({
+                    notificaciones: nuevasNotificaciones,
+                });
+            },
+
+            // Acción para marcar una notificación como leída
+            marcarNotificacionComoLeida: (index) => {
+                const store = getStore();
+                const notificacionesActualizadas = store.notificaciones.map((notificacion, i) =>
+                    i === index ? `✅ ${notificacion}` : notificacion
+                );
+                setStore({
+                    notificaciones: notificacionesActualizadas,
+                });
+            },
+        }
     };
-  };
-  export default getState;
-  
+};
+
+
+export default getState;
