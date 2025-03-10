@@ -3,6 +3,8 @@ from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey
 from werkzeug.security import generate_password_hash, check_password_hash
 import json
+from datetime import datetime
+
 
 
 db = SQLAlchemy()
@@ -173,3 +175,9 @@ class Admin(db.Model):
     
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    message = db.Column(db.String(255), nullable=False)
+    read = db.Column(db.Boolean, default=False)
+    date = db.Column(db.DateTime, default=datetime.utc)
