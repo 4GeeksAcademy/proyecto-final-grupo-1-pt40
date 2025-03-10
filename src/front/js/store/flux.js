@@ -11,7 +11,14 @@ const getState = ({ getStore, getActions, setStore }) => {
             menuRestaurant: [],
             restaurants: [],
             top: [],
-            searchL: []
+            search: [],
+            notificaciones: [
+        "Nueva reserva en Restaurante A",
+        "Restaurante B ha actualizado su menú",
+        "Nuevo comentario en Restaurante A",
+      ],
+            notificacionesSeleccionadas: [],
+            solicitudes: [], // Lista de solicitudes (reportes)
         },
         actions: {
             registerUser: async (userType, registration) => {
@@ -656,10 +663,56 @@ const getState = ({ getStore, getActions, setStore }) => {
                   return false;
                 }
               },
+        
+        manejarSeleccionNotificacion: (index) => {
+        const store = getStore();
+        if (store.notificacionesSeleccionadas.includes(index)) {
+          // Si ya está seleccionada, la eliminamos
+          setStore({
+            notificacionesSeleccionadas: store.notificacionesSeleccionadas.filter((i) => i !== index),
+          });
+        } else {
+          // Si no está seleccionada, la agregamos
+          setStore({
+            notificacionesSeleccionadas: [...store.notificacionesSeleccionadas, index],
+          })
+        },
 
-        }
-    }
+      // Acción para agregar una nueva solicitud (reporte)
+      agregarSolicitud: (destinatario, mensaje) => {
+        const store = getStore();
+        const nuevaSolicitud = {
+          id: store.solicitudes.length + 1,
+          destinatario,
+          mensaje,
+          fecha: new Date().toLocaleString(),
+        };
+        setStore({
+          solicitudes: [...store.solicitudes, nuevaSolicitud],
+        });
+      },
 
-}
+      // Acción para eliminar una notificación
+      eliminarNotificacion: (index) => {
+        const store = getStore();
+        const nuevasNotificaciones = store.notificaciones.filter((_, i) => i !== index);
+        setStore({
+          notificaciones: nuevasNotificaciones,
+        });
+      },
 
-export default getState;
+      // Acción para marcar una notificación como leída
+      marcarNotificacionComoLeida: (index) => {
+        const store = getStore();
+        const notificacionesActualizadas = store.notificaciones.map((notificacion, i) =>
+          i === index ? `✅ ${notificacion}` : notificacion
+        );
+        setStore({
+          notificaciones: notificacionesActualizadas,
+        });
+      },
+      }
+    };
+  };
+  export default getState;
+  
