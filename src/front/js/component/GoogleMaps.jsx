@@ -6,25 +6,29 @@ const containerStyle = {
     height: "400px",
 };
 
-const GoogleMaps = ({ plusCode }) => {
+const GoogleMaps = ({ address }) => {
     const [location, setLocation] = useState(null)
-    const KEY= process.env.MAP_API
-    const getLocation = async (plusCode) => {
-        const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${plusCode}&key=${KEY}`)
-        const data = await response.json()
-        console.log(data)
-        if (data.results.length > 0) {
-            const { lat, lng } = data.results[0].geometry.location;
-            setLocation({ lat, lng })
+    const KEY = process.env.MAP_API
+
+    const parseAddress = (address) => {
+        const url = new URL(address);
+        const placeIdMatch = url.href.match(/!3d([^!]+)!4d([^!]+)/);
+        if (placeIdMatch) {
+            const [_, lat, lng] = placeIdMatch;
+            return { lat: parseFloat(lat), lng: parseFloat(lng) };
+        } else {
+            return null;
         }
     }
+
     useEffect(() => {
-        getLocation(plusCode)
-    }, [plusCode])
+        const coordinates = parseAddress(address)
+        setLocation(coordinates)
+    }, [address])
 
     if (!location) {
         return (
-            <div>Cargando mapa</div>
+            <div>Cargando mapa...</div>
         )
     }
     return (

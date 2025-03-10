@@ -59,11 +59,12 @@ class Restaurant(db.Model):
     schedule = db.Column(db.JSON, nullable=True)
     cuisine_type = db.Column(db.String(100), nullable=True)
     exact_address = db.Column(db.String(255), nullable=True)
-    social_networks = db.Column(db.String(255), nullable=True)
+    social_networks = db.Column(db.String(650), nullable=True)
     phone = db.Column(db.String(20), nullable=True)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     description = db.Column(db.Text, nullable=True)
     image = db.Column(db.String(255), nullable=True)
+    plan = db.Column(db.Boolean, default=False)
     
     menus = relationship('Menu', back_populates='restaurant')
     notifications = relationship('RestaurantNotifications', back_populates='restaurant')
@@ -91,6 +92,7 @@ class Restaurant(db.Model):
             'social_networks':self.social_networks,
             'phone': self.phone,
             'description':self.description,
+            'plan':self.plan
         }
 
 class Menu(db.Model):

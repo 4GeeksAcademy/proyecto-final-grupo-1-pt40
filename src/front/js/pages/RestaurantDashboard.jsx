@@ -21,7 +21,7 @@ const RestaurantDashboard = () => {
     };
 
     const handleView = (id) => {
-        navigate(`/menu/${id}`)
+        navigate(`/restaurant/donpepeburger/${id}`)
     }
 
     const handleEdit = (id) => {
@@ -30,14 +30,16 @@ const RestaurantDashboard = () => {
 
     const handlePublish = async (id) => {
         const response = await actions.publishMenu(id)
-        if (response) {setAlert('Public')
+        if (response) {
+            setAlert('Public')
             onLoad()
         }
     }
 
     const handleUnpublish = async (id) => {
         const response = await actions.unpublishMenu(id)
-        if (response) {setAlert('Private')
+        if (response) {
+            setAlert('Private')
             onLoad()
         }
     }
@@ -60,7 +62,10 @@ const RestaurantDashboard = () => {
                                 <Link className="nav-link" to="/edit-restaurant/">Agregar Información</Link>
                             </li>
                             <li className="nav-item">
-                            <Link className="nav-link" to={`/restaurant-profile/`}>Mi Perfil</Link>
+                                <Link className="nav-link" to={`/restaurant-profile/`}>Mi Perfil</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link" to={`/plan-purchase/`}>AlPunto+</Link>
                             </li>
                         </ul>
                     </div>

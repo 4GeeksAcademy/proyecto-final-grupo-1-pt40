@@ -410,8 +410,8 @@ def get_menu(menu_id):
         for category in categories:
             dishes = Dish.query.filter_by(menu_id=menu_id, category=category).order_by(Dish.id).all()
             dish_list[category] = [dish.serialize() for dish in dishes] if dishes else 'No dishes in this category'
-
-        return jsonify({**menu_response, **{'dishes': dish_list}}), 200
+        restaurant = Restaurant.query.filter_by(id=menu.restaurant_id).first()
+        return jsonify({**menu_response, **{'dishes': dish_list},**{'restaurant':restaurant.serialize()}}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': 'Server error: Failed to process request'}), 500
@@ -583,7 +583,9 @@ def get_restaurant_by_id():
         'social_networks': restaurant.social_networks,
         'phone': restaurant.phone,
         'description': restaurant.description,
-        'image': restaurant.image
+        'image': restaurant.image,
+        'plan': restaurant.plan
+
         # 'menus': [menu.name for menu in restaurant.menus],  # Listado de menús
         # 'notifications': [notif.message for notif in restaurant.notifications]  # Mensajes de notificación
     })
@@ -677,40 +679,6 @@ def top_restaurants(city):
     #Termina rutas para explora y descrubre, puedes continuar agregando despues de esta linea
 
 
-@api.route('/admin/delete/restaurant', methods=['DELETE'])
-def admin_delete_restaurant():
-    data = request.json
-    restaurant_id = data.get('restaurant_id', None)
-    if not restaurant_id:
-        return jsonify({'error':'Missing restaurant id'}), 400
-    try:
-       restaurant = Restaurant.query.get(restaurant_id)
-       if not restaurant:
-            return jsonify({'error': 'Client not found'}), 404
-       db.session.delete(restaurant)
-       db.session.commit()
-       return jsonify({'message':'Restaurant deleted successfully'}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'message': 'Server error: Failed to process request'}), 500
-    
-@api.route('/admin/delete/client', methods=['DELETE'])
-def admin_delete_client():
-    data = request.json
-    client_id = data.get('client_id', None)
-    if not client_id:
-        return jsonify({'error':'Missing client id'}), 400
-    try:
-       client = Client.query.get(client_id)
-       if not client:
-            return jsonify({'error': 'Client not found'}), 404
-       db.session.delete(client)
-       db.session.commit()
-       return jsonify({'message':'Client deleted successfully'}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'message': 'Server error: Failed to process request'}), 500
-
 @api.route('/orders', methods=['POST'])
 def create_order():
     request_body = request.get_json()
@@ -769,3 +737,24 @@ def capture_order(order_id):
         return jsonify({'error': 'Resource not found', 'details': str(e)}), 404
     except Exception as e:
          return jsonify({'error': str(e)}), 500
+
+@api.route('restaurant/successful/payment', methods=['PUT'])
+@jwt_required()
+def update_plan():
+    restaurant_id = get_jwt_identity()  
+    claims = get_jwt()
+    role = claims.get('role')
+    if role != "restaurant":
+            return jsonify({"error": "Unauthorized: Not authorized to view profile"}), 403
+    if restaurant_id:
+        try:
+            restaurant = Restaurant.query.get(restaurant_id)
+            restaurant.plan = True
+            db.session.commit()
+            return jsonify(restaurant.serialize()),200
+        except Exception as e:
+            db.session.rollback() 
+            return jsonify({"msg": "Server error", "error": str(e)}), 500
+    else:
+        return jsonify({"msg": "Restaurant not found"}), 404
+        

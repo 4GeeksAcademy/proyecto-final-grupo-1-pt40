@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { Context } from "../store/appContext";
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
 
 
-const PayPalButton = () => {
+const PayPal = () => {
   const initialOptions = {
     "client-id": process.env.PAYPAL_CLIENT_ID,
     "buyer-country": "US",
     currency: "USD",
     components: "buttons",
   };
+
+  const { store, actions } = useContext(Context);
+  const [plan, setPlan] = useState(false)
 
   const [message, setMessage] = useState("");
   const [order, setOrder] = useState('')
@@ -46,35 +50,38 @@ const PayPalButton = () => {
       }
     } catch (error) {
       console.error(error);
-      setMessage(`Could not initiate PayPal Checkout...${error}`);
+      setMessage(`Fallo inicio de orden`);
     }
   };
 
-  const onApprove = async (data, actions) => {
+  const onApprove = async (data, task) => {
     try {
       const response = await fetch(`${backendUrl}api/orders/${data.orderID}/capture`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({'orderID':order})
+        body: JSON.stringify({ 'orderID': order })
       });
 
       const orderData = await response.json();
       const errorDetail = orderData?.details?.[0];
 
       if (errorDetail?.issue === "INSTRUMENT_DECLINED") {
-        return actions.restart();
+        return task.restart();
       } else if (errorDetail) {
         throw new Error(`${errorDetail.description} (${orderData.debug_id})`);
       } else {
         const transaction = orderData;
-        setMessage('PAGO EXITOSO')
-        console.log("Capture result",JSON.stringify(orderData, null, 2));
+        setMessage('Pago exitoso')
+        const payment = await actions.premiumPlan()
+        if (payment) {
+          setPlan(true)
+        }
       }
     } catch (error) {
       console.error(error);
-      setMessage(`Sorry, your transaction could not be processed...${error}`);
+      setMessage(`Tu pago no pudo ser completado`);
     }
   };
 
@@ -89,7 +96,7 @@ const PayPalButton = () => {
             label: "paypal",
           }}
           createOrder={createOrder}
-          onApprove={onApprove}
+          onApprove={onApprove} disabled={plan}
         />
       </PayPalScriptProvider>
       <div>{message}</div>
@@ -97,4 +104,4 @@ const PayPalButton = () => {
   );
 };
 
-export default PayPalButton;
+export default PayPal;

@@ -13,7 +13,7 @@ const SignUpRestaurant = () => {
     const [cuisines, setCuisines] = useState('')
 
     const [registration, setRegistration] = useState({
-        'email': '', 'username': '', 'password': '','name':'', 'exact_address': '',
+        'email': '', 'username': '', 'password': '', 'name': '', 'exact_address': '',
         'social_networks': '', 'phone': '', 'department': { 'id': '', "name": '' }, 'city': { 'id': '', "name": '' }, 'image': '', 'description': '',
         'cuisine_type': ''
     })
@@ -98,7 +98,7 @@ const SignUpRestaurant = () => {
     };
     const handleSubmission = async (e) => {
         e.preventDefault();
-        const response = actions.registerUser('restaurant', registration)
+        const response = await actions.registerUser('restaurant', registration)
         if (response) navigate(`/restaurant-dashboard`)
     }
 

@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import GoogleMaps from './GoogleMaps.jsx'
 
-const GoogleMapsModal = () => {
+const GoogleMapsModal = ({ addressLink }) => {
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
@@ -20,7 +20,7 @@ const GoogleMapsModal = () => {
           <Modal.Title>Ubicación en Google Maps</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <GoogleMaps plusCode={'3PH9+59 Barquisimeto, Lara'} />
+          <GoogleMaps address={addressLink} />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
