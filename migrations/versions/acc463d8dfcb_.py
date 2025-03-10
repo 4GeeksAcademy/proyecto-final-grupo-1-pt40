@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 06bd55187440
+Revision ID: acc463d8dfcb
 Revises: 
-Create Date: 2025-03-05 20:55:18.383768
+Create Date: 2025-03-10 01:42:06.425399
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '06bd55187440'
+revision = 'acc463d8dfcb'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -39,6 +39,13 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
+    )
+    op.create_table('notification',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('message', sa.String(length=255), nullable=False),
+    sa.Column('read', sa.Boolean(), nullable=True),
+    sa.Column('date', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('restaurant',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -135,6 +142,7 @@ def downgrade():
     op.drop_table('client_notifications')
     op.drop_table('user')
     op.drop_table('restaurant')
+    op.drop_table('notification')
     op.drop_table('client')
     op.drop_table('admin')
     # ### end Alembic commands ###
