@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
-import Spinner from 'react-bootstrap/Spinner';
+import FavoritePage from "./FavoritePage.jsx";
+import ExplorePage from "./ExplorePage.jsx";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
+import FavoriteButton from "../component/FavoriteButton.jsx"
+import ClientProfile from "./ClientProfile.jsx";
 
 const ClientDashboard = () => {
     const navigate = useNavigate();
@@ -18,20 +21,10 @@ const ClientDashboard = () => {
     const renderContent = () => {
         switch (activeMenu) {
             case "perfil":
-                return (
-                    <div>
-                        <h2>Perfil</h2>
-                        <p>Visualiza y actualiza tu información personal.</p>
-                    </div>
-                );
+                return <ClientProfile />;
 
             case "favoritos":
-                return (
-                    <div>
-                        <h2>Favoritos</h2>
-                        <p>Aquí se mostrarán tus restaurantes y platillos favoritos.</p>
-                    </div>
-                );
+                return <FavoritePage />;
 
             case "ayuda":
                 return (
@@ -40,6 +33,8 @@ const ClientDashboard = () => {
                         <p>¿Necesitas asistencia? Consulta nuestras preguntas frecuentes o contáctanos.</p>
                     </div>
                 );
+            case "explore":
+                return <ExplorePage />
 
             default:
                 return (
@@ -60,15 +55,16 @@ const ClientDashboard = () => {
                                                 <p className="card-text">{restaurant.description}</p>
                                                 <button
                                                     className="btn btn-primary"
-                                                    onClick={() => navigate(`/menu/${restaurant.id}`)}
+                                                    onClick={() => navigate(`/menu/1`)}
                                                 >
                                                     Ver Menú
                                                 </button>
+                                                <FavoriteButton restaurant_id={restaurant.id} />
                                             </div>
                                         </div>
                                     </div>
                                 ))
-                             ) : (
+                            ) : (
                                 <p>No hay restaurantes disponibles.</p>
                             )}
                         </div>
@@ -79,6 +75,7 @@ const ClientDashboard = () => {
 
     return (
         <div>
+            {/* Navbar se mantiene siempre visible */}
             <Navbar bg="dark" variant="dark" expand="lg">
                 <Container>
                     <Navbar.Brand>El punto</Navbar.Brand>
@@ -86,12 +83,15 @@ const ClientDashboard = () => {
                         <Nav.Link onClick={() => setActiveMenu("restaurants")} active={activeMenu === "restaurants"}>
                             Restaurantes
                         </Nav.Link>
+                        <Nav.Link onClick={() => setActiveMenu("explore")} active={activeMenu === "explore"}>
+                            Explora
+                        </Nav.Link>
                         <Nav.Link onClick={() => setActiveMenu("perfil")} active={activeMenu === "perfil"}>
                             Perfil
                         </Nav.Link>
-                        <LinkContainer to="/favorites">
-                            <Nav.Link active={activeMenu === "favoritos"}>Favoritos</Nav.Link>
-                        </LinkContainer>
+                        <Nav.Link onClick={() => setActiveMenu("favoritos")} active={activeMenu === "favoritos"}>
+                            Favoritos
+                        </Nav.Link>
                         <Nav.Link onClick={() => setActiveMenu("ayuda")} active={activeMenu === "ayuda"}>
                             Ayuda
                         </Nav.Link>
@@ -105,3 +105,4 @@ const ClientDashboard = () => {
 };
 
 export default ClientDashboard;
+
