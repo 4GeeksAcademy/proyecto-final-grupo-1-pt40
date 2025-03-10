@@ -6,6 +6,7 @@ import ExplorePage from "./ExplorePage.jsx";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import FavoriteButton from "../component/FavoriteButton.jsx"
+import ClientProfile from "./ClientProfile.jsx";
 
 const ClientDashboard = () => {
     const navigate = useNavigate();
@@ -20,12 +21,7 @@ const ClientDashboard = () => {
     const renderContent = () => {
         switch (activeMenu) {
             case "perfil":
-                return (
-                    <div>
-                        <h2>Perfil</h2>
-                        <p>Visualiza y actualiza tu información personal.</p>
-                    </div>
-                );
+                return <ClientProfile />;
 
             case "favoritos":
                 return <FavoritePage />;
