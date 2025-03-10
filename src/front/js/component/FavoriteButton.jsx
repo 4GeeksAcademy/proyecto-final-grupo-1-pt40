@@ -1,30 +1,52 @@
 import React, { useContext } from "react";
 import { Context } from "../store/appContext";
 
-const FavoriteButton = ({ dish_id = null, restaurant_id = null }) => {
+const FavoriteButton = ({ dish_id , restaurant_id  }) => {
     const { store, actions } = useContext(Context);
 
-    // Verifica si el elemento ya está en favoritos
+
+    
+   
     const isFavorite = store.favorites.some(fav =>
         (dish_id && fav.dish_id === dish_id) ||
         (restaurant_id && fav.restaurant_id === restaurant_id)
     );
 
-    // Manejar clic en el botón
+    
     const handleFavorite = () => {
-        if (!store.client?.id) return alert("Debes iniciar sesión para guardar favoritos.");
-
+        
+       
+        if (!store.client?.client_id) {
+            console.log("🛑 store.client.id está vacío o undefined");
+            alert("Debes iniciar sesión para guardar favoritos.");
+            return;
+            
+            
+        }
+        console.log("✅ El usuario tiene id:", store.client.client_id);
+        
         if (isFavorite) {
-            // Encontrar el favorito y eliminarlo
+           
             const favorite = store.favorites.find(fav =>
                 (dish_id && fav.dish_id === dish_id) ||
                 (restaurant_id && fav.restaurant_id === restaurant_id)
             );
-            actions.removeFavorite(favorite.id);
+    
+            if (favorite) {
+                actions.removeFavorite(favorite.id);
+            }
         } else {
-            // Agregar a favoritos
-            actions.addFavorite(store.client.id, dish_id, restaurant_id);
+            
+            if (dish_id) {
+                actions.addFavorite(dish_id, null);
+            } else if (restaurant_id) {
+                actions.addFavorite(null, restaurant_id);
+            } else {
+                console.error("No se proporcionó ni dish_id ni restaurant_id");
+            }
         }
+            
+        
     };
 
     return (

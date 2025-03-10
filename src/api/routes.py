@@ -448,20 +448,19 @@ def add_favorite():
    
     data = request.get_json()
     client_identity = get_jwt_identity()  
-    client_id = client_identity.get("id")  
-    menu_id = data.get("menu_id")
+    client_id = int (client_identity)  
+    
+    
     dish_id = data.get("dish_id")
     restaurant_id = data.get("restaurant_id")
 
-    if sum(bool(x) for x in [menu_id, dish_id, restaurant_id]) != 1:
-        return jsonify({"error": "Debes proporcionar SOLO un `menu_id`, `dish_id` o `restaurant_id`"}), 400
+    if sum(bool(x) for x in [ dish_id, restaurant_id]) != 1:
+        return jsonify({"error": "Debes proporcionar SOLO un `dish_id` o `restaurant_id`"}), 400
 
-    existing_favorite = Favorites.query.filter_by(client_id=client_id, menu_id=menu_id, dish_id=dish_id,restaurant_id=restaurant_id).first()
-    if existing_favorite:
-        return jsonify({"error": "Este elemento ya está en tus favoritos"}), 400
+    
     
     existing_favorite = Favorites.query.filter_by(
-        client_id=client_id, menu_id=menu_id, dish_id=dish_id, restaurant_id=restaurant_id
+        client_id=client_id,  dish_id=dish_id, restaurant_id=restaurant_id
     ).first()
 
     if existing_favorite:
@@ -471,7 +470,7 @@ def add_favorite():
     try:
         new_favorite = Favorites(
             client_id=client_id, 
-            menu_id=menu_id if menu_id else None, 
+            
             dish_id=dish_id if dish_id else None, 
             restaurant_id=restaurant_id if restaurant_id else None
         )
@@ -483,9 +482,10 @@ def add_favorite():
         return jsonify({"error": "Failed to add favorite"}), 500
 
 @api.route('/favorites/<int:favorite_id>', methods=['DELETE'])
+@jwt_required() 
 def remove_favorite(favorite_id):
     client_identity = get_jwt_identity()
-    client_id = client_identity.get("id")
+    client_id = int(client_identity)
 
     favorite = Favorites.query.filter_by(id=favorite_id, client_id=client_id).first()
 
@@ -502,22 +502,49 @@ def remove_favorite(favorite_id):
 
 @api.route('/favorites', methods=['GET'])
 @jwt_required()
-def get_favorites(): 
-    client_identity = get_jwt_identity()
-    client_id = client_identity.get("id")
+def get_favorites():
+    user_identity = get_jwt_identity() 
+    client_id = get_jwt_identity()
+    
 
     favorites = Favorites.query.filter_by(client_id=client_id).all()
-    if not favorites:
-        return jsonify({"message": "No tienes favoritos aún"}), 200
-      
-    favorite_dishes = [fav.serialize() for fav in favorites]
-    return jsonify(favorite_dishes), 200    
+    
+    result = []
+    for fav in favorites:
+        if fav.dish_id:
+            dish = Dish.query.get(fav.dish_id)
+            result.append({
+                "id": fav.id,
+                "dish": dish.serialize(),
+                "restaurant": None
+            })
+        elif fav.restaurant_id:
+            restaurant = Restaurant.query.get(fav.restaurant_id)
+            result.append({
+                "id": fav.id,
+                "dish": None,
+                "restaurant": restaurant.serialize()
+            })
+        
+
+    return jsonify(result), 200
+
 
 @api.route('/profile', methods=['GET'])
 @jwt_required()
 def profile():
-    current_user = get_jwt_identity()  
-    return jsonify({"user": current_user}), 200
+    claims=get_jwt()
+    role=claims.get("role")
+    identity=get_jwt_identity()
+    user_id=int(identity)
+    if role == "client":
+        client = Client.query.get(user_id)
+        return client.serialize(), 200
+    elif role == "restaurant":
+        restaurant = Restaurant.query.get(user_id)
+        return restaurant.serialize(), 200
+    else:
+        return {"error": "Rol inválido"}, 400
 
 ADMIN_EMAILS = {"felipe@alpunto.com",
 "gloria@alpunto.com",

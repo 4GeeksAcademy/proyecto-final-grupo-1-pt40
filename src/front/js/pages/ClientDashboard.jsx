@@ -16,7 +16,7 @@ const ClientDashboard = () => {
         actions.getRestaurants();
     }, []);
 
-    // Renderiza el contenido según la opción del menú seleccionada
+    
     const renderContent = () => {
         switch (activeMenu) {
             case "perfil":
@@ -41,13 +41,14 @@ const ClientDashboard = () => {
                 return <ExplorePage />
 
             default:
+                
                 return (
                     <div>
                         <h2>Opciones de Restaurante</h2>
                         <div className="row">
                             {Array.isArray(store.restaurants) && store.restaurants.length > 0 ? (
                                 store.restaurants.map((restaurant) => (
-                                    <div key={restaurant.id} className="col-md-4 mb-3">
+                                    <div key={restaurant.restaurant_id} className="col-md-4 mb-3">
                                         <div className="card">
                                             <img
                                                 src={restaurant.image || "https://via.placeholder.com/300x200?text=Restaurante"}
@@ -63,7 +64,8 @@ const ClientDashboard = () => {
                                                 >
                                                     Ver Menú
                                                 </button>
-                                                <FavoriteButton restaurant_id={restaurant.id} />
+                                                
+                                                <FavoriteButton restaurant_id={restaurant.restaurant_id} />
                                             </div>
                                         </div>
                                     </div>
@@ -79,7 +81,7 @@ const ClientDashboard = () => {
 
     return (
         <div>
-            {/* Navbar se mantiene siempre visible */}
+            
             <Navbar bg="dark" variant="dark" expand="lg">
                 <Container>
                     <Navbar.Brand>El punto</Navbar.Brand>
