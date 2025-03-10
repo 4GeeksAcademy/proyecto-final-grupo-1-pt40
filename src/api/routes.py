@@ -24,8 +24,6 @@ load_dotenv()
 FRONTEND_URL = os.getenv('FRONTEND_URL')
 
 
-
-
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
 
@@ -453,20 +451,19 @@ def add_favorite():
    
     data = request.get_json()
     client_identity = get_jwt_identity()  
-    client_id = client_identity.get("id")  
-    menu_id = data.get("menu_id")
+    client_id = int (client_identity)  
+    
+    
     dish_id = data.get("dish_id")
     restaurant_id = data.get("restaurant_id")
 
-    if sum(bool(x) for x in [menu_id, dish_id, restaurant_id]) != 1:
-        return jsonify({"error": "Debes proporcionar SOLO un `menu_id`, `dish_id` o `restaurant_id`"}), 400
+    if sum(bool(x) for x in [ dish_id, restaurant_id]) != 1:
+        return jsonify({"error": "Debes proporcionar SOLO un `dish_id` o `restaurant_id`"}), 400
 
-    existing_favorite = Favorites.query.filter_by(client_id=client_id, menu_id=menu_id, dish_id=dish_id,restaurant_id=restaurant_id).first()
-    if existing_favorite:
-        return jsonify({"error": "Este elemento ya está en tus favoritos"}), 400
+    
     
     existing_favorite = Favorites.query.filter_by(
-        client_id=client_id, menu_id=menu_id, dish_id=dish_id, restaurant_id=restaurant_id
+        client_id=client_id,  dish_id=dish_id, restaurant_id=restaurant_id
     ).first()
 
     if existing_favorite:
@@ -476,7 +473,7 @@ def add_favorite():
     try:
         new_favorite = Favorites(
             client_id=client_id, 
-            menu_id=menu_id if menu_id else None, 
+            
             dish_id=dish_id if dish_id else None, 
             restaurant_id=restaurant_id if restaurant_id else None
         )
@@ -488,9 +485,10 @@ def add_favorite():
         return jsonify({"error": "Failed to add favorite"}), 500
 
 @api.route('/favorites/<int:favorite_id>', methods=['DELETE'])
+@jwt_required() 
 def remove_favorite(favorite_id):
     client_identity = get_jwt_identity()
-    client_id = client_identity.get("id")
+    client_id = int(client_identity)
 
     favorite = Favorites.query.filter_by(id=favorite_id, client_id=client_id).first()
 
@@ -507,22 +505,115 @@ def remove_favorite(favorite_id):
 
 @api.route('/favorites', methods=['GET'])
 @jwt_required()
-def get_favorites(): 
-    client_identity = get_jwt_identity()
-    client_id = client_identity.get("id")
-
+def get_favorites():
+    user_identity = get_jwt_identity() 
+    client_id = get_jwt_identity()
+  
     favorites = Favorites.query.filter_by(client_id=client_id).all()
-    if not favorites:
+     if not favorites:
         return jsonify({"message": "No tienes favoritos aún"}), 200
-      
-    favorite_dishes = [fav.serialize() for fav in favorites]
-    return jsonify(favorite_dishes), 200    
+    result = []
+    for fav in favorites:
+        if fav.dish_id:
+            dish = Dish.query.get(fav.dish_id)
+            result.append({
+                "id": fav.id,
+                "dish": dish.serialize(),
+                "restaurant": None
+            })
+        elif fav.restaurant_id:
+            restaurant = Restaurant.query.get(fav.restaurant_id)
+            result.append({
+                "id": fav.id,
+                "dish": None,
+                "restaurant": restaurant.serialize()
+            })
+    return jsonify(result), 200    
 
+# Ruta para manejar notificaciones
+@api.route('/notifications', methods=['GET', 'POST', 'DELETE', 'PUT'])
+def handle_notifications():
+    if request.method == 'GET':
+        # Obtener todas las notificaciones
+        notifications = Notification.query.all()
+        return jsonify([notification.serialize() for notification in notifications]), 200
+
+    elif request.method == 'POST':
+        # Agregar una nueva notificación
+        data = request.json
+        message = data.get('message')
+        if not message:
+            return jsonify({"error": "Message is required"}), 400
+
+        new_notification = Notification(message=message)
+        db.session.add(new_notification)
+        db.session.commit()
+        return jsonify(new_notification.serialize()), 201
+    elif request.method == 'DELETE':
+        # Eliminar una notificación por ID
+        notification_id = request.json.get('id')
+        if not notification_id:
+            return jsonify({"error": "Notification ID is required"}), 400
+
+        notification = Notification.query.get(notification_id)
+        if not notification:
+            return jsonify({"error": "Notification not found"}), 404
+
+        db.session.delete(notification)
+        db.session.commit()
+        return jsonify({"message": "Notification deleted"}), 200
+
+    elif request.method == 'PUT':
+        # Marcar una notificación como leída
+        notification_id = request.json.get('id')
+        if not notification_id:
+            return jsonify({"error": "Notification ID is required"}), 400
+
+        notification = Notification.query.get(notification_id)
+        if not notification:
+            return jsonify({"error": "Notification not found"}), 404
+
+        notification.read = True
+        db.session.commit()
+        return jsonify(notification.serialize()), 200
+
+
+# Ruta para manejar reportes (solicitudes)
+@api.route('/reports', methods=['GET', 'POST'])
+def handle_reports():
+    if request.method == 'GET':
+        # Obtener todos los reportes
+        reports = Report.query.all()
+        return jsonify([report.serialize() for report in reports]), 200
+
+    elif request.method == 'POST':
+        # Enviar un nuevo reporte
+        data = request.json
+        recipient = data.get('recipient')
+        message = data.get('message')
+        if not recipient or not message:
+            return jsonify({"error": "Recipient and message are required"}), 400
+
+        new_report = Report(recipient=recipient, message=message, date=datetime.utcnow())
+        db.session.add(new_report)
+        db.session.commit()
+        return jsonify(new_report.serialize()), 201
+ 
 @api.route('/profile', methods=['GET'])
 @jwt_required()
 def profile():
-    current_user = get_jwt_identity()  
-    return jsonify({"user": current_user}), 200
+    claims=get_jwt()
+    role=claims.get("role")
+    identity=get_jwt_identity()
+    user_id=int(identity)
+    if role == "client":
+        client = Client.query.get(user_id)
+        return client.serialize(), 200
+    elif role == "restaurant":
+        restaurant = Restaurant.query.get(user_id)
+        return restaurant.serialize(), 200
+    else:
+        return {"error": "Rol inválido"}, 400
 
 ADMIN_EMAILS = {"felipe@alpunto.com",
 "gloria@alpunto.com",
@@ -678,7 +769,6 @@ def top_restaurants(city):
         return jsonify({"msg": "Error al buscar restaurantes", "error": str(e)}), 500
     #Termina rutas para explora y descrubre, puedes continuar agregando despues de esta linea
 
-
 @api.route('/orders', methods=['POST'])
 def create_order():
     request_body = request.get_json()
@@ -758,3 +848,65 @@ def update_plan():
     else:
         return jsonify({"msg": "Restaurant not found"}), 404
         
+@api.route('/client/profile', methods=['GET'])
+@jwt_required()
+def get_client_by_id():
+    client_id = get_jwt_identity()  
+    claims = get_jwt()
+    role = claims.get('role')
+
+    if role != "client":
+        return jsonify({"error": "Unauthorized: Not authorized to view profile"}), 403
+
+    client = Client.query.get(client_id)
+    
+    if client is None:
+        return jsonify({'error': 'Client not found'}), 404
+
+    return jsonify({
+        'client_id': client.id,
+        'email': client.email,
+        'username': client.username,
+        'department': client.department,
+        'city': client.city,
+        'is_active': client.is_active
+    })
+
+@api.route('/client/profile', methods=['PUT'])
+@jwt_required()
+def update_client():
+    client_id = get_jwt_identity()  # Get client ID from JWT token
+    claims = get_jwt()
+    role = claims.get('role')
+
+    # Check if the user is a client
+    if role != "client":
+        return jsonify({"error": "Unauthorized: Not authorized to update client profile"}), 403
+
+    try:
+        client = Client.query.get(client_id)
+        if not client:
+            return jsonify({"msg": "Cliente no encontrado"}), 404
+
+        data = request.get_json()
+        if not data:
+            return jsonify({"msg": "Datos inválidos"}), 400
+
+        # Update only the fields provided in the request
+        if 'department' in data:
+            client.department = data['department']
+        if 'city' in data:
+            client.city = data['city']
+        if 'password' in data and data['password']:
+            client.set_password(data['password'])  # Hash the password using the model's method
+
+        db.session.commit()
+
+        return jsonify({
+            "msg": "Cliente actualizado correctamente",
+            "client": client.serialize()
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al actualizar el cliente", "error": str(e)}), 500    
