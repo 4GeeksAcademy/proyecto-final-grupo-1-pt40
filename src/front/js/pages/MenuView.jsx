@@ -45,7 +45,8 @@ const MenuView = () => {
                                                         <Card.Title>{dish.name}</Card.Title>
                                                         <Card.Text>{dish.description}</Card.Text>
                                                         <Card.Text><strong>Precio:</strong> {`${dish.price} ${menu.currency}`}</Card.Text>
-                                                        <FavoriteButton dish_id={dish.id} />
+                                                        
+                                                        <FavoriteButton dish_id={dish.dish_id} />
                                                     </Card.Body>
                                                 </Card>
                                             ))

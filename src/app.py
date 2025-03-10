@@ -11,8 +11,10 @@ from api.models import db
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "*"}},supports_credentials=True)
 app.config["JWT_SECRET_KEY"] = "my-secret-key"  
 jwt = JWTManager(app)
 # from models import Person
