@@ -510,7 +510,7 @@ def get_favorites():
     client_id = get_jwt_identity()
   
     favorites = Favorites.query.filter_by(client_id=client_id).all()
-     if not favorites:
+    if not favorites:
         return jsonify({"message": "No tienes favoritos aún"}), 200
     result = []
     for fav in favorites:
