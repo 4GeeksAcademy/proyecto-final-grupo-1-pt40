@@ -752,13 +752,20 @@ def search():
         db.session.rollback() 
         return jsonify({"msg": "Error al buscar restaurantes", "error": str(e)}), 500
 
-@api.route('/top-restaurants/<city>', methods=['GET'])
-def top_restaurants(city):
-    if not city:
-        return jsonify({'error':'Missing city parameter'}), 400
+@api.route('/top-restaurants/', methods=['GET'])
+@jwt_required()
+def top_restaurants():
+    client_id = get_jwt_identity()  
+    claims = get_jwt()
+    role = claims.get('role')
+
+    if role != "client":
+            return jsonify({"error": "Unauthorized: Must use client account"}), 403
     try:
+        client = Client.query.get(client_id).first()
+        client_city = client.city
         top_restaurants = db.session.query(Restaurant, db.func.count(Favorites.id).label('likes')
-        ).join(Favorites, Restaurant.id == Favorites.restaurant_id).filter(Restaurant.city == city).group_by(Restaurant.id).order_by(db.desc('likes')).limit(10).all()
+        ).join(Favorites, Restaurant.id == Favorites.restaurant_id).filter(Restaurant.city == client_city).group_by(Restaurant.id).order_by(db.desc('likes')).limit(10).all()
 
         if not top_restaurants:
             return jsonify({'message':'No restaurants found'}),404

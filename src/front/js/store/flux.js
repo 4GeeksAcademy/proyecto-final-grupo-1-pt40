@@ -608,12 +608,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             },
 
-            topRestaurants: async (city) => {
-                const store = getStore()
+            topRestaurants: async () => {
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}api/top-restaurants/${city}`, {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/top-restaurants/`, {
                         method: 'GET',
-                        headers: { "Content-Type": "application/json" },
+                        headers: { "Content-Type": "application/json" ,'Authorization': `Bearer ${sessionStorage.getItem('token')}`},
                     });
 
                     if (!response.ok) {

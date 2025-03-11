@@ -12,79 +12,7 @@ const ExplorePage = () => {
     const [search, setSearch] = useState({ 'department': '', "city": '', "cuisine": '', "keyword": '' })
     const [searchOn, setSearchOn] = useState({ 'department': false, 'city': false, 'cuisine': false, 'keyword': false })
     const [top, setTop] = useState([])
-    const sample = [
-        {
-            id: 1,
-            nombre: "Restaurante A",
-            direccion: "Calle 123, Ciudad",
-            telefono: "123-456-7890",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 2,
-            nombre: "Restaurante B",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-
-        {
-            id: 3,
-            nombre: "Restaurante C",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 4,
-            nombre: "Restaurante D",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 5,
-            nombre: "Restaurante E",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 6,
-            nombre: "Restaurante F",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 7,
-            nombre: "Restaurante G",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 8,
-            nombre: "Restaurante H",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 9,
-            nombre: "Restaurante i",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 10,
-            nombre: "Restaurante J",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-    ]
+    
 
     const setOne = ["Colombiana", "Americana", "Peruana", "Mexicana", "Brasileña"]
     const setTwo = ["Italiana", "Española", "Griega", "Francesa", "Turca"]
@@ -94,7 +22,7 @@ const ExplorePage = () => {
     const onLoad = async () => {
         const data = await actions.getDepartments()
         setDepartments(data)
-        const response = await actions.topRestaurants('Cali')
+        const response = await actions.topRestaurants()
         setTop(response)
     }
 
