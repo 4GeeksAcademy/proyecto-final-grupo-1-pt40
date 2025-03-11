@@ -22,6 +22,7 @@ flask-jwt-extended = "*"
 wtforms = "==3.1.2"
 mercadopago = "*"
 paypalrestsdk = "*"
+mailjet-rest = "*"
 
 [requires]
 python_version = "3.10"

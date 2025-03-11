@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for, Blueprint, Response,send_fil
 from werkzeug.utils import secure_filename
 from sqlalchemy.exc import DataError
 from sqlalchemy import or_
-from api.utils import generate_sitemap, APIException
+from api.utils import generate_sitemap, APIException, send_email
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity,get_jwt
 from flask_jwt_extended import JWTManager
@@ -14,6 +14,8 @@ import json
 import os
 from dotenv import load_dotenv
 import paypalrestsdk
+from datetime import timedelta
+
 
 
 api = Blueprint('api', __name__)
@@ -917,3 +919,20 @@ def update_client():
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al actualizar el cliente", "error": str(e)}), 500    
+    
+
+@api.route('/reset-password/client', methods=['POST'])
+def reset_password():
+    data = request.json
+    email = data.get('email',None)
+    #try:
+        #client = Client.query.filter_by(email=email).first()
+        #if not client:
+            #return jsonify({'error':'Incorrect email address'}),404
+    expiration = timedelta(minutes=10)
+    reset_token = create_access_token(identity=email, expires_delta=expiration)
+    status = send_email(email,reset_token)
+    return jsonify(status),200
+    #except Exception as e:
+        #return jsonify({"msg": "Server error"}), 500  
+    

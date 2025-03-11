@@ -1,5 +1,9 @@
 from flask import jsonify, url_for
-
+from mailjet_rest import Client
+from dotenv import load_dotenv
+import os
+load_dotenv()
+FRONTEND_URL = os.getenv('FRONTEND_URL')
 class APIException(Exception):
     status_code = 400
 
@@ -39,3 +43,34 @@ def generate_sitemap(app):
         <p>Start working on your project by following the <a href="https://start.4geeksacademy.com/starters/full-stack" target="_blank">Quick Start</a></p>
         <p>Remember to specify a real endpoint path like: </p>
         <ul style="text-align: left;">"""+links_html+"</ul></div>"
+
+def send_email(to_email,token):
+    reset_link = f'{FRONTEND_URL}/password-reset/{token}'
+    api_key = 'myapikey'
+    api_secret = 'myapisecret'
+    mailjet = Client(auth=(api_key, api_secret), version='v3.1')
+    data = {
+      'Messages': [
+        {
+          "From": {
+            "Email": "mdaniela.martin@proton.me",
+            "Name": "AlPunto Colombia"
+          },
+          "To": [
+            {
+              "Email": to_email,
+              "Name": to_email
+            }
+          ],
+          "Subject": "Solicitud de Cambio de Contraseña",
+          "TextPart": f"Click on the following link to reset your password: {reset_link}",
+          "HTMLPart": f"<p>Click on the following link to reset your password: <a href='{reset_link}'>Reset Password</a></p>"
+        }
+      ]
+    }
+    result = mailjet.send.create(data=data)
+    return (result.status_code)
+
+
+    
+
