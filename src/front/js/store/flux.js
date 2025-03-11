@@ -417,9 +417,8 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
             
-
-
             addFavorite: async (dish_id, restaurant_id) => {
+
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 console.log("Valores recibidos:", { dish_id, restaurant_id });
                 let bodyData = {};
@@ -632,7 +631,8 @@ const getState = ({ getStore, getActions, setStore }) => {
             deleteRestaurant: async (restaurantId) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
-                    const response = await fetch(`${backendUrl}/api/restaurants/${restaurantId}`, {
+                    const response = await fetch(`${backendUrl}api/restaurants/${restaurantId}`, {
+
                         method: "DELETE"
                     });
                     if (!response.ok) throw new Error("Failed to delete restaurant");
@@ -645,8 +645,27 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return false;
                 }
             },
-            //Agrega actions despues de esta linea
 
+            premiumPlan: async () => {
+                const backendUrl = process.env.BACKEND_URL
+
+                try {
+                    const response = await fetch(`${backendUrl}api/restaurant/successful/payment`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` }
+                    })
+
+                    if (!response.ok) {
+                        if (!response.ok) throw new Error(response.statusText)
+                    }
+
+                    return true
+                } catch (error) {
+                    console.error("Error updating data base:", error);
+                    return false;
+                }
+            },
+        
             getClientDetails: async () => {
                 const store = getStore();
                 try {

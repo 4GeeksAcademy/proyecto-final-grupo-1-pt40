@@ -11,12 +11,17 @@ from flask_cors import CORS
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity,get_jwt
 from flask_jwt_extended import JWTManager
 import json
+import os
+from dotenv import load_dotenv
+import paypalrestsdk
 
 
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
 CORS(api)
+load_dotenv()
+FRONTEND_URL = os.getenv('FRONTEND_URL')
 
 
 @api.route('/hello', methods=['POST', 'GET'])
@@ -403,8 +408,8 @@ def get_menu(menu_id):
         for category in categories:
             dishes = Dish.query.filter_by(menu_id=menu_id, category=category).order_by(Dish.id).all()
             dish_list[category] = [dish.serialize() for dish in dishes] if dishes else 'No dishes in this category'
-
-        return jsonify({**menu_response, **{'dishes': dish_list}}), 200
+        restaurant = Restaurant.query.filter_by(id=menu.restaurant_id).first()
+        return jsonify({**menu_response, **{'dishes': dish_list},**{'restaurant':restaurant.serialize()}}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': 'Server error: Failed to process request'}), 500
@@ -669,7 +674,9 @@ def get_restaurant_by_id():
         'social_networks': restaurant.social_networks,
         'phone': restaurant.phone,
         'description': restaurant.description,
-        'image': restaurant.image
+        'image': restaurant.image,
+        'plan': restaurant.plan
+
         # 'menus': [menu.name for menu in restaurant.menus],  # Listado de menús
         # 'notifications': [notif.message for notif in restaurant.notifications]  # Mensajes de notificación
     })
@@ -762,6 +769,85 @@ def top_restaurants(city):
         return jsonify({"msg": "Error al buscar restaurantes", "error": str(e)}), 500
     #Termina rutas para explora y descrubre, puedes continuar agregando despues de esta linea
 
+@api.route('/orders', methods=['POST'])
+def create_order():
+    request_body = request.get_json()
+    cart = request_body['cart']  # Use the cart information as needed
+    payment = paypalrestsdk.Payment({
+        "intent": "sale",
+        "payer": {
+            "payment_method": "paypal"
+        },
+        "redirect_urls": {
+            "return_url": f"{os.getenv('FRONTEND_URL')}restaurant-dashboard",
+            "cancel_url": f"{os.getenv('FRONTEND_URL')}restaurant-dashboard"
+        },
+        "transactions": [{
+            "item_list": {
+                "items": [{
+                    "name": "test item",
+                    "sku": "item",
+                    "price": "10.00",
+                    "currency": "USD",
+                    "quantity": 1
+                }]
+            },
+            "amount": {
+                "total": "10.00",
+                "currency": "USD"
+            },
+            "description": "This is the payment transaction description."
+        }]
+    })
+
+    if payment.create():
+        for link in payment.links:
+            if link.rel == "approval_url":
+                approval_url = link.href
+                token = approval_url.split('token=')[1] 
+                return jsonify({'approval_url': approval_url, 'order_id': payment.id, 'token':token})
+    else:
+        return jsonify({'error': payment.error}), 400
+
+@api.route('orders/<order_id>/capture', methods=['POST'])
+def capture_order(order_id):
+    try:
+        data = request.json
+        orderID = data.get('orderID')
+        payment = paypalrestsdk.Payment.find(orderID)
+        if payment:
+            if payment.execute({"payer_id": payment.payer.payer_info.payer_id}):
+                    captured_payment = payment.to_dict()
+                    return jsonify(captured_payment), 200
+            else:
+                return jsonify({'error': payment.error}), 400
+        else:
+            return jsonify({'error': 'Payment not found'}), 404
+    except paypalrestsdk.exceptions.ResourceNotFound as e:
+        return jsonify({'error': 'Resource not found', 'details': str(e)}), 404
+    except Exception as e:
+         return jsonify({'error': str(e)}), 500
+
+@api.route('restaurant/successful/payment', methods=['PUT'])
+@jwt_required()
+def update_plan():
+    restaurant_id = get_jwt_identity()  
+    claims = get_jwt()
+    role = claims.get('role')
+    if role != "restaurant":
+            return jsonify({"error": "Unauthorized: Not authorized to view profile"}), 403
+    if restaurant_id:
+        try:
+            restaurant = Restaurant.query.get(restaurant_id)
+            restaurant.plan = True
+            db.session.commit()
+            return jsonify(restaurant.serialize()),200
+        except Exception as e:
+            db.session.rollback() 
+            return jsonify({"msg": "Server error", "error": str(e)}), 500
+    else:
+        return jsonify({"msg": "Restaurant not found"}), 404
+        
 @api.route('/client/profile', methods=['GET'])
 @jwt_required()
 def get_client_by_id():
@@ -824,4 +910,3 @@ def update_client():
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al actualizar el cliente", "error": str(e)}), 500    
-
