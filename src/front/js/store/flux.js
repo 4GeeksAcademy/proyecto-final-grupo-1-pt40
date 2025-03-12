@@ -3,7 +3,7 @@ const getState = ({ getStore, getActions, setStore }) => {
         store: {
             client: null,
             restaurant: {},
-            menuBuilder: {},
+            menuBuilder: {dishes:{},menu:{}},
             menu: {},
             favorites: [],
             menuList: [],
@@ -19,6 +19,8 @@ const getState = ({ getStore, getActions, setStore }) => {
             ],
             notificacionesSeleccionadas: [],
             solicitudes: [], // Lista de solicitudes (reportes)
+            showLimitToast: false,
+            showLimitMenuToast: false,
         },
         actions: {
             registerUser: async (userType, registration) => {
@@ -137,10 +139,23 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
+
+                    const token=sessionStorage.getItem('token');
+                    if (!token){
+                        console.error('No authentication token found');
+                        throw new Error('No authentication token found');
+                    }
+                    const totalDishes = Object.values(store.menuBuilder.dishes).flat().length;
+                    if (totalDishes >= 10) {
+                        alert("Has alcanzado el límite de 10 platillos por menú en la cuenta gratuita. 📌 Unete a Al Punto+.");
+                        return; 
+                    }
                     const response = await fetch(`${backendURL}api/new/dish`,
                         {
                             method: "POST",
-                            headers: { "Content-Type": "application/json" },
+                            headers: { "Content-Type": "application/json",
+                                "Authorization":`Bearer ${token}`
+                             },
                             body: JSON.stringify({
                                 'menu_id': menu_id, 'category': category,
                                 'name': name, 'description': description, 'price': price, 'image': image
@@ -161,11 +176,12 @@ const getState = ({ getStore, getActions, setStore }) => {
                         updatedDishes[dish.category] = [dish];
                     }
                     setStore({ ...store, menuBuilder: { ...store.menuBuilder, dishes: updatedDishes } });
-
+                    alert("¡Platillo agregado con éxito! 🎉");
                     return dish;
                 }
                 catch {
                     console.error('Error adding Menu Builder dish');
+                    alert("Hubo un error al agregar el platillo. Intenta de nuevo.");
                 }
             },
 
@@ -249,7 +265,20 @@ const getState = ({ getStore, getActions, setStore }) => {
             createMenu: async (menuInfo) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
+                
                 try {
+                    const token = sessionStorage.getItem("token");
+                    if (!token) {
+                        console.error("No authentication token found");
+                        throw new Error("No authentication token found");
+                    }
+            
+                    
+                    if (store.menuList.length>=1) {
+                        alert("Upss. Solo puedes crear un menú con la cuenta gratuita. Para agregar más menús, únete a Al Punto+ 🚀");
+                        return;  
+                    }
+            
                     const response = await fetch(`${backendURL}api/new/menu`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
@@ -257,14 +286,19 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
                     )
                     if (!response.ok) {
+                        alert("⚠️ No puedes crear más menús.");
                         throw new Error(res.statusText);
                     }
                     const data = await response.json()
-                    return data
-                }
-                catch (error) {
+                    setStore({ menuBuilder: { ...store.menuBuilder, menu: data } });
+                    return data;
+                }catch (error) {
                     console.error('Error creating menu', error);
                 }
+            },
+            closeMenuToast: () => {
+                console.log("Cerrando showLimitMenuToast...");
+                setStore({ showLimitMenuToast: false });
             },
 
             deleteMenu: async (menu_id) => {
