@@ -510,7 +510,7 @@ def get_favorites():
     client_id = get_jwt_identity()
   
     favorites = Favorites.query.filter_by(client_id=client_id).all()
-     if not favorites:
+    if not favorites:
         return jsonify({"message": "No tienes favoritos aún"}), 200
     result = []
     for fav in favorites:
@@ -530,74 +530,74 @@ def get_favorites():
             })
     return jsonify(result), 200    
 
-# Ruta para manejar notificaciones
-@api.route('/notifications', methods=['GET', 'POST', 'DELETE', 'PUT'])
-def handle_notifications():
-    if request.method == 'GET':
-        # Obtener todas las notificaciones
-        notifications = Notification.query.all()
-        return jsonify([notification.serialize() for notification in notifications]), 200
+# # Ruta para manejar notificaciones
+# @api.route('/notifications', methods=['GET', 'POST', 'DELETE', 'PUT'])
+# def handle_notifications():
+#     if request.method == 'GET':
+#         # Obtener todas las notificaciones
+#         notifications = Notification.query.all()
+#         return jsonify([notification.serialize() for notification in notifications]), 200
 
-    elif request.method == 'POST':
-        # Agregar una nueva notificación
-        data = request.json
-        message = data.get('message')
-        if not message:
-            return jsonify({"error": "Message is required"}), 400
+#     elif request.method == 'POST':
+#         # Agregar una nueva notificación
+#         data = request.json
+#         message = data.get('message')
+#         if not message:
+#             return jsonify({"error": "Message is required"}), 400
 
-        new_notification = Notification(message=message)
-        db.session.add(new_notification)
-        db.session.commit()
-        return jsonify(new_notification.serialize()), 201
-    elif request.method == 'DELETE':
-        # Eliminar una notificación por ID
-        notification_id = request.json.get('id')
-        if not notification_id:
-            return jsonify({"error": "Notification ID is required"}), 400
+#         new_notification = Notification(message=message)
+#         db.session.add(new_notification)
+#         db.session.commit()
+#         return jsonify(new_notification.serialize()), 201
+#     elif request.method == 'DELETE':
+#         # Eliminar una notificación por ID
+#         notification_id = request.json.get('id')
+#         if not notification_id:
+#             return jsonify({"error": "Notification ID is required"}), 400
 
-        notification = Notification.query.get(notification_id)
-        if not notification:
-            return jsonify({"error": "Notification not found"}), 404
+#         notification = Notification.query.get(notification_id)
+#         if not notification:
+#             return jsonify({"error": "Notification not found"}), 404
 
-        db.session.delete(notification)
-        db.session.commit()
-        return jsonify({"message": "Notification deleted"}), 200
+#         db.session.delete(notification)
+#         db.session.commit()
+#         return jsonify({"message": "Notification deleted"}), 200
 
-    elif request.method == 'PUT':
-        # Marcar una notificación como leída
-        notification_id = request.json.get('id')
-        if not notification_id:
-            return jsonify({"error": "Notification ID is required"}), 400
+#     elif request.method == 'PUT':
+#         # Marcar una notificación como leída
+#         notification_id = request.json.get('id')
+#         if not notification_id:
+#             return jsonify({"error": "Notification ID is required"}), 400
 
-        notification = Notification.query.get(notification_id)
-        if not notification:
-            return jsonify({"error": "Notification not found"}), 404
+#         notification = Notification.query.get(notification_id)
+#         if not notification:
+#             return jsonify({"error": "Notification not found"}), 404
 
-        notification.read = True
-        db.session.commit()
-        return jsonify(notification.serialize()), 200
+#         notification.read = True
+#         db.session.commit()
+#         return jsonify(notification.serialize()), 200
 
 
-# Ruta para manejar reportes (solicitudes)
-@api.route('/reports', methods=['GET', 'POST'])
-def handle_reports():
-    if request.method == 'GET':
-        # Obtener todos los reportes
-        reports = Report.query.all()
-        return jsonify([report.serialize() for report in reports]), 200
+# # Ruta para manejar reportes (solicitudes)
+# @api.route('/reports', methods=['GET', 'POST'])
+# def handle_reports():
+#     if request.method == 'GET':
+#         # Obtener todos los reportes
+#         reports = Report.query.all()
+#         return jsonify([report.serialize() for report in reports]), 200
 
-    elif request.method == 'POST':
-        # Enviar un nuevo reporte
-        data = request.json
-        recipient = data.get('recipient')
-        message = data.get('message')
-        if not recipient or not message:
-            return jsonify({"error": "Recipient and message are required"}), 400
+#     elif request.method == 'POST':
+#         # Enviar un nuevo reporte
+#         data = request.json
+#         recipient = data.get('recipient')
+#         message = data.get('message')
+#         if not recipient or not message:
+#             return jsonify({"error": "Recipient and message are required"}), 400
 
-        new_report = Report(recipient=recipient, message=message, date=datetime.utcnow())
-        db.session.add(new_report)
-        db.session.commit()
-        return jsonify(new_report.serialize()), 201
+#         new_report = Report(recipient=recipient, message=message, date=datetime.utcnow())
+#         db.session.add(new_report)
+#         db.session.commit()
+#         return jsonify(new_report.serialize()), 201
  
 @api.route('/profile', methods=['GET'])
 @jwt_required()

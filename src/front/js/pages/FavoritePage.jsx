@@ -13,8 +13,9 @@ const FavoriteView = () => {
 
     }, []);
 
-    const dishFavorites = store.favorites.filter(fav => fav.dish);
-    const restaurantFavorites = store.favorites.filter(fav => fav.restaurant);
+    const favorites = Array.isArray(store.favorites) ? store.favorites : [];
+    const dishFavorites = favorites.filter(fav => fav.dish);
+    const restaurantFavorites = favorites.filter(fav => fav.restaurant);
 
     return (
         <Container className="mt-4">

@@ -1,21 +1,22 @@
 import React, { useEffect, useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Context } from "../store/appContext";
+import RestaurantNavbar from "../component/RestaurantNavbar.jsx";
 
 const RestaurantProfile = () => {
     const { store, actions } = useContext(Context);
     const [profile, setProfile] = useState(null)
     const navigate = useNavigate();
-    
-    const onLoad = async ()=>{
+
+    const onLoad = async () => {
         const response = await actions.getRestaurantDetails()
-        if (response)setProfile(response)
+        if (response) setProfile(response)
     }
     useEffect(() => {
         onLoad()
     }, []);
 
-   
+
     const convertToAmPm = (time) => {
         if (!time) return "";
         const [hour, minute] = time.split(":").map(Number);
@@ -32,64 +33,67 @@ const RestaurantProfile = () => {
     }
 
     return (
-        <div className="container mt-5">
-            <div className="profile-card text-center p-4 bg-white shadow rounded">
-                <img
-                    src={profile.image ? profile.image.trim() : "https://i.pinimg.com/236x/59/b5/91/59b591cbaee5d0b308648cfbae25d78a.jpg"}
-                    alt="Profile"
-                    className="profile-img rounded-circle mb-3"
-                    style={{ width: "150px", height: "150px", objectFit: "cover" }}
-                    onError={(e) => { e.target.src = "https://i.pinimg.com/236x/59/b5/91/59b591cbaee5d0b308648cfbae25d78a.jpg"; }}
-                />
-                <h2>{profile.name}</h2>
-                <p className="text-muted">@{profile.username}</p>
+        <div>
+            <RestaurantNavbar />
+            <div className="container mt-4">
+                <div className="profile-card text-center p-4 bg-white shadow rounded">
+                    <img
+                        src={profile.image ? profile.image.trim() : "https://i.pinimg.com/236x/59/b5/91/59b591cbaee5d0b308648cfbae25d78a.jpg"}
+                        alt="Profile"
+                        className="profile-img rounded-circle mb-3"
+                        style={{ width: "150px", height: "150px", objectFit: "cover" }}
+                        onError={(e) => { e.target.src = "https://i.pinimg.com/236x/59/b5/91/59b591cbaee5d0b308648cfbae25d78a.jpg"; }}
+                    />
+                    <h2>{profile.name}</h2>
+                    <p className="text-muted">@{profile.username}</p>
 
-                <div className="row mt-4 text-start">
-                    <div className="col-md-6">
-                        <p><strong>Departamento:</strong> {profile.department}</p>
-                        <p><strong>Ciudad:</strong> {profile.city}</p>
-                        <p><strong>Dirección:</strong> {profile.exact_address || "No disponible"}</p>
-                        <p><strong>Teléfono:</strong> {profile.phone || "No disponible"}</p>
-                    </div>
-                    <div className="col-md-6">
-                        {profile.schedule ? (
-                            <div>
-                                <p>
-                                    <strong className="pb-1">Horario de Atención</strong>
-                                </p>
-
+                    <div className="row mt-4 text-start">
+                        <div className="col-md-6">
+                            <p><strong>Departamento:</strong> {profile.department}</p>
+                            <p><strong>Ciudad:</strong> {profile.city}</p>
+                            <p><strong>Dirección:</strong> {profile.exact_address || "No disponible"}</p>
+                            <p><strong>Teléfono:</strong> {profile.phone || "No disponible"}</p>
+                        </div>
+                        <div className="col-md-6">
+                            {profile.schedule ? (
                                 <div>
-                                    {profile.schedule.map((day, index) => (
-                                        <div className="p-0" key={index}>{`${day.day}: ${day.isClosed ? 'Cerrado' : `${convertToAmPm(day.open)} - ${convertToAmPm(day.close)}`}`}</div>
-                                    ))}
+                                    <p>
+                                        <strong className="pb-1">Horario de Atención</strong>
+                                    </p>
+
+                                    <div>
+                                        {profile.schedule.map((day, index) => (
+                                            <div className="p-0" key={index}>{`${day.day}: ${day.isClosed ? 'Cerrado' : `${convertToAmPm(day.open)} - ${convertToAmPm(day.close)}`}`}</div>
+                                        ))}
+
+                                    </div>
+
 
                                 </div>
-
-
-                            </div>
-                        ) : (
-                            <p>No disponible</p>
-                        )}
-                        <p><strong>Tipo de Cocina:</strong> {profile.cuisine_type || "No especificado"}</p>
-                        <p><strong>Descripción:</strong> {profile.description || "No disponible"}</p>
+                            ) : (
+                                <p>No disponible</p>
+                            )}
+                            <p><strong>Tipo de Cocina:</strong> {profile.cuisine_type || "No especificado"}</p>
+                            <p><strong>Descripción:</strong> {profile.description || "No disponible"}</p>
+                        </div>
                     </div>
-                </div>
 
-                <div className="social-icons mt-3">
-                    {profile.social_networks
-                        ? profile.social_networks.split(",").map((network, index) => (
-                            <a key={index} href={network.trim()} className="me-3" target="_blank" rel="noopener noreferrer">
-                                <i className="fab fa-facebook fa-2x text-primary"></i>
-                            </a>
-                        ))
-                        : <p>No tiene redes sociales registradas</p>
-                    }
-                </div>
+                    <div className="social-icons mt-3">
+                        {profile.social_networks
+                            ? profile.social_networks.split(",").map((network, index) => (
+                                <a key={index} href={network.trim()} className="me-3" target="_blank" rel="noopener noreferrer">
+                                    <i className="fab fa-facebook fa-2x text-primary"></i>
+                                </a>
+                            ))
+                            : <p>No tiene redes sociales registradas</p>
+                        }
+                    </div>
 
-                <div className="mt-4">
-                    <button className="btn btn-success" onClick={() => navigate(`/edit-restaurant/`)}>
-                        Editar perfil
-                    </button>
+                    <div className="mt-4">
+                        <button className="btn btn-success" onClick={() => navigate(`/edit-restaurant/`)}>
+                            Editar perfil
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
