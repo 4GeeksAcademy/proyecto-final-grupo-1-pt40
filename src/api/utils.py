@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 FRONTEND_URL = os.getenv('FRONTEND_URL')
+KEY = os.getenv('MAIL_KEY')
+SECRET = os.getenv('MAIL_SECRET')
 class APIException(Exception):
     status_code = 400
 
@@ -46,8 +48,8 @@ def generate_sitemap(app):
 
 def send_email(to_email,token):
     reset_link = f'{FRONTEND_URL}/password-reset/{token}'
-    api_key = 'myapikey'
-    api_secret = 'myapisecret'
+    api_key = KEY
+    api_secret = SECRET
     mailjet = Client(auth=(api_key, api_secret), version='v3.1')
     data = {
       'Messages': [
@@ -64,7 +66,7 @@ def send_email(to_email,token):
           ],
           "Subject": "Solicitud de Cambio de Contraseña",
           "TextPart": f"Click on the following link to reset your password: {reset_link}",
-          "HTMLPart": f"<p>Click on the following link to reset your password: <a href='{reset_link}'>Reset Password</a></p>"
+          "HTMLPart": f"<div><p>Recibimos una solicitud de cambio de contraseña.</p><p>Haz click en el siguiente enlace <a href='{reset_link}'>Cambiar contraseña</a></p><p>El enlace tiene una validez de 10 minutos</p></div>"
         }
       ]
     }
