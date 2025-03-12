@@ -7,6 +7,7 @@ import EditModal from "../component/EditModal.jsx"
 import { useParams } from 'react-router-dom';
 
 
+
 const MenuBuilder = () => {
   const { menuID } = useParams();
   const { store, actions } = useContext(Context);
@@ -123,6 +124,7 @@ const MenuBuilder = () => {
             <Button className="mt-2" onClick={addDish}>Agregar Platillo</Button>
           </Form>
         )}
+        
         <h4 className="mt-4">Platillos</h4>
 
         {selectedCategory && (<div>

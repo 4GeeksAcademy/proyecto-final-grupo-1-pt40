@@ -4,7 +4,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 from api.models import db, Client, Restaurant, Menu, Dish,Favorites,Admin
 from flask import Flask, request, jsonify, url_for, Blueprint, Response,send_file
 from werkzeug.utils import secure_filename
-from sqlalchemy.exc import DataError
+from sqlalchemy.exc import DataError,IntegrityError
 from sqlalchemy import or_
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
@@ -209,18 +209,33 @@ def add_menu():
         return jsonify({"error": "Invalid request, JSON body required"}), 400
 
     name = data.get("name")
-    currency = data.get("currency")
+    currency = data.get("currency","COP")
     restaurant_id = get_jwt_identity() 
     claims = get_jwt() 
     role = claims.get("role")
 
     if role != "restaurant":
             return jsonify({"error": "Unauthorized: Only restaurants can create menus"}), 403
+    
+    restaurant= Restaurant.query.get(restaurant_id)
+    if not restaurant:
+        return jsonify({"error": " Restaurant not found"}),404
+    
+    is_premium=restaurant.plan
+
+    menu_count = Menu.query.filter_by(restaurant_id=restaurant_id).count()
+
+    if not is_premium and menu_count>=1:
+        return jsonify({"error":"Limit reached:Free restaurants can only have 1 menu"}),403
+    
     try:
         new_menu = Menu(name=name, restaurant_id=restaurant_id, currency=currency)
         db.session.add(new_menu)
         db.session.commit()
         return jsonify(new_menu.serialize()), 201
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({"error":"Database integrity error. Possible duplicate or constraint violation"}),400
     except DataError as e:
         db.session.rollback()
         return jsonify({"error": f"Bad Request: {e.args[0]}"}), 400
@@ -288,19 +303,56 @@ def delete_menu(menu_id):
          return jsonify('Server error: Failed to process request'), 500
     
 @api.route('/new/dish/', methods=['POST'])
+@jwt_required()
 def add_dish():
     data = request.json
+    if not data:
+        return jsonify({"error":"Invalid request,JSON body required"}),400
+    
+    name=data.get('name')
+    category=data.get('category')
+    price=data.get('price')
+    menu_id=data.get('menu_id')
     description = data.get('description',None)
     image_URL = data.get('image',None)
+
+    claims=get_jwt()
+    role=claims.get("role")
+    if role !="restaurant":
+        return jsonify({"error":"Unauthorized:Only restaurants can add dishes"}),403
+    if not all ([name,category,price,menu_id]):
+        return jsonify ({"error":"Missing required fields (name,category,price,menu_id)"}),400
     try:
-        if data["name"] and data["category"] and data["price"] and data["menu_id"]:
-            new_dish = Dish(name=data['name'], category=data['category'], price=float(data["price"]),menu_id=data["menu_id"],description=description, image_URL=image_URL)
-            if new_dish:
-                db.session.add(new_dish)
-                db.session.commit()
-                return jsonify(new_dish.serialize()), 201
-        else:
-             return jsonify('Bad Request: Request is missing data/fields'),400
+       price=float(price)
+       if price <=0:
+           return jsonify({"error":"Price must be greater than zero"}),400
+    except ValueError:
+        return jsonify ({"error":"Invalid price format. It must be a number"}),400
+    
+    menu= Menu.query.get(menu_id)
+    if not menu:
+        return jsonify({"error":" Menu not found"},404)
+    restaurant=Restaurant.query.get(menu.restaurant_id)
+    if not restaurant:
+        return jsonify({"error":"Restaurant not found"}),404
+    is_premiun=restaurant.plan
+    dish_count=Dish.query.filter_by(menu_id=menu_id).count()
+    if not is_premiun and dish_count >=10:
+        return jsonify({"error":"Limit reached: Free restaurants can only have 10 dishes"}),403
+    try:
+        new_dish=Dish(
+            name=name,
+            category=category,
+            price=price,
+            menu_id=menu_id,
+            description=description,
+            image_URL=image_URL
+
+        )
+        db.session.add(new_dish)
+        db.session.commit()
+        return jsonify(new_dish.serialize()),201
+    
     except DataError as e:
         db.session.rollback()
         return jsonify('Bad Request: Incorrect data format/type'),400
@@ -510,7 +562,7 @@ def get_favorites():
     client_id = get_jwt_identity()
   
     favorites = Favorites.query.filter_by(client_id=client_id).all()
-     if not favorites:
+    if not favorites:
         return jsonify({"message": "No tienes favoritos aún"}), 200
     result = []
     for fav in favorites:
@@ -752,13 +804,20 @@ def search():
         db.session.rollback() 
         return jsonify({"msg": "Error al buscar restaurantes", "error": str(e)}), 500
 
-@api.route('/top-restaurants/<city>', methods=['GET'])
-def top_restaurants(city):
-    if not city:
-        return jsonify({'error':'Missing city parameter'}), 400
+@api.route('/top-restaurants/', methods=['GET'])
+@jwt_required()
+def top_restaurants():
+    client_id = get_jwt_identity()  
+    claims = get_jwt()
+    role = claims.get('role')
+
+    if role != "client":
+            return jsonify({"error": "Unauthorized: Must use client account"}), 403
     try:
+        client = Client.query.get(client_id).first()
+        client_city = client.city
         top_restaurants = db.session.query(Restaurant, db.func.count(Favorites.id).label('likes')
-        ).join(Favorites, Restaurant.id == Favorites.restaurant_id).filter(Restaurant.city == city).group_by(Restaurant.id).order_by(db.desc('likes')).limit(10).all()
+        ).join(Favorites, Restaurant.id == Favorites.restaurant_id).filter(Restaurant.city == client_city).group_by(Restaurant.id).order_by(db.desc('likes')).limit(10).all()
 
         if not top_restaurants:
             return jsonify({'message':'No restaurants found'}),404

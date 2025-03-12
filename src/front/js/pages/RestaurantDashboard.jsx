@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
-import { Button, Accordion, Alert } from "react-bootstrap";
+import { Button, Accordion, Alert} from "react-bootstrap";
 import Spinner from 'react-bootstrap/Spinner';
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
@@ -71,6 +71,7 @@ const RestaurantDashboard = () => {
                     </div>
                 </div>
             </nav>
+            
 
             {alert === 'Public' ? (<Alert key={1} variant='success'>
                 Menú publicado con éxito, se encuentra disponible para todo público

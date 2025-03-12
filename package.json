@@ -74,6 +74,7 @@
 	},
 	"dependencies": {
 		"@mercadopago/sdk-react": "^1.0.0",
+		"@paypal/paypal-js": "^8.2.0",
 		"@paypal/react-paypal-js": "^8.8.2",
 		"@react-google-maps/api": "^2.20.6",
 		"@uploadcare/react-widget": "^2.4.7",

@@ -4,6 +4,7 @@ from sqlalchemy import ForeignKey
 from werkzeug.security import generate_password_hash, check_password_hash
 import json
 from datetime import datetime
+from api.config import MAX_FREE_MENUS,MAX_FREE_DISHES_PER_MENU
 
 
 
@@ -68,10 +69,14 @@ class Restaurant(db.Model):
     image = db.Column(db.String(255), nullable=True)
     plan = db.Column(db.Boolean, default=False)
     
-    menus = relationship('Menu', back_populates='restaurant')
+    menus = relationship('Menu', back_populates='restaurant', lazy ='dynamic')
     notifications = relationship('RestaurantNotifications', back_populates='restaurant')
     favorites = relationship('Favorites', back_populates='restaurant')
 
+    def can_add_menu(self):
+        if self.plan:
+            return True
+        return self.menus.count()< MAX_FREE_MENUS
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -108,8 +113,13 @@ class Menu(db.Model):
     is_active = db.Column(db.Boolean, nullable=True, default=False)
 
     restaurant = relationship('Restaurant', back_populates='menus')
-    dishes = relationship('Dish', back_populates='menu', cascade='all, delete-orphan')
+    dishes = relationship('Dish', back_populates='menu',lazy='dynamic', cascade='all, delete-orphan')
     favorites = relationship('Favorites', back_populates='menu')
+
+    def can_add_dish(self):
+        if self.restaurant.plan:
+            return True
+        return self.dishes.count()< MAX_FREE_DISHES_PER_MENU
 
     def set_categories(self, categories_list):
        self.categories = json.dumps(categories_list)
