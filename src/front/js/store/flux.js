@@ -176,7 +176,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         updatedDishes[dish.category] = [dish];
                     }
                     setStore({ ...store, menuBuilder: { ...store.menuBuilder, dishes: updatedDishes } });
-                    alert("¡Platillo agregado con éxito! 🎉");
+                    
                     return dish;
                 }
                 catch {
@@ -296,11 +296,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error('Error creating menu', error);
                 }
             },
-            closeMenuToast: () => {
-                console.log("Cerrando showLimitMenuToast...");
-                setStore({ showLimitMenuToast: false });
-            },
-
+           
             deleteMenu: async (menu_id) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
@@ -360,6 +356,45 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
                 catch (error) {
                     console.error('Error publishing Menu', error);
+                }
+            },
+            
+            updateMenu: async (menu_id, menuData) => {
+                const backendURL = process.env.BACKEND_URL;
+                const store = getStore();
+            
+                try {
+                    const token = sessionStorage.getItem('token');
+                    if (!token) {
+                        console.error('No authentication token found');
+                        return;
+                    }
+            
+                    const response = await fetch(`${backendURL}api/menu/${menu_id}`, {
+                        method: "PUT",
+                        headers: { 
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify(menuData)
+                    });
+            
+                    if (!response.ok) {
+                        throw new Error("Error updating menu");
+                    }
+            
+                    const data = await response.json();
+                    console.log("Menu updated:", data);
+            
+                    setStore({
+                        ...store,
+                        menu: data.menu 
+                    });
+            
+                    alert("Menú actualizado con éxito");
+            
+                } catch (error) {
+                    console.error("Error updating menu:", error);
                 }
             },
 
@@ -443,10 +478,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
                     
                     const data = await response.json();
-                    setStore({ favorites: data });
+                    setStore({ ...store,favorites: data });
                     return data;
                 } catch (error) {
                     console.error("Error al obtener favoritos:", error);
+                    setStore({...store,favorites:[]});
                     return [];
                 }
             },
