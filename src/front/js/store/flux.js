@@ -427,8 +427,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             fetchFavorites: async () => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
-                const store=getStore();
-                
+                const store = getStore();
+
                 try {
                     const response = await fetch(`${backendUrl}api/favorites`, {
                         method: "GET",
@@ -437,11 +437,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                             'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                         },
                     });
-                    
+
                     if (!response.ok) {
                         throw new Error(`Error en la solicitud: ${response.status}`);
                     }
-                    
+
                     const data = await response.json();
                     setStore({ favorites: data });
                     return data;
@@ -450,7 +450,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return [];
                 }
             },
-            
+
             addFavorite: async (dish_id, restaurant_id) => {
 
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
@@ -458,33 +458,33 @@ const getState = ({ getStore, getActions, setStore }) => {
                 let bodyData = {};
                 if (dish_id !== null && dish_id !== undefined) {
                     bodyData.dish_id = parseInt(dish_id);
-                } 
+                }
                 if (restaurant_id !== null && restaurant_id !== undefined) {
                     bodyData.restaurant_id = parseInt(restaurant_id);
                 }
-                
+
                 if (Object.keys(bodyData).length === 0) {
                     console.error("Error: Se debe proporcionar al menos un dish_id o restaurant_id válido");
                     return;
                 }
 
-                    console.log("Datos a enviar:", bodyData);
+                console.log("Datos a enviar:", bodyData);
 
                 try {
-                    const url=`${backendUrl}api/favorites`;
-                    console.log("URL a utilizar:",url);
+                    const url = `${backendUrl}api/favorites`;
+                    console.log("URL a utilizar:", url);
                     const response = await fetch(`${backendUrl}api/favorites`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                         },
-                      body: JSON.stringify(bodyData),
+                        body: JSON.stringify(bodyData),
                     });
 
                     if (!response.ok) {
                         const errorText = await response.text();
                         console.error("Respuesta del servidor:", errorText);
-                        if (errorText.includes("ya esta en tus favoritos")){
+                        if (errorText.includes("ya esta en tus favoritos")) {
                             console.log("este elemento ya esta en tus favoritos");
                             return null;
                         }
@@ -506,7 +506,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 try {
                     const response = await fetch(`${backendUrl}api/favorites/${favoriteId}`, {
                         method: "DELETE",
-                        headers:{
+                        headers: {
                             "Authorization": `Bearer ${sessionStorage.getItem("token")}`
                         }
                     });
@@ -646,7 +646,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 try {
                     const response = await fetch(`${process.env.BACKEND_URL}api/top-restaurants/`, {
                         method: 'GET',
-                        headers: { "Content-Type": "application/json" ,'Authorization': `Bearer ${sessionStorage.getItem('token')}`},
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
                     });
 
                     if (!response.ok) {
@@ -689,7 +689,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     })
 
                     if (!response.ok) {
-                        if (!response.ok) throw new Error(response.statusText)
+                        throw new Error(response.statusText)
                     }
 
                     return true
@@ -698,7 +698,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return false;
                 }
             },
-        
+
             getClientDetails: async () => {
                 const store = getStore();
                 try {
@@ -814,6 +814,64 @@ const getState = ({ getStore, getActions, setStore }) => {
                     notificaciones: notificacionesActualizadas,
                 });
             },
+
+            passwordResetRequest: async (email, role) => {
+                const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/reset-password/send-email`, {
+                        method: 'POST',
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ 'email': email, 'role': role })
+                    })
+
+                    if (!response.ok) {
+                        throw new Error(response.statusText)
+                    }
+
+                    return true
+
+                } catch (error) {
+                    return false;
+                }
+
+            },
+
+            checkResetToken: async (token) => {
+                const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/reset-password/`, {
+                        method: 'GET',
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
+
+                    })
+
+                    if (!response.ok) {
+                        throw new Error(response.statusText)
+                    }
+
+                    const data = await response.json()
+                    return data
+                } catch (error) {
+                    return false;
+                }
+            },
+
+            updatePassword: async (token, email, password) => {
+                const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/reset-password/`, {
+                        method: 'PUT',
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ 'email': email, 'password': password })
+                    })
+                    if (!response.ok) {
+                        throw new Error(response.statusText)
+                    }
+                    return true
+                } catch (error) {
+                    return false;
+                }
+            }
         }
     };
 };

@@ -6,14 +6,17 @@ from flask import Flask, request, jsonify, url_for, Blueprint, Response,send_fil
 from werkzeug.utils import secure_filename
 from sqlalchemy.exc import DataError,IntegrityError
 from sqlalchemy import or_
-from api.utils import generate_sitemap, APIException
+from api.utils import generate_sitemap, APIException, send_email
 from flask_cors import CORS
-from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity,get_jwt
+from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity,get_jwt,decode_token
 from flask_jwt_extended import JWTManager
+from jwt import ExpiredSignatureError, InvalidTokenError
 import json
 import os
 from dotenv import load_dotenv
 import paypalrestsdk
+from datetime import timedelta
+
 
 
 api = Blueprint('api', __name__)
@@ -969,3 +972,72 @@ def update_client():
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al actualizar el cliente", "error": str(e)}), 500    
+    
+
+@api.route('/reset-password/send-email', methods=['POST'])
+def reset_password_email():
+        data = request.json
+        email = data.get('email',None)
+        role = data.get('role',None)
+        try:
+            user = None
+
+            if role == 'client':
+                user = Client.query.filter_by(email=email).first()
+            elif role == 'restaurant':
+                user = Restaurant.query.filter_by(email=email).first()
+            
+            if not user:
+                return jsonify({'error':'Incorrect email address'}),404
+            
+            expiration = timedelta(minutes=10)
+            reset_token = create_access_token(identity=email, expires_delta=expiration,additional_claims={"role":role})
+            status = send_email(email,reset_token)
+            if status == 200:
+                return jsonify({'msg':'Email sent successfully'}),200
+            return jsonify({'msg':'Email not send'}),400
+        except Exception as e:
+            return jsonify({"msg": f"Server error: {e}"}), 500  
+
+@api.route('/reset-password', methods=['GET', 'PUT'])
+@jwt_required()
+def reset_password():
+    if request.method == 'GET':
+        try:
+            client_email = get_jwt_identity()
+            return jsonify({'msg':'Token is valid','email':client_email}),200
+        except ExpiredSignatureError:
+            return jsonify({'msg':'Token is expired'}),401
+        except InvalidTokenError:
+            return jsonify({'msg':'Token is invalid'}),401
+        except Exception as e:
+            return jsonify({"msg": f"Server error: {e}"}), 500
+    elif request.method == 'PUT':
+        data = request.json
+        identity = get_jwt_identity()  
+        claims = get_jwt()
+        role = claims.get('role')
+        password = data.get('password',None)
+        email = data.get('email',None)
+        if not password or not email:
+            return jsonify({'msg':'Must provide a new password'}), 400
+        try: 
+            if email == identity:
+                if role == 'client':
+                    client = Client.query.filter_by(email=email).first()
+                    client.set_password(password)
+                    db.session.commit()
+                    return jsonify({'msg':f'Password changed successfully'}), 200
+                elif role == 'restaurant':
+                    restaurant = Restaurant.query.filter_by(email=email).first()
+                    restaurant.set_password(password)
+                    db.session.commit()
+                    return jsonify({'msg':f'Password changed successfully'}), 200
+            else:
+                return jsonify({'msg':f'Invalid token'}), 403
+        except Exception as e:
+            return jsonify({"msg": "Server error"}), 500 
+
+
+
+
