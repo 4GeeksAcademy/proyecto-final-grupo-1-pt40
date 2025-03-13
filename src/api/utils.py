@@ -47,7 +47,7 @@ def generate_sitemap(app):
         <ul style="text-align: left;">"""+links_html+"</ul></div>"
 
 def send_email(to_email,token):
-    reset_link = f'{FRONTEND_URL}/password-reset/{token}'
+    reset_link = f'{FRONTEND_URL}password-reset?token={token}'
     api_key = KEY
     api_secret = SECRET
     mailjet = Client(auth=(api_key, api_secret), version='v3.1')
@@ -66,7 +66,7 @@ def send_email(to_email,token):
           ],
           "Subject": "Solicitud de Cambio de Contraseña",
           "TextPart": f"Click on the following link to reset your password: {reset_link}",
-          "HTMLPart": f"<div><p>Recibimos una solicitud de cambio de contraseña.</p><p>Haz click en el siguiente enlace <a href='{reset_link}'>Cambiar contraseña</a></p><p>El enlace tiene una validez de 10 minutos</p></div>"
+          "HTMLPart": f"<div><p>Recibimos una solicitud de cambio de contraseña.</p><p>Haz click en el siguiente enlace: <a href='{reset_link}'>Cambiar contraseña</a></p><p>El enlace expirará de 10 minutos</p></div>"
         }
       ]
     }

@@ -922,40 +922,70 @@ def update_client():
         return jsonify({"msg": "Error al actualizar el cliente", "error": str(e)}), 500    
     
 
-@api.route('/reset-password/<token>', methods=['POST','GET'])
-def reset_password(token):
-    if request.method == 'POST':
+@api.route('/reset-password/send-email', methods=['POST'])
+def reset_password_email():
         data = request.json
         email = data.get('email',None)
+        role = data.get('role',None)
         try:
-            client = Client.query.filter_by(email=email).first()
-            if not client:
+            user = None
+
+            if role == 'client':
+                user = Client.query.filter_by(email=email).first()
+            elif role == 'restaurant':
+                user = Restaurant.query.filter_by(email=email).first()
+            
+            if not user:
                 return jsonify({'error':'Incorrect email address'}),404
+            
             expiration = timedelta(minutes=10)
-            reset_token = create_access_token(identity=email, expires_delta=expiration)
+            reset_token = create_access_token(identity=email, expires_delta=expiration,additional_claims={"role":role})
             status = send_email(email,reset_token)
-            return jsonify(status),200
+            if status == 200:
+                return jsonify({'msg':'Email sent successfully'}),200
+            return jsonify({'msg':'Email not send'}),400
         except Exception as e:
-            return jsonify({"msg": "Server error"}), 500  
-    elif request.method == 'GET':
+            return jsonify({"msg": f"Server error: {e}"}), 500  
+
+@api.route('/reset-password', methods=['GET', 'PUT'])
+@jwt_required()
+def reset_password():
+    if request.method == 'GET':
         try:
-            decoded_token = decode_token(token)
-            client_email = get_jwt_identity(token)
+            client_email = get_jwt_identity()
             return jsonify({'msg':'Token is valid','email':client_email}),200
         except ExpiredSignatureError:
             return jsonify({'msg':'Token is expired'}),401
         except InvalidTokenError:
             return jsonify({'msg':'Token is invalid'}),401
+        except Exception as e:
+            return jsonify({"msg": f"Server error: {e}"}), 500
     elif request.method == 'PUT':
         data = request.json
+        identity = get_jwt_identity()  
+        claims = get_jwt()
+        role = claims.get('role')
         password = data.get('password',None)
-        if not password:
+        email = data.get('email',None)
+        if not password or not email:
             return jsonify({'msg':'Must provide a new password'}), 400
         try: 
-            client_email = get_jwt_identity(token)
-            client = Client.query.filter_by(email=email).first()
-            client.set_password(password)
-            return jsonify({'msg':'Password updated successfully'}), 200
+            if email == identity:
+                if role == 'client':
+                    client = Client.query.filter_by(email=email).first()
+                    client.set_password(password)
+                    db.session.commit()
+                    return jsonify({'msg':f'Password changed successfully'}), 200
+                elif role == 'restaurant':
+                    restaurant = Restaurant.query.filter_by(email=email).first()
+                    restaurant.set_password(password)
+                    db.session.commit()
+                    return jsonify({'msg':f'Password changed successfully'}), 200
+            else:
+                return jsonify({'msg':f'Invalid token'}), 403
         except Exception as e:
             return jsonify({"msg": "Server error"}), 500 
+
+
+
 

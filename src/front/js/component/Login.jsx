@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import { Button, Form, Card } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +16,7 @@ const Login = () => {
       const success = await actions.loginUser(role, email, password);
       if (success) {
         if (role === "client") {
-          navigate("/client-dashboard"); 
+          navigate("/client-dashboard");
         } else if (role === "restaurant") {
           navigate("/restaurant-dashboard");
         }
@@ -49,6 +50,9 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <Form.Text className="text-muted">
+              <Link className="nav-link" to="/password-reset-request">¿Olvidaste tu contraseña?</Link>
+            </Form.Text>
           </Form.Group>
           <div className="d-flex justify-content-between">
             <Button variant="primary" onClick={() => handleLogin("client")}>

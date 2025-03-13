@@ -655,7 +655,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     })
 
                     if (!response.ok) {
-                        if (!response.ok) throw new Error(response.statusText)
+                        throw new Error(response.statusText)
                     }
 
                     return true
@@ -781,17 +781,62 @@ const getState = ({ getStore, getActions, setStore }) => {
                 });
             },
 
-            passwordResetRequest: async () => {
+            passwordResetRequest: async (email, role) => {
                 const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/reset-password/send-email`, {
+                        method: 'POST',
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ 'email': email, 'role': role })
+                    })
+
+                    if (!response.ok) {
+                        throw new Error(response.statusText)
+                    }
+
+                    return true
+
+                } catch (error) {
+                    return false;
+                }
+
             },
 
-            checkResetToken: async () => {
+            checkResetToken: async (token) => {
                 const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/reset-password/`, {
+                        method: 'GET',
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
+
+                    })
+
+                    if (!response.ok) {
+                        throw new Error(response.statusText)
+                    }
+
+                    const data = await response.json()
+                    return data
+                } catch (error) {
+                    return false;
+                }
             },
 
-            updatePassword: async () => {
+            updatePassword: async (token, email, password) => {
                 const store = getStore()
-
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/reset-password/`, {
+                        method: 'PUT',
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ 'email': email, 'password': password })
+                    })
+                    if (!response.ok) {
+                        throw new Error(response.statusText)
+                    }
+                    return true
+                } catch (error) {
+                    return false;
+                }
             }
         }
     };

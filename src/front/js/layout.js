@@ -21,6 +21,7 @@ import RestaurantProfileEdit from "./pages/RestaurantProfileEdit.jsx";
 import RestaurantPurchasePlan from "./pages/RestaurantPurchasePlan.jsx";
 import ClientProfileEdit from "./pages/ClientProfileEdit.jsx";
 import PasswordReset from "./pages/PasswordReset.jsx";
+import PasswordResetRequest from "./pages/PasswordResetRequest.jsx";
 
 
 
@@ -58,7 +59,7 @@ const Layout = () => {
                         <Route element={<RestaurantProfileEdit />} path="/edit-restaurant" />
                         <Route element={<RestaurantPurchasePlan />} path="/plan-purchase" />
                         <Route element={<ClientProfileEdit />} path="/edit-client" />
-                        <Route element={<PasswordReset/>} path="/password-reset/:token"/>
+                        <Route element={<PasswordReset/>} path="/password-reset"/>
                         <Route element={<PasswordResetRequest/>} path="/password-reset-request/"/>
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
