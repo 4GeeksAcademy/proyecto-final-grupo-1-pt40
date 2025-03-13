@@ -6,17 +6,12 @@ const MainNavbar = () => {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-4 p-3 shadow rounded">
             <div className="container-fluid">
-                <span className="navbar-brand fw-bold">Al punto</span>
+                <Link to="/" className="navbar-brand fw-bold">Al punto</Link>
                 <div className="collapse navbar-collapse">
                     <ul className="navbar-nav ms-auto">
                         <li className="nav-item">
                             <Link className="nav-link" to="/how-work/">
-                                ¿Cómo funciona?
-                            </Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/signup/">
-                                Registrarse
+                                Sobre nosotros
                             </Link>
                         </li>
                         <li className="nav-item">
@@ -30,8 +25,13 @@ const MainNavbar = () => {
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/login/">
-                                Ingresar
+                            <Link className="nav-link btn btn-outline-primary" to="/signup/">
+                                Registrarse
+                            </Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link className="nav-link btn btn-outline-success" to="/login/">
+                                Iniciar sesión
                             </Link>
                         </li>
                     </ul>

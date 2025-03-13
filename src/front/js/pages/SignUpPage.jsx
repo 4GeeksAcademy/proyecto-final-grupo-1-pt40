@@ -8,14 +8,16 @@ const SignUpPage = () => {
   return (
     <div>
       <MainNavbar />
-      <Tabs defaultActiveKey="client" id="fill-tab-example" className="mb-3" fill>
-        <Tab eventKey='client' title='Registrarte como Cliente' key='client'>
-          <SignUpClient />
-        </Tab>
-        <Tab eventKey='restaurant' title='Registrar Restaurante' key='restaurant'>
-          <SignUpRestaurant />
-        </Tab>
-      </Tabs>
+      <div className="container">
+        <Tabs defaultActiveKey="client" id="fill-tab-example" className="mb-3" fill>
+          <Tab eventKey='client' title='Registrarte como Cliente' key='client'>
+            <SignUpClient />
+          </Tab>
+          <Tab eventKey='restaurant' title='Registrar Restaurante' key='restaurant'>
+            <SignUpRestaurant />
+          </Tab>
+        </Tabs>
+      </div>
     </div>
   );
 };
