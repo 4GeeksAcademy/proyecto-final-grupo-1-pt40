@@ -11,7 +11,7 @@ const GoogleMapsModal = ({ addressLink }) => {
 
   return (
     <>
-      <Button variant="primary" onClick={handleShow}>
+      <Button variant="light" className='text-dark' onClick={handleShow}>
         Google Maps
       </Button>
 

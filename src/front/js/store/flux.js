@@ -400,7 +400,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             getRestaurantMenusPublic: async (username) => {
                 const store = getStore()
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}'api/restaurant/${username}/menus/public'`, {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/restaurant/${username}/menus/public`, {
                         method: 'GET',
                         headers: { "Content-Type": "application/json"}
                     });
