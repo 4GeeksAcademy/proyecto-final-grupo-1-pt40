@@ -20,9 +20,14 @@ import AdminDashboard from "./pages/AdminDashboard.jsx";
 import RestaurantProfileEdit from "./pages/RestaurantProfileEdit.jsx";
 import RestaurantPurchasePlan from "./pages/RestaurantPurchasePlan.jsx";
 import ClientProfileEdit from "./pages/ClientProfileEdit.jsx";
+
 import HowItWork from "./pages/HowItWork.jsx";
 import FrequentQuestions from "./pages/FrequentQuestions.jsx";
 import Contact from "./pages/Contact.jsx";
+
+
+import PasswordReset from "./pages/PasswordReset.jsx";
+import PasswordResetRequest from "./pages/PasswordResetRequest.jsx";
 
 
 
@@ -44,7 +49,7 @@ const Layout = () => {
                         <Route element={<Home />} path="/" />
                         <Route element={<SignUpPage />} path="/signup" />
                         <Route element={<LoginPage />} path="/login" />
-                        <Route element={<MenuPublicView />} path="/restaurant/:restaurant/:menuID" />
+                        <Route element={<MenuPublicView />} path="/restaurant/:restaurant_username/menu/:menu_id" />
 
 
                         <Route element={<MenuView />} path="/menu/:menuID" />
@@ -62,9 +67,14 @@ const Layout = () => {
                         <Route element={<RestaurantPurchasePlan />} path="/plan-purchase" />
                         <Route element={<ClientProfileEdit />} path="/edit-client" />
 
+
                         <Route element={<HowItWork />} path="/how-work" />
                         <Route element={<FrequentQuestions />} path="/frequent-questions" />
                         <Route element={<Contact />} path="/contact" />
+
+                        <Route element={<PasswordReset />} path="/password-reset" />
+                        <Route element={<PasswordResetRequest />} path="/password-reset-request/" />
+
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
 

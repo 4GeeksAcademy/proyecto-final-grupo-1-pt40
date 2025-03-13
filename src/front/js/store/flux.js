@@ -3,7 +3,7 @@ const getState = ({ getStore, getActions, setStore }) => {
         store: {
             client: null,
             restaurant: {},
-            menuBuilder: {},
+            menuBuilder: { dishes: {}, menu: {} },
             menu: {},
             favorites: [],
             menuList: [],
@@ -19,6 +19,8 @@ const getState = ({ getStore, getActions, setStore }) => {
             ],
             notificacionesSeleccionadas: [],
             solicitudes: [], // Lista de solicitudes (reportes)
+            showLimitToast: false,
+            showLimitMenuToast: false,
         },
         actions: {
             registerUser: async (userType, registration) => {
@@ -137,10 +139,24 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
+
+                    const token = sessionStorage.getItem('token');
+                    if (!token) {
+                        console.error('No authentication token found');
+                        throw new Error('No authentication token found');
+                    }
+                    const totalDishes = Object.values(store.menuBuilder.dishes).flat().length;
+                    if (totalDishes >= 10) {
+                        alert("Has alcanzado el límite de 10 platillos por menú en la cuenta gratuita. 📌 Unete a Al Punto+.");
+                        return;
+                    }
                     const response = await fetch(`${backendURL}api/new/dish`,
                         {
                             method: "POST",
-                            headers: { "Content-Type": "application/json" },
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`
+                            },
                             body: JSON.stringify({
                                 'menu_id': menu_id, 'category': category,
                                 'name': name, 'description': description, 'price': price, 'image': image
@@ -161,11 +177,12 @@ const getState = ({ getStore, getActions, setStore }) => {
                         updatedDishes[dish.category] = [dish];
                     }
                     setStore({ ...store, menuBuilder: { ...store.menuBuilder, dishes: updatedDishes } });
-
+                    
                     return dish;
                 }
                 catch {
                     console.error('Error adding Menu Builder dish');
+                    alert("Hubo un error al agregar el platillo. Intenta de nuevo.");
                 }
             },
 
@@ -249,7 +266,20 @@ const getState = ({ getStore, getActions, setStore }) => {
             createMenu: async (menuInfo) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
+
                 try {
+                    const token = sessionStorage.getItem("token");
+                    if (!token) {
+                        console.error("No authentication token found");
+                        throw new Error("No authentication token found");
+                    }
+
+
+                    if (store.menuList.length >= 1) {
+                        alert("Upss. Solo puedes crear un menú con la cuenta gratuita. Para agregar más menús, únete a Al Punto+ 🚀");
+                        return;
+                    }
+
                     const response = await fetch(`${backendURL}api/new/menu`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
@@ -257,16 +287,17 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
                     )
                     if (!response.ok) {
+                        alert("⚠️ No puedes crear más menús.");
                         throw new Error(res.statusText);
                     }
                     const data = await response.json()
-                    return data
-                }
-                catch (error) {
+                    setStore({ menuBuilder: { ...store.menuBuilder, menu: data } });
+                    return data;
+                } catch (error) {
                     console.error('Error creating menu', error);
                 }
             },
-
+           
             deleteMenu: async (menu_id) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
@@ -328,6 +359,45 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error('Error publishing Menu', error);
                 }
             },
+            
+            updateMenu: async (menu_id, menuData) => {
+                const backendURL = process.env.BACKEND_URL;
+                const store = getStore();
+            
+                try {
+                    const token = sessionStorage.getItem('token');
+                    if (!token) {
+                        console.error('No authentication token found');
+                        return;
+                    }
+            
+                    const response = await fetch(`${backendURL}api/menu/${menu_id}`, {
+                        method: "PUT",
+                        headers: { 
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify(menuData)
+                    });
+            
+                    if (!response.ok) {
+                        throw new Error("Error updating menu");
+                    }
+            
+                    const data = await response.json();
+                    console.log("Menu updated:", data);
+            
+                    setStore({
+                        ...store,
+                        menu: data.menu 
+                    });
+            
+                    alert("Menú actualizado con éxito");
+            
+                } catch (error) {
+                    console.error("Error updating menu:", error);
+                }
+            },
 
             getRestaurants: async () => {
                 try {
@@ -358,6 +428,23 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return true;
                 } catch (error) {
                     console.error("Error en getRestaurantMenus:", error);
+                    return false;
+                }
+            },
+
+            getRestaurantMenusPublic: async (username) => {
+                const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/restaurant/${username}/menus/public`, {
+                        method: 'GET',
+                        headers: { "Content-Type": "application/json"}
+                    });
+                    if (!response.ok) throw new Error("Error al obtener los menús");
+                    const data = await response.json();
+                    setStore({ ...store, restaurantMenus: data });
+                    return data;
+                } catch (error) {
+                    console.error("Error en getRestaurantMenusPublic:", error);
                     return false;
                 }
             },
@@ -393,8 +480,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             fetchFavorites: async () => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
-                const store=getStore();
-                
+                const store = getStore();
+
                 try {
                     const response = await fetch(`${backendUrl}api/favorites`, {
                         method: "GET",
@@ -403,20 +490,21 @@ const getState = ({ getStore, getActions, setStore }) => {
                             'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                         },
                     });
-                    
+
                     if (!response.ok) {
                         throw new Error(`Error en la solicitud: ${response.status}`);
                     }
-                    
+
                     const data = await response.json();
-                    setStore({ favorites: data });
+                    setStore({ ...store,favorites: data });
                     return data;
                 } catch (error) {
                     console.error("Error al obtener favoritos:", error);
+                    setStore({...store,favorites:[]});
                     return [];
                 }
             },
-            
+
             addFavorite: async (dish_id, restaurant_id) => {
 
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
@@ -424,33 +512,33 @@ const getState = ({ getStore, getActions, setStore }) => {
                 let bodyData = {};
                 if (dish_id !== null && dish_id !== undefined) {
                     bodyData.dish_id = parseInt(dish_id);
-                } 
+                }
                 if (restaurant_id !== null && restaurant_id !== undefined) {
                     bodyData.restaurant_id = parseInt(restaurant_id);
                 }
-                
+
                 if (Object.keys(bodyData).length === 0) {
                     console.error("Error: Se debe proporcionar al menos un dish_id o restaurant_id válido");
                     return;
                 }
 
-                    console.log("Datos a enviar:", bodyData);
+                console.log("Datos a enviar:", bodyData);
 
                 try {
-                    const url=`${backendUrl}api/favorites`;
-                    console.log("URL a utilizar:",url);
+                    const url = `${backendUrl}api/favorites`;
+                    console.log("URL a utilizar:", url);
                     const response = await fetch(`${backendUrl}api/favorites`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                         },
-                      body: JSON.stringify(bodyData),
+                        body: JSON.stringify(bodyData),
                     });
 
                     if (!response.ok) {
                         const errorText = await response.text();
                         console.error("Respuesta del servidor:", errorText);
-                        if (errorText.includes("ya esta en tus favoritos")){
+                        if (errorText.includes("ya esta en tus favoritos")) {
                             console.log("este elemento ya esta en tus favoritos");
                             return null;
                         }
@@ -472,7 +560,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 try {
                     const response = await fetch(`${backendUrl}api/favorites/${favoriteId}`, {
                         method: "DELETE",
-                        headers:{
+                        headers: {
                             "Authorization": `Bearer ${sessionStorage.getItem("token")}`
                         }
                     });
@@ -608,12 +696,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             },
 
-            topRestaurants: async (city) => {
-                const store = getStore()
+            topRestaurants: async () => {
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}api/top-restaurants/${city}`, {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/top-restaurants/`, {
                         method: 'GET',
-                        headers: { "Content-Type": "application/json" },
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
                     });
 
                     if (!response.ok) {
@@ -623,6 +710,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return data;
                 } catch (error) {
                     console.error("Error with search query", error);
+                    return ({ restaurant: [], city: 'Bogota' })
                 }
 
             },
@@ -656,7 +744,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     })
 
                     if (!response.ok) {
-                        if (!response.ok) throw new Error(response.statusText)
+                        throw new Error(response.statusText)
                     }
 
                     return true
@@ -665,7 +753,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return false;
                 }
             },
-        
+
             getClientDetails: async () => {
                 const store = getStore();
                 try {
@@ -781,6 +869,64 @@ const getState = ({ getStore, getActions, setStore }) => {
                     notificaciones: notificacionesActualizadas,
                 });
             },
+
+            passwordResetRequest: async (email, role) => {
+                const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/reset-password/send-email`, {
+                        method: 'POST',
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ 'email': email, 'role': role })
+                    })
+
+                    if (!response.ok) {
+                        throw new Error(response.statusText)
+                    }
+
+                    return true
+
+                } catch (error) {
+                    return false;
+                }
+
+            },
+
+            checkResetToken: async (token) => {
+                const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/reset-password/`, {
+                        method: 'GET',
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
+
+                    })
+
+                    if (!response.ok) {
+                        throw new Error(response.statusText)
+                    }
+
+                    const data = await response.json()
+                    return data
+                } catch (error) {
+                    return false;
+                }
+            },
+
+            updatePassword: async (token, email, password) => {
+                const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/reset-password/`, {
+                        method: 'PUT',
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ 'email': email, 'password': password })
+                    })
+                    if (!response.ok) {
+                        throw new Error(response.statusText)
+                    }
+                    return true
+                } catch (error) {
+                    return false;
+                }
+            }
         }
     };
 };

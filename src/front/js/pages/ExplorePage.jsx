@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
-import { Container, Card, Row, Col, Form, Button, Badge } from "react-bootstrap";
+import { Container, Card, Row, Col, Form, Button, Badge, Spinner } from "react-bootstrap";
+import RestaurantCard from "../component/RestaurantCard.jsx";
 
 
 const ExplorePage = () => {
@@ -11,80 +12,8 @@ const ExplorePage = () => {
     const [cities, setCities] = useState([])
     const [search, setSearch] = useState({ 'department': '', "city": '', "cuisine": '', "keyword": '' })
     const [searchOn, setSearchOn] = useState({ 'department': false, 'city': false, 'cuisine': false, 'keyword': false })
-    const [top, setTop] = useState([])
-    const sample = [
-        {
-            id: 1,
-            nombre: "Restaurante A",
-            direccion: "Calle 123, Ciudad",
-            telefono: "123-456-7890",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 2,
-            nombre: "Restaurante B",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
+    const [top, setTop] = useState({})
 
-        {
-            id: 3,
-            nombre: "Restaurante C",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 4,
-            nombre: "Restaurante D",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 5,
-            nombre: "Restaurante E",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 6,
-            nombre: "Restaurante F",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 7,
-            nombre: "Restaurante G",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 8,
-            nombre: "Restaurante H",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 9,
-            nombre: "Restaurante i",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-            id: 10,
-            nombre: "Restaurante J",
-            direccion: "Avenida 456, Ciudad",
-            telefono: "987-654-3210",
-            imagen: "https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-    ]
 
     const setOne = ["Colombiana", "Americana", "Peruana", "Mexicana", "Brasileña"]
     const setTwo = ["Italiana", "Española", "Griega", "Francesa", "Turca"]
@@ -94,7 +23,7 @@ const ExplorePage = () => {
     const onLoad = async () => {
         const data = await actions.getDepartments()
         setDepartments(data)
-        const response = await actions.topRestaurants('Cali')
+        const response = await actions.topRestaurants()
         setTop(response)
     }
 
@@ -155,25 +84,37 @@ const ExplorePage = () => {
         }
     }, [search.department])
 
+
+    if (Object.keys(top) === 0) {
+        return (
+            <Container>
+                <Row>
+                    <Spinner animation="border" variant="danger" />
+                </Row>
+            </Container>
+        )
+    }
+
+
     return (
 
 
         <Container>
-            <h1>Top 10 en Cali</h1>
+            <h1>Top Restaurantes en {top.city}</h1>
             <Row className="flex-nowrap overflow-auto p-3" style={{ whiteSpace: 'nowrap' }}>
-                {top?.map((res, index) => (
-                    <Col key={index} className="d-inline-block">
-                        <Card style={{ width: '250px', height: '200px' }}>
-                            <Card.Img variant="top" src={res.image} alt={res.name} />
-                            <Card.Body>
-                                <Card.Title>{res.name}</Card.Title>
-                                <Card.Text>{`${res.city}, ${res.department}`}</Card.Text>
-                                <Card.Text><strong>Estilo:</strong>{res.cuisine_type}</Card.Text>
-                                <Card.Text>{res.description}</Card.Text>
-                            </Card.Body>
-                        </Card>
+                {top.restaurants && top.restaurants.length > 0 ? (
+                    top.restaurants.map((res, index) => (
+                        <Col key={index} className="d-inline-block">
+                            <RestaurantCard data={res}/>
+                        </Col>
+                    ))
+                ) : (
+                    <Col className="d-inline-block">
+                        <div>No se encontraron restaurantes</div>
                     </Col>
-                ))}
+                )}
+
+
             </Row>
             <Form className="mt-4">
                 <Row className="d-flex justify-content-center">
@@ -251,14 +192,7 @@ const ExplorePage = () => {
             <Row className="mt-4 justify-content-center">
                 {store.search?.map((res, index) => (
                     <Col key={index} className="justify-content-center" lg='4'>
-                        <Card style={{ width: '250px', height: '200px' }}>
-                            <Card.Img variant="top" src={res.image} alt={res.name} />
-                            <Card.Body>
-                                <Card.Title>{res.name}</Card.Title>
-                                <Card.Text>{`${res.city}, ${res.department}`}</Card.Text>
-                                <Card.Text><strong>Estilo:</strong> {res.cuisine_type}</Card.Text>
-                            </Card.Body>
-                        </Card>
+                        <RestaurantCard data={res}/>
                     </Col>
                 ))}
 

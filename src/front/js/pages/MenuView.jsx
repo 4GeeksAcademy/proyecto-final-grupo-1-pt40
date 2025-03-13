@@ -46,11 +46,11 @@ const MenuView = () => {
                                                         <Card.Text>{dish.description}</Card.Text>
                                                         <Card.Text><strong>Precio:</strong> {`${dish.price} ${menu.currency}`}</Card.Text>
                                                         
-                                                        <FavoriteButton dish_id={dish.dish_id} />
+                                                        {store.client?.client_id &&<FavoriteButton dish_id={dish.dish_id} />}
                                                     </Card.Body>
                                                 </Card>
                                             ))
-                                        ) : (
+                                        ) : ( 
                                             'No hay platillos en esta categoria'
                                         )
                                     }

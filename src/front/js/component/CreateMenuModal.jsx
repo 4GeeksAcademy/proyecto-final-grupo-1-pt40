@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { Context } from "../store/appContext";
 import Button from 'react-bootstrap/Button';
-import { Form, Dropdown, DropdownButton } from "react-bootstrap";
+import { Form, Dropdown, DropdownButton, } from "react-bootstrap";
 import Modal from 'react-bootstrap/Modal';
 import { useNavigate } from "react-router-dom";
 
@@ -68,6 +68,7 @@ function CreateMenuModal() {
                     <Button variant="primary" onClick={handleCreate}>Crear Menú</Button>
                 </Modal.Footer>
             </Modal>
+                      
         </>
     );
 }

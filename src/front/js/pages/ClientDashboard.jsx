@@ -4,10 +4,15 @@ import { Context } from "../store/appContext";
 import FavoritePage from "./FavoritePage.jsx";
 import ExplorePage from "./ExplorePage.jsx";
 import { Navbar, Nav, Container } from "react-bootstrap";
+import {  Card, Button, Row, Col, Badge, Spinner } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import FavoriteButton from "../component/FavoriteButton.jsx"
 import ClientProfile from "./ClientProfile.jsx";
+
 import ClientNavbar from "../component/ClientNavbar.jsx";
+
+
+import RestaurantCard from "../component/RestaurantCard.jsx";
 
 const ClientDashboard = () => {
     const navigate = useNavigate();
@@ -40,38 +45,21 @@ const ClientDashboard = () => {
             default:
                 
                 return (
-                    <div>
+                    <Container fluid className="m-2">
                         <h2>Opciones de Restaurante</h2>
-                        <div className="row">
-                            {Array.isArray(store.restaurants) && store.restaurants.length > 0 ? (
-                                store.restaurants.map((restaurant) => (
-                                    <div key={restaurant.restaurant_id} className="col-md-4 mb-3">
-                                        <div className="card">
-                                            <img
-                                                src={restaurant.image || "https://via.placeholder.com/300x200?text=Restaurante"}
-                                                className="card-img-top"
-                                                alt={restaurant.name}
-                                            />
-                                            <div className="card-body">
-                                                <h5 className="card-title">{restaurant.name}</h5>
-                                                <p className="card-text">{restaurant.description}</p>
-                                                <button
-                                                    className="btn btn-primary"
-                                                    onClick={() => navigate(`/menu/1`)}
-                                                >
-                                                    Ver Menú
-                                                </button>
-                                                
-                                                <FavoriteButton restaurant_id={restaurant.restaurant_id} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <p>No hay restaurantes disponibles.</p>
-                            )}
-                        </div>
-                    </div>
+                        <Row className="w-100 h-100">
+                        {Array.isArray(store.restaurants) && store.restaurants.length > 0 ? (
+                            store.restaurants.map((restaurant) => (
+                                <Col key={restaurant.restaurant_id}>
+                                    <RestaurantCard data={restaurant}/>
+                                </Col>
+                            ))
+                        ) : (
+                            <p>No hay restaurantes disponibles.</p>
+                        )}
+                        </Row>
+                    </Container>
+    
                 );
         }
     };
