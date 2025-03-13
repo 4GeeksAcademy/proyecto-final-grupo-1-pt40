@@ -13,13 +13,14 @@ const getState = ({ getStore, getActions, setStore }) => {
             top: [],
             search: [],
             notificaciones: [
-        "Nueva reserva en Restaurante A",
-        "Restaurante B ha actualizado su menú",
-        "Nuevo comentario en Restaurante A",
-      ],
+                "Nueva reserva en Restaurante A",
+                "Restaurante B ha actualizado su menú",
+                "Nuevo comentario en Restaurante A",
+            ],
             notificacionesSeleccionadas: [],
             solicitudes: [], // Lista de solicitudes (reportes)
         },
+
         actions: {
             registerUser: async (userType, registration) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
@@ -77,6 +78,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return false;
                 }
             },
+
             menuBuilderLoad: async (menu_id) => {
                 const store = getStore()
                 try {
@@ -394,7 +396,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-
             addFavorite: async (client_id,dish_id,restaurant_id) => {
                 //Corregir para que vaya acorder con el nuevo endpoint, acepta dish, menu y restaurante
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
@@ -491,7 +492,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            //Actions para explora y descrubre
             getDepartments: async () => {
                 try {
                     const response = await fetch('https://api-colombia.com/api/v1/Department')
@@ -552,7 +552,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             },
 
-
             resetSearch: () => {
                 const store = getStore()
                 setStore({ ...store, search: [] })
@@ -578,24 +577,22 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             },
 
-        // Acción para eliminar un restaurante (o producto)
-        deleteRestaurant: async (restaurantId) => {
-            const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
-            try {
-              const response = await fetch(`${backendUrl}/api/restaurants/${restaurantId}`, {
-                method: "DELETE"
-              });
-              if (!response.ok) throw new Error("Failed to delete restaurant");
-              const store = getStore();
-              const updatedRestaurants = store.restaurants.filter(r => r.id !== restaurantId);
-              setStore({ ...store, restaurants: updatedRestaurants });
-              return true;
-            } catch (error) {
-              console.error("Error deleting restaurant:", error);
-              return false;
-            }
-          },
-          //Agrega actions despues de esta linea
+            deleteRestaurant: async (restaurantId) => {
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
+                try {
+                const response = await fetch(`${backendUrl}/api/restaurants/${restaurantId}`, {
+                    method: "DELETE"
+                });
+                if (!response.ok) throw new Error("Failed to delete restaurant");
+                const store = getStore();
+                const updatedRestaurants = store.restaurants.filter(r => r.id !== restaurantId);
+                setStore({ ...store, restaurants: updatedRestaurants });
+                return true;
+                } catch (error) {
+                console.error("Error deleting restaurant:", error);
+                return false;
+                }
+            },
 
             getClientDetails: async () => {
                 const store = getStore();
@@ -662,57 +659,58 @@ const getState = ({ getStore, getActions, setStore }) => {
                   console.error("Error actualizando cliente:", error);
                   return false;
                 }
-              },
+            },
         
-        manejarSeleccionNotificacion: (index) => {
-        const store = getStore();
-        if (store.notificacionesSeleccionadas.includes(index)) {
-          // Si ya está seleccionada, la eliminamos
-          setStore({
-            notificacionesSeleccionadas: store.notificacionesSeleccionadas.filter((i) => i !== index),
-          });
-        } else {
-          // Si no está seleccionada, la agregamos
-          setStore({
-            notificacionesSeleccionadas: [...store.notificacionesSeleccionadas, index],
-          })
+            manejarSeleccionNotificacion: (index) => {
+            const store = getStore();
+            if (store.notificacionesSeleccionadas.includes(index)) {
+            // Si ya está seleccionada, la eliminamos
+            setStore({
+                notificacionesSeleccionadas: store.notificacionesSeleccionadas.filter((i) => i !== index),
+            });
+            } else {
+                    // Si no está seleccionada, la agregamos
+                    setStore({
+                        notificacionesSeleccionadas: [...store.notificacionesSeleccionadas, index],
+                    })
+                }
+            },
+
+        
+            agregarSolicitud: (destinatario, mensaje) => {
+                const store = getStore();
+                const nuevaSolicitud = {
+                id: store.solicitudes.length + 1,
+                destinatario,
+                mensaje,
+                fecha: new Date().toLocaleString(),
+                };
+                setStore({
+                solicitudes: [...store.solicitudes, nuevaSolicitud],
+                });
+            },
+
+            eliminarNotificacion: (index) => {
+                const store = getStore();
+                const nuevasNotificaciones = store.notificaciones.filter((_, i) => i !== index);
+                setStore({
+                    notificaciones: nuevasNotificaciones,
+                });
+            },
+        
+            marcarNotificacionComoLeida: (index) => {
+                const store = getStore();
+                const notificacionesActualizadas = store.notificaciones.map((notificacion, i) =>
+                    i === index ? `✅ ${notificacion}` : notificacion
+                );
+                setStore({
+                    notificaciones: notificacionesActualizadas,
+                });
+        
+            }
         },
-
-      // Acción para agregar una nueva solicitud (reporte)
-      agregarSolicitud: (destinatario, mensaje) => {
-        const store = getStore();
-        const nuevaSolicitud = {
-          id: store.solicitudes.length + 1,
-          destinatario,
-          mensaje,
-          fecha: new Date().toLocaleString(),
-        };
-        setStore({
-          solicitudes: [...store.solicitudes, nuevaSolicitud],
-        });
-      },
-
-      // Acción para eliminar una notificación
-      eliminarNotificacion: (index) => {
-        const store = getStore();
-        const nuevasNotificaciones = store.notificaciones.filter((_, i) => i !== index);
-        setStore({
-          notificaciones: nuevasNotificaciones,
-        });
-      },
-
-      // Acción para marcar una notificación como leída
-      marcarNotificacionComoLeida: (index) => {
-        const store = getStore();
-        const notificacionesActualizadas = store.notificaciones.map((notificacion, i) =>
-          i === index ? `✅ ${notificacion}` : notificacion
-        );
-        setStore({
-          notificaciones: notificacionesActualizadas,
-        });
-      },
-      }
+        
     };
-  };
-  export default getState;
-  
+};
+
+export default getState;
