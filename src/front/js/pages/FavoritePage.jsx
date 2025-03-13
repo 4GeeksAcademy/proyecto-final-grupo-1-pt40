@@ -3,24 +3,31 @@ import { Context } from "../store/appContext";
 import { Card, Button, Container, Row, Col, Tabs, Tab } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
+
 const FavoriteView = () => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate();
 
+   
     useEffect(() => {
-
         actions.fetchFavorites();
+    }, []); 
+    
 
-    }, []);
+    const favorites = Array.isArray(store.favorites) ? store.favorites : []; 
+    const dishFavorites = favorites.filter(fav => fav.dish);
+    const restaurantFavorites = favorites.filter(fav => fav.restaurant);
+   
+   
 
-    const dishFavorites = store.favorites.filter(fav => fav.dish);
-    const restaurantFavorites = store.favorites.filter(fav => fav.restaurant);
+   
 
+    
     return (
         <Container className="mt-4">
             <h2 className="d-flex justify-content-center mb-4">Mis Favoritos</h2>
 
-            {store.favorites.length === 0 ? (
+            {favorites.length === 0 ? (
                 <p>No tienes favoritos aún.</p>
             ) : (
                 <Tabs defaultActiveKey="restaurants" id="favorites-tabs" className="mb-3" fill>

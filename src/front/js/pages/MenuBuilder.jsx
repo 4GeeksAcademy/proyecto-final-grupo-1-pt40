@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom';
 
 
 
+
 const MenuBuilder = () => {
   const { menuID } = useParams();
   const { store, actions } = useContext(Context);
@@ -17,6 +18,8 @@ const MenuBuilder = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [newDish, setNewDish] = useState({ name: "", description: "", price: "", category: "", image: null });
   const [loaded, setLoaded] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [editedCategoryName, setEditedCategoryName] = useState("");
 
   const onLoad = async () => {
     if (await actions.menuBuilderLoad(menuID)) {
@@ -24,6 +27,28 @@ const MenuBuilder = () => {
       setCategories(store.menuBuilder.menu.categories);
     }
   };
+
+  const startEditing = (category) => {
+    setEditingCategory(category);
+    setEditedCategoryName(category);
+  };
+
+  const saveCategoryName = (oldName) => {
+    if (!editedCategoryName.trim()) return; // Evita nombres vacíos
+
+    const updatedCategories = categories.map(cat =>
+      cat === oldName ? editedCategoryName : cat
+    );
+
+    setCategories(updatedCategories); // Actualiza el estado
+    setEditingCategory(null); // Sale del modo edición
+  };
+
+  const cancelEditing = () => {
+    setEditingCategory(null); // Cancela la edición
+    setEditedCategoryName(""); // Resetea el nombre
+  };
+
 
   const updateCategories = async () => {
     await actions.menuBuilderCategories(menuID, categories)
@@ -80,11 +105,33 @@ const MenuBuilder = () => {
         <h4>Categorías</h4>
         {store.menuBuilder.menu.categories.length > 0 ?
           (<ListGroup>
-            {store.menuBuilder.menu.categories?.map((category, index) => (
-              <ListGroup.Item key={index} action onClick={() => setSelectedCategory(category)} className="d-flex justify-content-between align-items-center">
-                <span>{category}</span>
-                <Button variant="danger" size="sm" onClick={() => removeCategory(category)}>X</Button>
-              </ListGroup.Item>))}
+            {categories?.map((category, index) => (
+              <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                {editingCategory === category ? (
+                  <>
+                    <input
+                      type="text"
+                      value={editedCategoryName}
+                      onChange={(e) => setEditedCategoryName(e.target.value)}
+                      className="form-control"
+                      style={{ width: "70%" }}
+                    />
+                    <div>
+                      <Button variant="success" size="sm" onClick={() => saveCategoryName(category)}>✔️</Button>
+                      <Button variant="secondary" size="sm" onClick={cancelEditing} className="ms-2">❌</Button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <span onClick={() => setSelectedCategory(category)} style={{ cursor: "pointer" }}>{category}</span>
+                    <div>
+                      <Button variant="warning" size="sm" onClick={() => startEditing(category)}>🖊️</Button>
+                      <Button variant="danger" size="sm" onClick={() => removeCategory(category)} className="ms-2">X</Button>
+                    </div>
+                  </>
+                )}
+              </ListGroup.Item>
+            ))}
           </ListGroup>) : (
             <div>No hay categorías en este momento</div>)}
         <Form.Control
@@ -124,7 +171,7 @@ const MenuBuilder = () => {
             <Button className="mt-2" onClick={addDish}>Agregar Platillo</Button>
           </Form>
         )}
-        
+
         <h4 className="mt-4">Platillos</h4>
 
         {selectedCategory && (<div>

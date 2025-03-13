@@ -304,6 +304,25 @@ def delete_menu(menu_id):
     except Exception as e:
          db.session.rollback()
          return jsonify('Server error: Failed to process request'), 500
+
+@api.route('/menu/<int:menu_id>', methods=['PUT'])
+@jwt_required()
+def update_menu(menu_id):
+    body = request.get_json()
+    name = body.get("name", None)
+    currency = body.get("currency", None)
+
+    menu = Menu.query.get(menu_id)
+    if not menu:
+        return jsonify({"error": "Menu not found"}), 404
+
+    if name:
+        menu.name = name
+    if currency:
+        menu.currency = currency
+
+    db.session.commit()
+    return jsonify({"message": "Menu updated successfully", "menu": menu.serialize()}), 200    
     
 @api.route('/new/dish/', methods=['POST'])
 @jwt_required()
