@@ -114,16 +114,6 @@ const ClientProfileEdit = () => {
           disabled // Username typically shouldn’t be editable
         />
       </Form.Group>
-      <Form.Group className="mb-3" controlId="Password">
-        <Form.Label>Nueva Contraseña (opcional)</Form.Label>
-        <Form.Control
-          type="password"
-          placeholder="Ingresa una nueva contraseña (mínimo 4 caracteres)"
-          value={registration.password}
-          name="password"
-          onChange={handleRegister}
-        />
-      </Form.Group>
       <Form.Group className="mb-3" controlId="Address">
         <Form.Label>Ubicación</Form.Label>
         <Form.Select

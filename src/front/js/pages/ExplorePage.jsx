@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
-import { Container, Card, Row, Col, Form, Button, Badge } from "react-bootstrap";
+import { Container, Card, Row, Col, Form, Button, Badge, Spinner } from "react-bootstrap";
+import RestaurantCard from "../component/RestaurantCard.jsx";
 
 
 const ExplorePage = () => {
@@ -11,8 +12,8 @@ const ExplorePage = () => {
     const [cities, setCities] = useState([])
     const [search, setSearch] = useState({ 'department': '', "city": '', "cuisine": '', "keyword": '' })
     const [searchOn, setSearchOn] = useState({ 'department': false, 'city': false, 'cuisine': false, 'keyword': false })
-    const [top, setTop] = useState([])
-    
+    const [top, setTop] = useState({})
+
 
     const setOne = ["Colombiana", "Americana", "Peruana", "Mexicana", "Brasileña"]
     const setTwo = ["Italiana", "Española", "Griega", "Francesa", "Turca"]
@@ -83,25 +84,37 @@ const ExplorePage = () => {
         }
     }, [search.department])
 
+
+    if (Object.keys(top) === 0) {
+        return (
+            <Container>
+                <Row>
+                    <Spinner animation="border" variant="danger" />
+                </Row>
+            </Container>
+        )
+    }
+
+
     return (
 
 
         <Container>
-            <h1>Top 10 en Cali</h1>
+            <h1>Top Restaurantes en {top.city}</h1>
             <Row className="flex-nowrap overflow-auto p-3" style={{ whiteSpace: 'nowrap' }}>
-                {top?.map((res, index) => (
-                    <Col key={index} className="d-inline-block">
-                        <Card style={{ width: '250px', height: '200px' }}>
-                            <Card.Img variant="top" src={res.image} alt={res.name} />
-                            <Card.Body>
-                                <Card.Title>{res.name}</Card.Title>
-                                <Card.Text>{`${res.city}, ${res.department}`}</Card.Text>
-                                <Card.Text><strong>Estilo:</strong>{res.cuisine_type}</Card.Text>
-                                <Card.Text>{res.description}</Card.Text>
-                            </Card.Body>
-                        </Card>
+                {top.restaurants && top.restaurants.length > 0 ? (
+                    top.restaurants.map((res, index) => (
+                        <Col key={index} className="d-inline-block">
+                            <RestaurantCard data={res}/>
+                        </Col>
+                    ))
+                ) : (
+                    <Col className="d-inline-block">
+                        <div>No se encontraron restaurantes</div>
                     </Col>
-                ))}
+                )}
+
+
             </Row>
             <Form className="mt-4">
                 <Row className="d-flex justify-content-center">
@@ -179,14 +192,7 @@ const ExplorePage = () => {
             <Row className="mt-4 justify-content-center">
                 {store.search?.map((res, index) => (
                     <Col key={index} className="justify-content-center" lg='4'>
-                        <Card style={{ width: '250px', height: '200px' }}>
-                            <Card.Img variant="top" src={res.image} alt={res.name} />
-                            <Card.Body>
-                                <Card.Title>{res.name}</Card.Title>
-                                <Card.Text>{`${res.city}, ${res.department}`}</Card.Text>
-                                <Card.Text><strong>Estilo:</strong> {res.cuisine_type}</Card.Text>
-                            </Card.Body>
-                        </Card>
+                        <RestaurantCard data={res}/>
                     </Col>
                 ))}
 

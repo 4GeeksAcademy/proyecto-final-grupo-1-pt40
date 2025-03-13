@@ -59,7 +59,8 @@ def client_registration():
         db.session.add(new_client)
         db.session.commit()
         try:
-            access_token = create_access_token(identity=str(new_client.id), additional_claims={"role":"client"})
+            expiration = timedelta(minutes=45)
+            access_token = create_access_token(identity=str(new_client.id),expires_delta=expiration, additional_claims={"role":"client"})
             return jsonify({'token':access_token})
         except Exception as e:
             return jsonify({"error":str(e)})
@@ -100,7 +101,8 @@ def restaurant_registration():
         new_restaurant.set_password(password)
         db.session.add(new_restaurant)
         db.session.commit()
-        access_token = create_access_token(identity=str(new_restaurant.id), additional_claims={"role":"restaurant"})
+        expiration = timedelta(minutes=45)
+        access_token = create_access_token(identity=str(new_restaurant.id), expires_delta = expiration,additional_claims={"role":"restaurant"})
         return jsonify({'token':access_token}), 201
     except DataError as e:
         db.session.rollback()
@@ -166,8 +168,8 @@ def client_login():
         return jsonify({"error":"Complete login information"}),400
     try:
         if client and client.check_password(password):
-       
-            access_token = create_access_token(identity=str(client.id), additional_claims={"role":"client"})
+            expiration = timedelta(minutes=45)
+            access_token = create_access_token(identity=str(client.id), expires_delta= expiration,additional_claims={"role":"client"})
             return jsonify({"token": access_token}), 200
     
         return jsonify({"message": "Check your username/email and password"}), 400
@@ -192,8 +194,8 @@ def restaurant_login():
         return jsonify({"error":"Complete login information"}),400
     try:
         if restaurant and restaurant.check_password(password):
-       
-            access_token = create_access_token(identity=str(restaurant.id), additional_claims={"role":"restaurant"})
+            expiration = timedelta(minutes=45)
+            access_token = create_access_token(identity=str(restaurant.id), expires_delta=expiration, additional_claims={"role":"restaurant"})
             return jsonify({"token": access_token}), 200
     
         return jsonify({"message": "Check your username/email and password"}), 400
@@ -518,6 +520,18 @@ def get_restaurant_menus():
         db.session.rollback()
         return jsonify({'message': 'Server error: Failed to process request'}), 500
     
+@api.route('/restaurant/<username>/menus/public', methods=['GET'])
+def get_restaurant_menus_public(username):
+    try:
+        restaurant = Restaurant.query.filter_by(username=username).first()
+        menus = Menu.query.filter_by(restaurant_id=restaurant.id).order_by(Menu.id).all()
+        if not menus:
+            return jsonify({'message': 'No menus at the moment'}), 200
+        return jsonify([menu.serialize() for menu in menus]), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'Server error: Failed to process request'}), 500
+    
 
 @api.route('/favorites', methods=['POST'])
 @jwt_required()
@@ -836,15 +850,15 @@ def top_restaurants():
     if role != "client":
             return jsonify({"error": "Unauthorized: Must use client account"}), 403
     try:
-        client = Client.query.get(client_id).first()
+        client = Client.query.get(client_id)
         client_city = client.city
         top_restaurants = db.session.query(Restaurant, db.func.count(Favorites.id).label('likes')
         ).join(Favorites, Restaurant.id == Favorites.restaurant_id).filter(Restaurant.city == client_city).group_by(Restaurant.id).order_by(db.desc('likes')).limit(10).all()
 
         if not top_restaurants:
-            return jsonify({'message':'No restaurants found'}),404
+            return jsonify({"restaurants":[], "city":client_city}),202
         result = [restaurant[0].serialize() for restaurant in top_restaurants]
-        return jsonify(result),200
+        return jsonify({"restaurants":result, "city":client_city}),200
     except Exception as e:
         db.session.rollback() 
         return jsonify({"msg": "Error al buscar restaurantes", "error": str(e)}), 500
