@@ -42,7 +42,7 @@ const Layout = () => {
                         <Route element={<Home />} path="/" />
                         <Route element={<SignUpPage />} path="/signup" />
                         <Route element={<LoginPage />} path="/login" />
-                        <Route element={<MenuPublicView />} path="/restaurant/:restaurant/:menuID" />
+                        <Route element={<MenuPublicView />} path="/restaurant/:restaurant_username/menu/:menu_id" />
 
 
                         <Route element={<MenuView />} path="/menu/:menuID" />
@@ -59,8 +59,8 @@ const Layout = () => {
                         <Route element={<RestaurantProfileEdit />} path="/edit-restaurant" />
                         <Route element={<RestaurantPurchasePlan />} path="/plan-purchase" />
                         <Route element={<ClientProfileEdit />} path="/edit-client" />
-                        <Route element={<PasswordReset/>} path="/password-reset"/>
-                        <Route element={<PasswordResetRequest/>} path="/password-reset-request/"/>
+                        <Route element={<PasswordReset />} path="/password-reset" />
+                        <Route element={<PasswordResetRequest />} path="/password-reset-request/" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
 

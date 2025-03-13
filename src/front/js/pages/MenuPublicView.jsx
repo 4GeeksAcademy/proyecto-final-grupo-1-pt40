@@ -6,19 +6,24 @@ import GoogleMapsModal from "../component/GoogleMapsModal.jsx";
 
 
 const MenuPublicView = () => {
-    const { menuID } = useParams();
+    const { menu_id, restaurant_username } = useParams();
     const { store, actions } = useContext(Context);
     const [menu, setMenu] = useState(null)
     const [dishes, setDishes] = useState(null)
     const [restaurant, setRestaurant] = useState(null)
+    const [menuList, setMenuList] = useState(null)
 
     const onLoad = async () => {
-        const response = await actions.menuViewLoad(menuID)
+        const response = await actions.menuViewLoad(menu_id)
         if (response) {
             setMenu(store.menu.menu)
             setDishes(store.menu.dishes)
             setRestaurant(store.menu.restaurant)
         }
+    }
+
+    const getMenuList = async () => {
+
     }
 
     const convertToAmPm = (time) => {

@@ -3,7 +3,7 @@ const getState = ({ getStore, getActions, setStore }) => {
         store: {
             client: null,
             restaurant: {},
-            menuBuilder: {dishes:{},menu:{}},
+            menuBuilder: { dishes: {}, menu: {} },
             menu: {},
             favorites: [],
             menuList: [],
@@ -140,22 +140,23 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const store = getStore();
                 try {
 
-                    const token=sessionStorage.getItem('token');
-                    if (!token){
+                    const token = sessionStorage.getItem('token');
+                    if (!token) {
                         console.error('No authentication token found');
                         throw new Error('No authentication token found');
                     }
                     const totalDishes = Object.values(store.menuBuilder.dishes).flat().length;
                     if (totalDishes >= 10) {
                         alert("Has alcanzado el límite de 10 platillos por menú en la cuenta gratuita. 📌 Unete a Al Punto+.");
-                        return; 
+                        return;
                     }
                     const response = await fetch(`${backendURL}api/new/dish`,
                         {
                             method: "POST",
-                            headers: { "Content-Type": "application/json",
-                                "Authorization":`Bearer ${token}`
-                             },
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`
+                            },
                             body: JSON.stringify({
                                 'menu_id': menu_id, 'category': category,
                                 'name': name, 'description': description, 'price': price, 'image': image
@@ -265,20 +266,20 @@ const getState = ({ getStore, getActions, setStore }) => {
             createMenu: async (menuInfo) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
-                
+
                 try {
                     const token = sessionStorage.getItem("token");
                     if (!token) {
                         console.error("No authentication token found");
                         throw new Error("No authentication token found");
                     }
-            
-                    
-                    if (store.menuList.length>=1) {
+
+
+                    if (store.menuList.length >= 1) {
                         alert("Upss. Solo puedes crear un menú con la cuenta gratuita. Para agregar más menús, únete a Al Punto+ 🚀");
-                        return;  
+                        return;
                     }
-            
+
                     const response = await fetch(`${backendURL}api/new/menu`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
@@ -292,7 +293,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const data = await response.json()
                     setStore({ menuBuilder: { ...store.menuBuilder, menu: data } });
                     return data;
-                }catch (error) {
+                } catch (error) {
                     console.error('Error creating menu', error);
                 }
             },
@@ -392,6 +393,23 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return true;
                 } catch (error) {
                     console.error("Error en getRestaurantMenus:", error);
+                    return false;
+                }
+            },
+
+            getRestaurantMenusPublic: async (username) => {
+                const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}'api/restaurant/${username}/menus/public'`, {
+                        method: 'GET',
+                        headers: { "Content-Type": "application/json"}
+                    });
+                    if (!response.ok) throw new Error("Error al obtener los menús");
+                    const data = await response.json();
+                    setStore({ ...store, restaurantMenus: data });
+                    return data;
+                } catch (error) {
+                    console.error("Error en getRestaurantMenusPublic:", error);
                     return false;
                 }
             },
@@ -656,6 +674,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return data;
                 } catch (error) {
                     console.error("Error with search query", error);
+                    return ({ restaurant: [], city: 'Bogota' })
                 }
 
             },
