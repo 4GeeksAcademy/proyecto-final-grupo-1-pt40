@@ -20,7 +20,6 @@ const FavoriteView = () => {
    
    
 
-   
 
     
     return (

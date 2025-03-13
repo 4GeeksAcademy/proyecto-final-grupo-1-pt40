@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import CreateMenuModal from "../component/CreateMenuModal.jsx";
 import DeleteMenuModal from "../component/DeleteMenuModal.jsx"
+import RestaurantNavbar from "../component/RestaurantNavbar.jsx";
 
 const RestaurantDashboard = () => {
     const { store, actions } = useContext(Context);
@@ -66,37 +67,22 @@ const RestaurantDashboard = () => {
     }, [])
 
     return (
-        <div className="container mt-4">
-            <nav className="navbar navbar-expand-lg navbar-light bg-light mb-4 p-3 shadow rounded">
-                <div className="container-fluid">
-                    <span className="navbar-brand fw-bold">Al punto</span>
-                    <div className="collapse navbar-collapse">
-                        <ul className="navbar-nav ms-auto">
-                            <li className="nav-item">
-                                <CreateMenuModal />
-                            </li>
-                            <li className="nav-item">
-                                <Link className="nav-link" to="/edit-restaurant/">Agregar Información</Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link className="nav-link" to={`/restaurant-profile/`}>Mi Perfil</Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link className="nav-link" to={`/plan-purchase/`}>AlPunto+</Link>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
+        <div>
+            <RestaurantNavbar />
+            <div className="container mt-4">
+                
+
 
 
             {alert === 'Public' ? (<Alert key={1} variant='success'>
                 Menú publicado con éxito, se encuentra disponible para todo público
             </Alert>) : ''}
 
-            {alert === 'Private' ? (<Alert key={2} variant='primary'>
-                Menú privatizado, no encuentra disponible para los clientes
-            </Alert>) : ''}
+
+                {alert === 'Private' ? (<Alert key={2} variant='primary'>
+                    Menú privatizado, no encuentra disponible para los clientes
+                </Alert>) : ''}
+
 
             <h2 className="mb-4">Mis Menús</h2>
             <div className="menu-list bg-white p-4 shadow rounded d-flex w-100">
@@ -162,7 +148,9 @@ const RestaurantDashboard = () => {
                 </Modal.Footer>
             </Modal>
 
-        </div >
+
+            </div >
+        </div>
     );
 };
 

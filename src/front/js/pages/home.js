@@ -4,6 +4,7 @@ import rigoImageUrl from "../../img/rigo-baby.jpg";
 import "../../styles/home.css";
 import { useNavigate } from "react-router-dom";
 import { Button, Container } from "react-bootstrap";
+import MainNavbar from "../component/MainNavbar.jsx";
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
@@ -11,15 +12,11 @@ export const Home = () => {
 
 
 	return (
-		<Container className="text-center mt-5">
-		<h1>Bienvenido Al Punto</h1>
-		<p>Elige una opción para continuar:</p>
-		<Button variant="primary" className="m-2" onClick={() => navigate("/login")}>
-		  Iniciar Sesión
-		</Button>
-		<Button variant="success" className="m-2" onClick={() => navigate("/signup")}>
-		  Registrarse
-		</Button>
-	  </Container>
+		<div>
+			<MainNavbar />
+			<Container className="text-center mt-5">
+				<h1>Bienvenido Al Punto!</h1>
+			</Container>
+		</div>
 	);
 };
