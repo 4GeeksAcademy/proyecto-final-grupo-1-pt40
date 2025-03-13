@@ -1,11 +1,14 @@
 import React from "react";
 import Login from "../component/Login.jsx";
+import MainNavbar from "../component/MainNavbar.jsx";
 
 const LoginPage = () => {
   return (
-    <div className="login-container">
-      <h2>Página de Login</h2>
-      <Login />
+    <div>
+      <MainNavbar />
+      <div className="login-container">
+        <Login />
+      </div>
     </div>
   );
 };
