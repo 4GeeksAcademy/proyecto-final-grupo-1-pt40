@@ -803,4 +803,4 @@ def update_client():
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al actualizar el cliente", "error": str(e)}), 500    
-
+    
