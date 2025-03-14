@@ -11,7 +11,7 @@ function RestaurantCard({ data }) {
     const navigateTo = useNavigate()
     const handleClick = async (username) => {
         const response = await actions.getRestaurantMenusPublic(username)
-        if (response && response[0].menu_id) {
+        if (response && Array.isArray(response)) {
             navigateTo(`/restaurant/${username}/menu/${response[0].menu_id}`)
         } else {
             alert('El restaurante no se encuentra activo')
