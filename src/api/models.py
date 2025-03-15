@@ -144,11 +144,12 @@ class Menu(db.Model):
 class Dish(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     menu_id = db.Column(db.Integer, ForeignKey('menu.id'), nullable=False)
-    category = db.Column(db.String(100), nullable=False)
+    category = db.Column(db.String(100), nullable=True)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(255), nullable=True)
     image_URL = db.Column(db.String(255), nullable=True)
+    
 
     menu = relationship('Menu', back_populates='dishes')
     favorites = relationship('Favorites', back_populates='dish')
