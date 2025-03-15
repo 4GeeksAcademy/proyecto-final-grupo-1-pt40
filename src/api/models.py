@@ -149,6 +149,7 @@ class Dish(db.Model):
     price = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(255), nullable=True)
     image_URL = db.Column(db.String(255), nullable=True)
+    
 
     menu = relationship('Menu', back_populates='dishes')
     favorites = relationship('Favorites', back_populates='dish')

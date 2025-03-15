@@ -464,6 +464,7 @@ def menu_categories():
         if not categories_list or not old_categories:
             return jsonify({'error': 'Bad Request: Missing categories data'}), 400
 
+        restaurant_id=menu.restaurant_id
         
         category_changes = {old: new for old, new in zip(old_categories, categories_list) if old != new}
 
@@ -472,7 +473,11 @@ def menu_categories():
 
         
         for old_cat, new_cat in category_changes.items():
-            dishes = Dish.query.filter_by(category=old_cat).all()
+            dishes = Dish.query.join(Menu).filter(Dish.category == old_cat,
+                Dish.menu_id == menu.id,
+                Menu.restaurant_id == restaurant_id).all()
+            print(f"🔹 Cambiando {len(dishes)} platillos de '{old_cat}' a '{new_cat}' en restaurante {restaurant_id}")
+            
             for dish in dishes:
                 dish.category = new_cat  
 
@@ -482,8 +487,9 @@ def menu_categories():
     except DataError:
         db.session.rollback()
         return jsonify({'error': 'Bad Request: Incorrect data format/type'}), 400
-    except Exception:
+    except Exception as e:
         db.session.rollback()
+        print("Error en menu_categories:",str(e))
         return jsonify({'error': 'Server error: Failed to process request'}), 500
 
 @api.route('/menu/<int:menu_id>', methods=['GET'])
