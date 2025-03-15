@@ -455,20 +455,36 @@ def menu_categories():
     data = request.get_json()
     menu_id = data.get('menu_id')
     categories_list = data.get('categories',None)
+    old_categories=data.get('old_categories',None)
     try:
         menu = Menu.query.filter_by(id=menu_id).first()
-        if menu:
-            menu.set_categories(categories_list)
-            db.session.commit()
-            return jsonify(menu.serialize()),200
-        else:
-             return jsonify('Bad Request: Menu ID not found'),400
-    except DataError as e:
+        if not menu:
+            return jsonify({"error":"Bad request:Menu ID not found"}),400
+        
+        if not categories_list or not old_categories:
+            return jsonify({'error': 'Bad Request: Missing categories data'}), 400
+
+        
+        category_changes = {old: new for old, new in zip(old_categories, categories_list) if old != new}
+
+        
+        menu.set_categories(categories_list)
+
+        
+        for old_cat, new_cat in category_changes.items():
+            dishes = Dish.query.filter_by(category=old_cat).all()
+            for dish in dishes:
+                dish.category = new_cat  
+
+        db.session.commit()
+        return jsonify(menu.serialize()), 200
+
+    except DataError:
         db.session.rollback()
-        return jsonify('Bad Request: Incorrect data format/type'),400
-    except Exception as e:
-         db.session.rollback()
-         return jsonify('Server error: Failed to process request'), 500
+        return jsonify({'error': 'Bad Request: Incorrect data format/type'}), 400
+    except Exception:
+        db.session.rollback()
+        return jsonify({'error': 'Server error: Failed to process request'}), 500
 
 @api.route('/menu/<int:menu_id>', methods=['GET'])
 def get_menu(menu_id):

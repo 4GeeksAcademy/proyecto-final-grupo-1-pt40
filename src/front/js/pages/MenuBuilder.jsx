@@ -22,8 +22,12 @@ const MenuBuilder = () => {
   const [editedCategoryName, setEditedCategoryName] = useState("");
 
   const onLoad = async () => {
-    if (await actions.menuBuilderLoad(menuID)) {
-      setLoaded(true)
+    if(!menuID){
+      console.error("Error:menuID es undefined");
+      return;
+    }
+     if (await actions.menuBuilderLoad(menuID)) {
+      setLoaded(true);
       setCategories(store.menuBuilder.menu.categories);
     }
   };
@@ -34,24 +38,42 @@ const MenuBuilder = () => {
   };
 
   const saveCategoryName = (oldName) => {
-    if (!editedCategoryName.trim()) return; // Evita nombres vacíos
+    if (!editedCategoryName.trim()) return; 
 
+    const oldCategories = [...categories];
     const updatedCategories = categories.map(cat =>
       cat === oldName ? editedCategoryName : cat
     );
 
-    setCategories(updatedCategories); // Actualiza el estado
-    setEditingCategory(null); // Sale del modo edición
+    
+    
+    console.log("Enviando a menuBuilderCategories:", {
+      menuID,
+      updatedCategories,
+      oldCategories
+    });
+    
+    actions.menuBuilderCategories(menuID, updatedCategories, oldCategories);
+    
+    setCategories(updatedCategories); 
+    setEditingCategory(null); 
   };
 
   const cancelEditing = () => {
-    setEditingCategory(null); // Cancela la edición
-    setEditedCategoryName(""); // Resetea el nombre
+    setEditingCategory(null); 
+    setEditedCategoryName(""); 
   };
 
 
-  const updateCategories = async () => {
-    await actions.menuBuilderCategories(menuID, categories)
+  const updateCategories = async (oldCats = null) => {
+    if (oldCats) {
+      console.log("Enviando categorías antiguas:", oldCats);
+      console.log("Enviando categorías nuevas:", categories);
+      await actions.menuBuilderCategories(menuID, categories, oldCats);
+    } else {
+      
+      await actions.menuBuilderCategories(menuID, categories);
+    }
   }
 
   const addCategory = async () => {
@@ -78,21 +100,21 @@ const MenuBuilder = () => {
     setNewDish({ ...newDish, image: file.cdnUrl })
   }
 
-  const removeDish = async (menuID, dishId, category) => {
-    console.log("Intentando eliminar:", { menuID, dishId, category });
-    if (!dishId || !menuID || !category) {
-      console.error("Error: Falta un parámetro", { menuID, dishId, category });
+  const removeDish = async (menuID, dishID, category) => {
+    console.log("Intentando eliminar:", { menuID, dishID, category });
+    if (!dishID || !menuID || !category) {
+      console.error("Error: Falta un parámetro", { menuID, dishID, category });
       return;
     }
-    await actions.menuBuilderDeleteDish(dishId, category);
+    await actions.menuBuilderDeleteDish(dishID, category);
   };
   useEffect(() => {
     onLoad()
   }, [])
 
   useEffect(() => {
-    if (loaded) updateCategories()
-  }, [categories])
+    if (loaded && !editingCategory) updateCategories();
+  }, [categories, editingCategory])
 
   useEffect(() => {
     setNewDish({ name: "", description: "", price: "", category: "", image: null })

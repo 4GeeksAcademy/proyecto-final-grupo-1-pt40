@@ -94,10 +94,17 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
             menuBuilderLoad: async (menu_id) => {
                 const store = getStore()
+                if (!menu_id){
+                    console.error("menu_id es undefined");
+                    return false;
+                }
                 try {
                     const response = await fetch(`${process.env.BACKEND_URL}api/menu/${menu_id}`);
-                    if (!response.ok) throw new Error("Error al cargar el menú");
-
+                    if (!response.ok) {
+                        const errorData = await response.text();  
+                        console.error("Respuesta del servidor:", errorData);
+                        throw new Error("Error al cargar el menú");
+                    }
                     const data = await response.json();
                     setStore({ ...store, menuBuilder: data });
                     return true;
@@ -107,19 +114,31 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            menuBuilderCategories: async (menu_id, categories) => {
+            menuBuilderCategories: async (menu_id, categories, old_categories=null) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
+                    const oldCats = old_categories || categories;
+                    
+                    const requestBody = { 
+                        'menu_id': menu_id,
+                        'categories': categories,
+                        'old_categories': oldCats
+                    };
+                    
+                    console.log("Enviando al backend:", requestBody);
+            
                     const response = await fetch(`${backendURL}api/menu/categories`,
                         {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ 'menu_id': menu_id, 'categories': categories })
+                            body: JSON.stringify(requestBody) 
                         })
-
+            
                     if (!response.ok) {
-                        throw new Error(res.statusText);
+                        const errorData = await response.text();
+                        console.error("Error respuesta backend:", errorData);
+                        throw new Error(response.statusText);
                     }
                     const menuDetails = await response.json()
                     setStore({ ...store, menuBuilder: { ...store.menuBuilder, menu: menuDetails } });
