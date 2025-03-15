@@ -717,7 +717,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             // Acción para eliminar un restaurante (o producto)
             deleteRestaurant: async (restaurantId) => {
-                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001"; 
                 try {
                     const response = await fetch(`${backendUrl}api/restaurants/${restaurantId}`, {
 

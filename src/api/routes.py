@@ -733,7 +733,6 @@ def admin_dashboard():
     return jsonify({"message": "Welcome, Admin!"}), 200
 
 
-
 @api.route('/restaurant/profile', methods=['GET'])
 @jwt_required()
 def get_restaurant_by_id():
@@ -1070,6 +1069,65 @@ def reset_password():
                 return jsonify({'msg':f'Invalid token'}), 403
         except Exception as e:
             return jsonify({"msg": "Server error"}), 500 
+        
+# Obtener todos los restaurantes
+@api.route('/api/restaurants', methods=['GET'])
+def get_restaurants():
+    return jsonify(restaurants), 200
+
+# Obtener un restaurante por su ID
+@api.route('/api/restaurants/<int:restaurant_id>', methods=['GET'])
+def get_restaurant(restaurant_id):
+    restaurant = next((r for r in restaurants if r['id'] == restaurant_id), None)
+    if restaurant:
+        return jsonify(restaurant), 200
+    else:
+        return jsonify({"error": "Restaurante no encontrado"}), 404
+
+# Agregar un nuevo restaurante
+@api.route('/api/restaurants', methods=['POST'])
+def add_restaurant():
+    data = request.json
+    if not data or not all(key in data for key in ['nombre', 'direccion', 'telefono']):
+        return jsonify({"error": "Datos incompletos"}), 400
+
+    new_restaurant = {
+        "id": len(restaurants) + 1,  
+        "nombre": data['nombre'],
+        "direccion": data['direccion'],
+        "telefono": data['telefono'],
+        "imagen": data.get('imagen', 'https://via.x.com/') 
+    }
+    restaurants.append(new_restaurant)
+    return jsonify(new_restaurant), 201
+
+# Actualizar un restaurante existente
+@api.route('/api/restaurants/<int:restaurant_id>', methods=['PUT'])
+def update_restaurant(restaurant_id):
+    data = request.json
+    restaurant = next((r for r in restaurants if r['id'] == restaurant_id), None)
+    if not restaurant:
+        return jsonify({"error": "Restaurante no encontrado"}), 404
+
+    # Actualizar los campos del restaurante
+    restaurant['nombre'] = data.get('nombre', restaurant['nombre'])
+    restaurant['direccion'] = data.get('direccion', restaurant['direccion'])
+    restaurant['telefono'] = data.get('telefono', restaurant['telefono'])
+    restaurant['imagen'] = data.get('imagen', restaurant['imagen'])
+
+    return jsonify(restaurant), 200
+
+# Eliminar un restaurante
+@api.route('/api/restaurants/<int:restaurant_id>', methods=['DELETE'])
+def delete_restaurant(restaurant_id):
+    global restaurants
+    restaurant = next((r for r in restaurants if r['id'] == restaurant_id), None)
+    if not restaurant:
+        return jsonify({"error": "Restaurante no encontrado"}), 404
+
+    restaurants = [r for r in restaurants if r['id'] != restaurant_id]
+    return jsonify({"message": "Restaurante eliminado"}), 200
+
 
 
 
