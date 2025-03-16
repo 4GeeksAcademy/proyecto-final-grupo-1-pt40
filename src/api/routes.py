@@ -1,7 +1,7 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from api.models import db, Client, Restaurant, Menu, Dish,Favorites,Admin
+from api.models import db, Client, Restaurant, Menu, Dish,Favorites,Admin, Notification, Report
 from flask import Flask, request, jsonify, url_for, Blueprint, Response,send_file
 from werkzeug.utils import secure_filename
 from sqlalchemy.exc import DataError,IntegrityError
@@ -687,6 +687,7 @@ def get_favorites():
 #         db.session.commit()
 #         return jsonify(new_report.serialize()), 201
  
+
 @api.route('/profile', methods=['GET'])
 @jwt_required()
 def profile():
@@ -703,34 +704,9 @@ def profile():
     else:
         return {"error": "Rol inválido"}, 400
 
-ADMIN_EMAILS = {"felipe@alpunto.com",
-"gloria@alpunto.com",
-"laura@alpunto.com",
-"maria@alpunto.com"}
 
-@api.route('/login/admin', methods=['POST'])
-def admin_login():
-    data = request.json
-    email = data.get('email')
-    password = data.get('password')
 
-    admin = Admin.query.filter_by(email=email).first()
 
-    if admin and admin.check_password(password):
-        if email in ADMIN_EMAILS:  
-            access_token = create_access_token(identity={"id": admin.id, "role": "admin"})
-            return jsonify({"token": access_token}), 200
-        return jsonify({"error": "Unauthorized"}), 403
-    
-    return jsonify({"message": "Check your email and password"}), 400
-
-@api.route('/admin/dashboard', methods=['GET'])
-@jwt_required()
-def admin_dashboard():
-    user = get_jwt_identity()
-    if user["role"] != "admin":
-        return jsonify({"error": "Unauthorized"}), 403
-    return jsonify({"message": "Welcome, Admin!"}), 200
 
 
 @api.route('/restaurant/profile', methods=['GET'])
@@ -800,6 +776,7 @@ def update_restaurant():
         restaurant.social_networks = data.get('social_networks', restaurant.social_networks)
         restaurant.phone = data.get('phone', restaurant.phone)
         restaurant.description = data.get('description', restaurant.description)
+        restaurant.image = data.get('image', restaurant.image)
 
         db.session.commit()
 
@@ -1070,65 +1047,173 @@ def reset_password():
         except Exception as e:
             return jsonify({"msg": "Server error"}), 500 
         
-# Obtener todos los restaurantes
-@api.route('/api/restaurants', methods=['GET'])
-def get_restaurants():
-    return jsonify(restaurants), 200
 
-# Obtener un restaurante por su ID
-@api.route('/api/restaurants/<int:restaurant_id>', methods=['GET'])
-def get_restaurant(restaurant_id):
-    restaurant = next((r for r in restaurants if r['id'] == restaurant_id), None)
-    if restaurant:
-        return jsonify(restaurant), 200
+@api.route('/admins', methods=['GET'])
+def get_admins():
+    admins = Admin.query.all()
+    if not admins:
+        return jsonify('No hay admins'),200
+    result = [admin.serialize() for admin in admins]
+    return jsonify(result),200
+
+@api.route('/login/admin', methods=['POST'])
+def admin_login(): 
+    data = request.json
+    email = data.get('email', None)
+    password = data.get('password')
+    if email:
+        admin = Admin.query.filter_by(email=email).first()
     else:
-        return jsonify({"error": "Restaurante no encontrado"}), 404
+        return jsonify({"error":"Complete login information"}),400
+    try:
+        if admin and admin.check_password(password):
+            expiration = timedelta(minutes=45)
+            access_token = create_access_token(identity=str(admin.id), expires_delta= expiration,additional_claims={"role":"admin"})
+            return jsonify({"token": access_token}), 200
+        return jsonify({"message": "Check your username/email and password"}), 400
+    except DataError as e:
+        db.session.rollback()
+        return jsonify('error: Incorrect data format/type'),400
+    except Exception as e:
+         db.session.rollback()
+         return jsonify('error: Failed to process request'), 500
 
-# Agregar un nuevo restaurante
-@api.route('/api/restaurants', methods=['POST'])
-def add_restaurant():
-    data = request.json
-    if not data or not all(key in data for key in ['nombre', 'direccion', 'telefono']):
-        return jsonify({"error": "Datos incompletos"}), 400
 
-    new_restaurant = {
-        "id": len(restaurants) + 1,  
-        "nombre": data['nombre'],
-        "direccion": data['direccion'],
-        "telefono": data['telefono'],
-        "imagen": data.get('imagen', 'https://via.x.com/') 
-    }
-    restaurants.append(new_restaurant)
-    return jsonify(new_restaurant), 201
-
-# Actualizar un restaurante existente
-@api.route('/api/restaurants/<int:restaurant_id>', methods=['PUT'])
-def update_restaurant(restaurant_id):
-    data = request.json
-    restaurant = next((r for r in restaurants if r['id'] == restaurant_id), None)
-    if not restaurant:
-        return jsonify({"error": "Restaurante no encontrado"}), 404
-
-    # Actualizar los campos del restaurante
-    restaurant['nombre'] = data.get('nombre', restaurant['nombre'])
-    restaurant['direccion'] = data.get('direccion', restaurant['direccion'])
-    restaurant['telefono'] = data.get('telefono', restaurant['telefono'])
-    restaurant['imagen'] = data.get('imagen', restaurant['imagen'])
-
-    return jsonify(restaurant), 200
-
-# Eliminar un restaurante
-@api.route('/api/restaurants/<int:restaurant_id>', methods=['DELETE'])
+@api.route('/admin/delete/restaurant/<restaurant_id>', methods=['DELETE'])
+@jwt_required()
 def delete_restaurant(restaurant_id):
-    global restaurants
-    restaurant = next((r for r in restaurants if r['id'] == restaurant_id), None)
-    if not restaurant:
-        return jsonify({"error": "Restaurante no encontrado"}), 404
+    admin_id = get_jwt_identity() 
+    claims = get_jwt() 
+    role = claims.get("role")
+    if role != "admin":
+            return jsonify({"error": "Unauthorized: Only administrators can delete restaurants"}), 403
+    if restaurant_id:
+        try:
+            restaurant = Restaurant.query.get(restaurant_id)
+            if restaurant:
+                db.session.delete(restaurant)
+                db.session.commit()
+                return jsonify({'msg':"Restaurant deleted"}), 200
+            else:
+                return jsonify({'error':"Restaurant not found"}), 404
+        except DataError as e:
+            db.session.rollback()
+            return jsonify('error: Incorrect data format/type'),400
+        except Exception as e:
+            db.session.rollback()
+            return jsonify('error: Failed to process request'), 500
 
-    restaurants = [r for r in restaurants if r['id'] != restaurant_id]
-    return jsonify({"message": "Restaurante eliminado"}), 200
+@api.route('/admin/delete/client/<client_id>', methods=['DELETE'])
+@jwt_required()
+def delete_client(client_id):
+    admin_id = get_jwt_identity() 
+    claims = get_jwt() 
+    role = claims.get("role")
+    if role != "admin":
+            return jsonify({"error": "Unauthorized: Only administrators can delete clients"}), 403
+    if client_id:
+        try:
+            client = Client.query.get(client_id)
+            if client:
+                db.session.delete(client)
+                db.session.commit()
+                return jsonify({'msg':"Client deleted"}), 200
+            else:
+                return jsonify({'error':"Client not found"}), 404
+        except DataError as e:
+            db.session.rollback()
+            return jsonify('error: Incorrect data format/type'),400
+        except Exception as e:
+            db.session.rollback()
+            return jsonify('error: Failed to process request'), 500
+        
+@api.route('/admin/reports', methods=['GET', 'PUT','DELETE'])
+@jwt_required()
+def admin_reports():
+    admin_id = get_jwt_identity() 
+    claims = get_jwt() 
+    role = claims.get("role")
+    if role != "admin":
+            return jsonify({"error": "Unauthorized: Access Restricted"}), 403
+    if request.method == 'GET':
+        try:
+            reports = db.session.query(Report.id,Report.subject,Report.message, Report.read,Report.date,Report.restaurant_id,
+                                       Restaurant.name.label("restaurant_name"), Restaurant.username.label("restaurant_username"), Restaurant.email.label("restaurant_email")).join(Restaurant, Report.restaurant_id == Restaurant.id).all()
+            if reports:
+                result = [{"report_id": report.id,
+                            "subject": report.subject,
+                            "message":report.message,
+                            "read":report.read,
+                            "date":report.date,
+                            "restaurant":{"id":report.restaurant_id,
+                                          "name":report.restaurant_name,
+                                          "username":report.restaurant_username,
+                                          "email":report.restaurant_email}} for report in reports]
+                return jsonify(result), 200
+            else:
+                return jsonify([]), 200
+        except DataError as e:
+            db.session.rollback()
+            return jsonify('error: Incorrect data format/type'),400
+        except Exception as e:
+            db.session.rollback()
+            return jsonify('error: Failed to process request'), 500
+    if request.method == 'PUT':
+        data = request.json
+        report_id = data.get('report_id',None)
+        if report_id:
+            try:
+                report = Report.query.get(report_id)
+                if report:
+                    report.read = True
+                    db.session.commit()
+                    return jsonify({'msg': 'Report updated'}), 200
+                else:
+                    return jsonify({'msg':"Report not found"}),400
+            except Exception as e:
+                db.session.rollback()
+                return jsonify('error: Failed to process request'), 500
+   
+    if request.method == 'DELETE':
+        data = request.json
+        report_id = data.get('report_id',None)
+        if report_id:
+            try:
+                report = Report.query.get(report_id)
+                if report:
+                    db.session.delete(report)
+                    db.session.commit()
+                    return jsonify({'msg': 'Report deleted'}), 200
+                else:
+                    return jsonify({'msg':"Report not found"}),400
+            except Exception as e:
+                db.session.rollback()
+                return jsonify('error: Failed to process request'), 500
 
 
 
-
+@api.route('/make-report', methods=['POST'])
+@jwt_required()
+def make_report():
+        client_id = get_jwt_identity() 
+        claims = get_jwt() 
+        role = claims.get("role")
+        data = request.json
+        restaurant_id = data.get('restaurant_id', None)
+        subject = data.get('subject', None)
+        message = data.get('message', None)
+        if role != "client":
+            return jsonify({"error": "Unauthorized: Access Restricted"}), 403
+        
+        if restaurant_id and subject and client_id:
+            try:
+                new_report = Report(client_id=client_id,restaurant_id=restaurant_id,subject=subject,message=message)
+                db.session.add(new_report)
+                db.session.commit()
+                return jsonify({"msg":"Report posted to Admin database"}),200
+            except Exception as e:
+                db.session.rollback()
+                return jsonify('error: Failed to process request'), 500
+        else:
+            return jsonify({'BadRequest':'Missing fields/data'}), 400
 

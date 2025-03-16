@@ -1,6 +1,6 @@
 
 import click
-from api.models import db, User
+from api.models import db, User, Admin
 
 """
 In this file, you can add as many commands as you want using the @app.cli.command decorator
@@ -29,6 +29,14 @@ def setup_commands(app):
 
         print("All test users created")
 
-    @app.cli.command("insert-test-data")
-    def insert_test_data():
-        pass
+    @app.cli.command("load-admins")
+    def preload_admins():
+        ADMIN_EMAILS = {"felipe@alpunto.com":'felipe',"gloria@alpunto.com":'gloria',"laura@alpunto.com":'laura',"maria@alpunto.com":'maria'}
+        for email,password in ADMIN_EMAILS.items():
+            admin_exists = Admin.query.filter_by(email=email).first()
+            if not admin_exists:
+                new_admin =  Admin(email=email,username=email)
+                new_admin.set_password(password)
+                db.session.add(new_admin)
+                db.session.commit()
+        print('Admins have been added successfully')
