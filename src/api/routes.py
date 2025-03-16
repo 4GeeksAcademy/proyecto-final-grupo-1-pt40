@@ -501,6 +501,17 @@ def get_restaurants():
         db.session.rollback()
         return jsonify({'message': 'Server error: Failed to process request'}), 500
 
+@api.route('/clients', methods=['GET'])
+def get_clients():
+    try:
+        clients = Client.query.all()
+        if not clients:
+            return jsonify({'message': 'No clients found'}), 404
+        return jsonify([client.serialize() for client in clients]), 200  
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'Server error: Failed to process request'}), 500
+
     
 @api.route('/restaurant/menus', methods=['GET'])
 @jwt_required()
@@ -1216,4 +1227,102 @@ def make_report():
                 return jsonify('error: Failed to process request'), 500
         else:
             return jsonify({'BadRequest':'Missing fields/data'}), 400
+        
+@api.route('/admin/notifications', methods=['GET', 'POST','DELETE'])
+@jwt_required()
+def admin_notifications():
+    admin_id = get_jwt_identity() 
+    claims = get_jwt() 
+    role = claims.get("role")
+    if role != "admin":
+            return jsonify({"error": "Unauthorized: Access Restricted"}), 403
+    if request.method == 'GET':
+        try:
+            notifications = db.session.query(Notification.id,Notification.subject,Notification.message, Notification.status,Notification.date,Notification.restaurant_id,
+                                       Restaurant.name.label("restaurant_name"), Restaurant.username.label("restaurant_username"), Restaurant.email.label("restaurant_email")).join(Restaurant, Notification.restaurant_id == Restaurant.id).all()
+            if notifications:
+                result = [{"notification_id": notification.id,
+                            "subject": notification.subject,
+                            "message": notification.message,
+                            "status":notification.status,
+                            "date":notification.date,
+                            "restaurant":{"id":notification.restaurant_id,
+                                          "name":notification.restaurant_name,
+                                          "username":notification.restaurant_username,
+                                          "email":notification.restaurant_email}} for notification in notifications]
+                return jsonify(result), 200
+            else:
+                return jsonify([]), 200
+        except DataError as e:
+            db.session.rollback()
+            return jsonify('error: Incorrect data format/type'),400
+        except Exception as e:
+            db.session.rollback()
+            return jsonify('error: Failed to process request'), 500
+    if request.method == 'POST':
+        data = request.json
+        restaurant_id = data.get('restaurant_id',None)
+        subject = data.get('subject',None)
+        message = data.get('message',None)
+        if restaurant_id and subject:
+            try:
+                notification = Notification(restaurant_id=restaurant_id, subject=subject,message=message)
+                db.session.add(notification)
+                db.session.commit()
+                return jsonify({'msg': 'Notification sent!'}), 200
+            except Exception as e:
+                db.session.rollback()
+                return jsonify({'error': "Failed to process request", 'detail':str(e)}), 500
+        else:
+            return jsonify({"BadRequest":"Missing fields/data"}),400
+   
+    if request.method == 'DELETE':
+        data = request.json
+        notification_id = data.get('notification_id',None)
+        if notification_id:
+            try:
+                notification = Notification.query.get(notification_id)
+                if notification:
+                    db.session.delete(notification)
+                    db.session.commit()
+                    return jsonify({'msg': 'Notification deleted'}), 200
+                else:
+                    return jsonify({'msg':"Notification not found"}),400
+            except Exception as e:
+                db.session.rollback()
+                return jsonify('error: Failed to process request'), 500
+            
+@api.route('/restaurant/notifications', methods=['GET','PUT'])
+@jwt_required()
+def restaurant_notifications():
+        restaurant_id = get_jwt_identity() 
+        claims = get_jwt() 
+        role = claims.get("role")
+        if role != "restaurant":
+            return jsonify({"error": "Unauthorized: Access Restricted"}), 403
+        
+        if request.method == 'GET':
+            try:
+                notifications = Notification.query.filter_by(restaurant_id=restaurant_id,status=True).all()
+                result = [notification.serialize() for notification in notifications]
+                return jsonify(result),200
+            except Exception as e:
+                db.session.rollback()
+                return jsonify('error: Failed to process request'), 500
+        if request.method == 'PUT':
+            data = request.json
+            notification_id = data.get('notification_id',None)
+            if notification_id:
+                try:
+                    notification = Notification.query.get(notification_id)
+                    if notification:
+                        notification.status = False #Indica que el restaurante borro la notification
+                        db.session.commit()
+                        return jsonify({'msg': 'Notification updated'}), 200
+                    else:
+                        return jsonify({'msg':"Notification not found"}),400
+                except Exception as e:
+                    db.session.rollback()
+                    return jsonify('error: Failed to process request'), 500
+        
 

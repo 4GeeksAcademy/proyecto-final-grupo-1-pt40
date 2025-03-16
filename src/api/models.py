@@ -74,6 +74,7 @@ class Restaurant(db.Model):
     notifications = relationship('RestaurantNotifications', back_populates='restaurant')
     favorites = relationship('Favorites', back_populates='restaurant')
     report = relationship('Report',back_populates='restaurant')
+    notification = relationship('Notification', back_populates='restaurant')
 
     def can_add_menu(self):
         if self.plan:
@@ -226,9 +227,23 @@ class Admin(db.Model):
 
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    message = db.Column(db.String(255), nullable=False)
-    read = db.Column(db.Boolean, default=False)
+    restaurant_id = db.Column(db.Integer,ForeignKey('restaurant.id'),nullable=False)
+    subject = db.Column(db.String(255), nullable=False)
+    message = db.Column(db.String(255), nullable=True)
+    status = db.Column(db.Boolean, default=True)
     date = db.Column(db.DateTime,default=db.func.now())
+
+    restaurant = relationship('Restaurant',back_populates='notification')
+
+    def serialize(self):
+        return {
+            'notification_id':self.id,
+            'restaurant_id':self.restaurant_id,
+            'subject':self.subject,
+            'message':self.message,
+            'status': self.read,
+            'date': self.date
+        }
 
 
 class Report(db.Model):
@@ -236,7 +251,7 @@ class Report(db.Model):
     client_id = db.Column(db.Integer,ForeignKey('client.id'),nullable=False)
     restaurant_id = db.Column(db.Integer,ForeignKey('restaurant.id'),nullable=False)
     subject = db.Column(db.String(255), nullable=False)
-    message = db.Column(db.String(255), nullable=False)
+    message = db.Column(db.String(255), nullable=True)
     read = db.Column(db.Boolean, default=False)
     date = db.Column(db.DateTime,default=db.func.now())
 
