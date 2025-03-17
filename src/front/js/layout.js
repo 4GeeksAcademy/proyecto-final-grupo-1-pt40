@@ -20,6 +20,9 @@ import AdminDashboard from "./pages/AdminDashboard.jsx";
 import RestaurantProfileEdit from "./pages/RestaurantProfileEdit.jsx";
 import RestaurantPurchasePlan from "./pages/RestaurantPurchasePlan.jsx";
 import ClientProfileEdit from "./pages/ClientProfileEdit.jsx";
+import ClientProfile from "./pages/ClientProfile.jsx";
+import ExplorePage from "./pages/ExplorePage.jsx";
+import HelpPage from "./pages/HelpPage.jsx";
 
 import HowItWork from "./pages/HowItWork.jsx";
 import FrequentQuestions from "./pages/FrequentQuestions.jsx";
@@ -57,6 +60,9 @@ const Layout = () => {
 
                         <Route element={<ClientDashboard />} path="/client-dashboard" />
                         <Route element={<FavoritePage />} path="/favorites" />
+                        <Route element={<ClientProfile />} path="/client-profile" />
+                        <Route element={<ExplorePage />} path="/explore-page" />
+                        <Route element={<HelpPage />} path="/help-page" />
 
                         <Route element={<AdminLogin />} path="/login/admin" />
                         <Route element={<AdminDashboard />} path="/admin-dashboard" />
