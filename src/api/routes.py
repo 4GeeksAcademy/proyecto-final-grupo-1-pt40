@@ -1,7 +1,7 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from api.models import db, Client, Restaurant, Menu, Dish,Favorites,Admin, Notification, Report
+from api.models import db, Client, Restaurant, Menu, Dish,Favorites,Admin,Notification,Report
 from flask import Flask, request, jsonify, url_for, Blueprint, Response,send_file
 from werkzeug.utils import secure_filename
 from sqlalchemy.exc import DataError,IntegrityError
@@ -455,42 +455,20 @@ def menu_categories():
     data = request.get_json()
     menu_id = data.get('menu_id')
     categories_list = data.get('categories',None)
-    old_categories=data.get('old_categories',None)
     try:
         menu = Menu.query.filter_by(id=menu_id).first()
-        if not menu:
-            return jsonify({"error":"Bad request:Menu ID not found"}),400
-        
-        if not categories_list or not old_categories:
-            return jsonify({'error': 'Bad Request: Missing categories data'}), 400
-
-        restaurant_id=menu.restaurant_id
-        
-        category_changes = {old: new for old, new in zip(old_categories, categories_list) if old != new}
-
-        
-        menu.set_categories(categories_list)
-
-        
-        for old_cat, new_cat in category_changes.items():
-            dishes = Dish.query.join(Menu).filter(Dish.category == old_cat,
-                Dish.menu_id == menu.id,
-                Menu.restaurant_id == restaurant_id).all()
-            print(f"🔹 Cambiando {len(dishes)} platillos de '{old_cat}' a '{new_cat}' en restaurante {restaurant_id}")
-            
-            for dish in dishes:
-                dish.category = new_cat  
-
-        db.session.commit()
-        return jsonify(menu.serialize()), 200
-
-    except DataError:
+        if menu:
+            menu.set_categories(categories_list)
+            db.session.commit()
+            return jsonify(menu.serialize()),200
+        else:
+             return jsonify('Bad Request: Menu ID not found'),400
+    except DataError as e:
         db.session.rollback()
-        return jsonify({'error': 'Bad Request: Incorrect data format/type'}), 400
+        return jsonify('Bad Request: Incorrect data format/type'),400
     except Exception as e:
-        db.session.rollback()
-        print("Error en menu_categories:",str(e))
-        return jsonify({'error': 'Server error: Failed to process request'}), 500
+         db.session.rollback()
+         return jsonify('Server error: Failed to process request'), 500
 
 @api.route('/menu/<int:menu_id>', methods=['GET'])
 def get_menu(menu_id):
@@ -517,17 +495,8 @@ def get_restaurants():
     try:
         restaurants = Restaurant.query.all()
         if not restaurants:
-            return jsonify({'message': 'No restaurants found'}), 200
+            return jsonify({'message': 'No restaurants found'}), 404
         return jsonify([res.serialize() for res in restaurants]), 200  
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'message': 'Server error: Failed to process request'}), 500
-
-@api.route('/clients', methods=['GET'])
-def get_clients():
-    try:
-        clients = Client.query.all()
-        return jsonify([client.serialize() for client in clients]), 200  
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': 'Server error: Failed to process request'}), 500
@@ -648,77 +617,7 @@ def get_favorites():
                 "restaurant": restaurant.serialize()
             })
     return jsonify(result), 200    
-
-# # Ruta para manejar notificaciones
-# @api.route('/notifications', methods=['GET', 'POST', 'DELETE', 'PUT'])
-# def handle_notifications():
-#     if request.method == 'GET':
-#         # Obtener todas las notificaciones
-#         notifications = Notification.query.all()
-#         return jsonify([notification.serialize() for notification in notifications]), 200
-
-#     elif request.method == 'POST':
-#         # Agregar una nueva notificación
-#         data = request.json
-#         message = data.get('message')
-#         if not message:
-#             return jsonify({"error": "Message is required"}), 400
-
-#         new_notification = Notification(message=message)
-#         db.session.add(new_notification)
-#         db.session.commit()
-#         return jsonify(new_notification.serialize()), 201
-#     elif request.method == 'DELETE':
-#         # Eliminar una notificación por ID
-#         notification_id = request.json.get('id')
-#         if not notification_id:
-#             return jsonify({"error": "Notification ID is required"}), 400
-
-#         notification = Notification.query.get(notification_id)
-#         if not notification:
-#             return jsonify({"error": "Notification not found"}), 404
-
-#         db.session.delete(notification)
-#         db.session.commit()
-#         return jsonify({"message": "Notification deleted"}), 200
-
-#     elif request.method == 'PUT':
-#         # Marcar una notificación como leída
-#         notification_id = request.json.get('id')
-#         if not notification_id:
-#             return jsonify({"error": "Notification ID is required"}), 400
-
-#         notification = Notification.query.get(notification_id)
-#         if not notification:
-#             return jsonify({"error": "Notification not found"}), 404
-
-#         notification.read = True
-#         db.session.commit()
-#         return jsonify(notification.serialize()), 200
-
-
-# # Ruta para manejar reportes (solicitudes)
-# @api.route('/reports', methods=['GET', 'POST'])
-# def handle_reports():
-#     if request.method == 'GET':
-#         # Obtener todos los reportes
-#         reports = Report.query.all()
-#         return jsonify([report.serialize() for report in reports]), 200
-
-#     elif request.method == 'POST':
-#         # Enviar un nuevo reporte
-#         data = request.json
-#         recipient = data.get('recipient')
-#         message = data.get('message')
-#         if not recipient or not message:
-#             return jsonify({"error": "Recipient and message are required"}), 400
-
-#         new_report = Report(recipient=recipient, message=message, date=datetime.utcnow())
-#         db.session.add(new_report)
-#         db.session.commit()
-#         return jsonify(new_report.serialize()), 201
  
-
 @api.route('/profile', methods=['GET'])
 @jwt_required()
 def profile():
@@ -735,9 +634,34 @@ def profile():
     else:
         return {"error": "Rol inválido"}, 400
 
+ADMIN_EMAILS = {"felipe@alpunto.com",
+"gloria@alpunto.com",
+"laura@alpunto.com",
+"maria@alpunto.com"}
 
+@api.route('/login/admin', methods=['POST'])
+def admin_login():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
 
+    admin = Admin.query.filter_by(email=email).first()
 
+    if admin and admin.check_password(password):
+        if email in ADMIN_EMAILS:  
+            access_token = create_access_token(identity={"id": admin.id, "role": "admin"})
+            return jsonify({"token": access_token}), 200
+        return jsonify({"error": "Unauthorized"}), 403
+    
+    return jsonify({"message": "Check your email and password"}), 400
+
+@api.route('/admin/dashboard', methods=['GET'])
+@jwt_required()
+def admin_dashboard():
+    user = get_jwt_identity()
+    if user["role"] != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    return jsonify({"message": "Welcome, Admin!"}), 200
 
 
 @api.route('/restaurant/profile', methods=['GET'])
@@ -807,7 +731,6 @@ def update_restaurant():
         restaurant.social_networks = data.get('social_networks', restaurant.social_networks)
         restaurant.phone = data.get('phone', restaurant.phone)
         restaurant.description = data.get('description', restaurant.description)
-        restaurant.image = data.get('image', restaurant.image)
 
         db.session.commit()
 
@@ -1078,273 +1001,221 @@ def reset_password():
         except Exception as e:
             return jsonify({"msg": "Server error"}), 500 
         
-
-@api.route('/admins', methods=['GET'])
-def get_admins():
-    admins = Admin.query.all()
-    if not admins:
-        return jsonify('No hay admins'),200
-    result = [admin.serialize() for admin in admins]
-    return jsonify(result),200
-
-@api.route('/login/admin', methods=['POST'])
-def admin_login(): 
-    data = request.json
-    email = data.get('email', None)
-    password = data.get('password')
-    if email:
-        admin = Admin.query.filter_by(email=email).first()
-    else:
-        return jsonify({"error":"Complete login information"}),400
+# Obtener todos los restaurantes
+@api.route('/restaurants', methods=['GET'])
+@jwt_required()
+def get_restaurants():
     try:
-        if admin and admin.check_password(password):
-            expiration = timedelta(minutes=45)
-            access_token = create_access_token(identity=str(admin.id), expires_delta= expiration,additional_claims={"role":"admin"})
-            return jsonify({"token": access_token}), 200
-        return jsonify({"message": "Check your username/email and password"}), 400
-    except DataError as e:
-        db.session.rollback()
-        return jsonify('error: Incorrect data format/type'),400
+        restaurants = Restaurant.query.all()
+        serialized_restaurants = [r.serialize() for r in restaurants]
+        return jsonify(serialized_restaurants), 200
     except Exception as e:
-         db.session.rollback()
-         return jsonify('error: Failed to process request'), 500
+        return jsonify({"error": "No se pudieron obtener los restaurantes"}), 500
 
 
-@api.route('/admin/delete/restaurant/<restaurant_id>', methods=['DELETE'])
+# Obtener un restaurante por su ID
+@api.route('/restaurants/<int:restaurant_id>', methods=['GET'])
+@jwt_required()
+def get_restaurant(restaurant_id):
+    try:
+        restaurant = Restaurant.query.get(restaurant_id)
+        if not restaurant:
+            return jsonify({"error": "Restaurante no encontrado"}), 404
+
+        return jsonify(restaurant.serialize()), 200
+    except Exception as e:
+        return jsonify({"error": "No se pudo obtener el restaurante"}), 500
+    
+
+# Agregar un nuevo restaurante
+@api.route('/restaurants', methods=['POST'])
+@jwt_required()
+def add_restaurant():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No se recibieron datos"}), 400
+    
+    nombre = data.get('nombre')
+    direccion = data.get('direccion')
+    telefono = data.get('telefono')
+    imagen = data.get('imagen', 'https://via.x.com/')
+
+    if not all([nombre, direccion, telefono]):
+        return jsonify({"error": "Datos incompletos"}), 400
+
+    try:
+        new_restaurant = Restaurant(
+            nombre=nombre,
+            direccion=direccion,
+            telefono=telefono,
+            imagen=imagen
+        )
+        db.session.add(new_restaurant)
+        db.session.commit()
+
+        return jsonify(new_restaurant.serialize()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "No se pudo crear el restaurante"}),
+
+# Actualizar un restaurante existente
+@api.route('/restaurants/<int:restaurant_id>', methods=['PUT'])
+@jwt_required()
+def update_restaurant(restaurant_id):
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No se recibieron datos"}), 400
+
+    try:
+        restaurant = Restaurant.query.get(restaurant_id)
+        if not restaurant:
+            return jsonify({"error": "Restaurante no encontrado"}), 404
+
+        # Actualizar campos si vienen en el request
+        restaurant.nombre = data.get('nombre', restaurant.nombre)
+        restaurant.direccion = data.get('direccion', restaurant.direccion)
+        restaurant.telefono = data.get('telefono', restaurant.telefono)
+        restaurant.imagen = data.get('imagen', restaurant.imagen)
+
+        db.session.commit()
+        return jsonify(restaurant.serialize()), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "No se pudo actualizar el restaurante"}), 500
+
+# Eliminar un restaurante
+@api.route('/restaurants/<int:restaurant_id>', methods=['DELETE'])
 @jwt_required()
 def delete_restaurant(restaurant_id):
-    admin_id = get_jwt_identity() 
-    claims = get_jwt() 
-    role = claims.get("role")
-    if role != "admin":
-            return jsonify({"error": "Unauthorized: Only administrators can delete restaurants"}), 403
-    if restaurant_id:
-        try:
-            restaurant = Restaurant.query.get(restaurant_id)
-            if restaurant:
-                db.session.delete(restaurant)
-                db.session.commit()
-                return jsonify({'msg':"Restaurant deleted"}), 200
-            else:
-                return jsonify({'error':"Restaurant not found"}), 404
-        except DataError as e:
-            db.session.rollback()
-            return jsonify('error: Incorrect data format/type'),400
-        except Exception as e:
-            db.session.rollback()
-            return jsonify('error: Failed to process request'), 500
+    try:
+        restaurant = Restaurant.query.get(restaurant_id)
+        if not restaurant:
+            return jsonify({"error": "Restaurante no encontrado"}), 404
 
-@api.route('/admin/delete/client/<client_id>', methods=['DELETE'])
+        db.session.delete(restaurant)
+        db.session.commit()
+        return jsonify({"message": "Restaurante eliminado"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "No se pudo eliminar el restaurante"}), 500
+
+# Crear una notificación
+@api.route('/notifications', methods=['POST'])
 @jwt_required()
-def delete_client(client_id):
-    admin_id = get_jwt_identity() 
-    claims = get_jwt() 
-    role = claims.get("role")
-    if role != "admin":
-            return jsonify({"error": "Unauthorized: Only administrators can delete clients"}), 403
-    if client_id:
-        try:
-            client = Client.query.get(client_id)
-            if client:
-                db.session.delete(client)
-                db.session.commit()
-                return jsonify({'msg':"Client deleted"}), 200
-            else:
-                return jsonify({'error':"Client not found"}), 404
-        except DataError as e:
-            db.session.rollback()
-            return jsonify('error: Incorrect data format/type'),400
-        except Exception as e:
-            db.session.rollback()
-            return jsonify('error: Failed to process request'), 500
-        
-@api.route('/admin/reports', methods=['GET', 'PUT','DELETE'])
+def add_notification():
+    data = request.get_json()
+    user_identity = get_jwt_identity()  # Obtenemos el ID del usuario/cliente autenticado
+    user_id = int(user_identity)
+
+    message = data.get("message")
+    if not message:
+        return jsonify({"error": "Falta el campo 'message'"}), 400
+
+    try:
+        new_notification = Notification(
+            user_id=user_id,
+            message=message
+        )
+        db.session.add(new_notification)
+        db.session.commit()
+        return jsonify({"message": "Notificación creada exitosamente"}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "No se pudo crear la notificación"}), 500
+
+# Obtener todas las notificaciones del usuario
+@api.route('/notifications', methods=['GET'])
 @jwt_required()
-def admin_reports():
-    admin_id = get_jwt_identity() 
-    claims = get_jwt() 
-    role = claims.get("role")
-    if role != "admin":
-            return jsonify({"error": "Unauthorized: Access Restricted"}), 403
-    if request.method == 'GET':
-        try:
-            reports = db.session.query(Report.id,Report.subject,Report.message, Report.read,Report.date,Report.restaurant_id,Report.client_id,
-                                       Restaurant.name.label("restaurant_name"), Restaurant.username.label("restaurant_username"), Restaurant.email.label("restaurant_email")).join(Restaurant, Report.restaurant_id == Restaurant.id).all()
-            if reports:
-                result = [{"report_id": report.id,
-                            "subject": report.subject,
-                            "message":report.message,
-                            "read":report.read,
-                            "date":report.date,
-                            "client_id":report.client_id,
-                            "restaurant":{"restaurant_id":report.restaurant_id,
-                                          "name":report.restaurant_name,
-                                          "username":report.restaurant_username,
-                                          "email":report.restaurant_email}} for report in reports]
-                return jsonify(result), 200
-            else:
-                return jsonify([]), 200
-        except DataError as e:
-            db.session.rollback()
-            return jsonify('error: Incorrect data format/type'),400
-        except Exception as e:
-            db.session.rollback()
-            return jsonify('error: Failed to process request'), 500
-    if request.method == 'PUT':
-        data = request.json
-        report_id = data.get('report_id',None)
-        if report_id:
-            try:
-                report = Report.query.get(report_id)
-                if report:
-                    report.read = True
-                    db.session.commit()
-                    return jsonify({'msg': 'Report updated'}), 200
-                else:
-                    return jsonify({'msg':"Report not found"}),400
-            except Exception as e:
-                db.session.rollback()
-                return jsonify('error: Failed to process request'), 500
-   
-    if request.method == 'DELETE':
-        data = request.json
-        report_id = data.get('report_id',None)
-        if report_id:
-            try:
-                report = Report.query.get(report_id)
-                if report:
-                    db.session.delete(report)
-                    db.session.commit()
-                    return jsonify({'msg': 'Report deleted'}), 200
-                else:
-                    return jsonify({'msg':"Report not found"}),400
-            except Exception as e:
-                db.session.rollback()
-                return jsonify('error: Failed to process request'), 500
+def get_notifications():
+    user_identity = get_jwt_identity()
+    user_id = int(user_identity)
+
+    notifications = Notification.query.filter_by(user_id=user_id).all()
+    serialized_notifications = [n.serialize() for n in notifications]
+
+    return jsonify(serialized_notifications), 200
+
+# Eliminar una notificación
+@api.route('/notifications/<int:notification_id>', methods=['DELETE'])
+@jwt_required()
+def delete_notification(notification_id):
+    user_identity = get_jwt_identity()
+    user_id = int(user_identity)
+
+    notification = Notification.query.filter_by(id=notification_id, user_id=user_id).first()
+    if not notification:
+        return jsonify({"error": "Notificación no encontrada"}), 404
+
+    try:
+        db.session.delete(notification)
+        db.session.commit()
+        return jsonify({"message": "Notificación eliminada"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "No se pudo eliminar la notificación"}), 500
 
 
+# Crear un reporte
+@api.route('/reports', methods=['POST'])
+@jwt_required()
+def add_report():
+    data = request.get_json()
+    user_identity = get_jwt_identity()
+    user_id = int(user_identity)
 
-@api.route('/make-report', methods=['POST'])
-@jwt_required()
-def make_report():
-        client_id = get_jwt_identity() 
-        claims = get_jwt() 
-        role = claims.get("role")
-        data = request.json
-        restaurant_id = data.get('restaurant_id', None)
-        subject = data.get('subject', None)
-        message = data.get('message', None)
-        if role != "client":
-            return jsonify({"error": "Unauthorized: Access Restricted"}), 403
-        
-        if restaurant_id and subject and client_id:
-            try:
-                new_report = Report(client_id=client_id,restaurant_id=restaurant_id,subject=subject,message=message)
-                db.session.add(new_report)
-                db.session.commit()
-                return jsonify({"msg":"Report posted to Admin database"}),200
-            except Exception as e:
-                db.session.rollback()
-                return jsonify('error: Failed to process request'), 500
-        else:
-            return jsonify({'BadRequest':'Missing fields/data'}), 400
-        
-@api.route('/admin/notifications', methods=['GET', 'POST','DELETE'])
-@jwt_required()
-def admin_notifications():
-    admin_id = get_jwt_identity() 
-    claims = get_jwt() 
-    role = claims.get("role")
-    if role != "admin":
-            return jsonify({"error": "Unauthorized: Access Restricted"}), 403
-    if request.method == 'GET':
-        try:
-            notifications = db.session.query(Notification.id,Notification.subject,Notification.message, Notification.status,Notification.date,Notification.restaurant_id,
-                                       Restaurant.name.label("restaurant_name"), Restaurant.username.label("restaurant_username"), Restaurant.email.label("restaurant_email")).join(Restaurant, Notification.restaurant_id == Restaurant.id).all()
-            if notifications:
-                result = [{"notification_id": notification.id,
-                            "subject": notification.subject,
-                            "message": notification.message,
-                            "status":notification.status,
-                            "date":notification.date,
-                            "restaurant":{"id":notification.restaurant_id,
-                                          "name":notification.restaurant_name,
-                                          "username":notification.restaurant_username,
-                                          "email":notification.restaurant_email}} for notification in notifications]
-                return jsonify(result), 200
-            else:
-                return jsonify([]), 200
-        except DataError as e:
-            db.session.rollback()
-            return jsonify('error: Incorrect data format/type'),400
-        except Exception as e:
-            db.session.rollback()
-            return jsonify('error: Failed to process request'), 500
-    if request.method == 'POST':
-        data = request.json
-        restaurant_id = data.get('restaurant_id',None)
-        subject = data.get('subject',None)
-        message = data.get('message',None)
-        if restaurant_id and subject:
-            try:
-                notification = Notification(restaurant_id=restaurant_id, subject=subject,message=message)
-                db.session.add(notification)
-                db.session.commit()
-                return jsonify({'msg': 'Notification sent!'}), 200
-            except Exception as e:
-                db.session.rollback()
-                return jsonify({'error': "Failed to process request", 'detail':str(e)}), 500
-        else:
-            return jsonify({"BadRequest":"Missing fields/data"}),400
-   
-    if request.method == 'DELETE':
-        data = request.json
-        notification_id = data.get('notification_id',None)
-        if notification_id:
-            try:
-                notification = Notification.query.get(notification_id)
-                if notification:
-                    db.session.delete(notification)
-                    db.session.commit()
-                    return jsonify({'msg': 'Notification deleted'}), 200
-                else:
-                    return jsonify({'msg':"Notification not found"}),400
-            except Exception as e:
-                db.session.rollback()
-                return jsonify('error: Failed to process request'), 500
-            
-@api.route('/restaurant/notifications', methods=['GET','PUT'])
-@jwt_required()
-def restaurant_notifications():
-        restaurant_id = get_jwt_identity() 
-        claims = get_jwt() 
-        role = claims.get("role")
-        if role != "restaurant":
-            return jsonify({"error": "Unauthorized: Access Restricted"}), 403
-        
-        if request.method == 'GET':
-            try:
-                notifications = Notification.query.filter_by(restaurant_id=restaurant_id,status=True).all()
-                result = [notification.serialize() for notification in notifications]
-                return jsonify(result),200
-            except Exception as e:
-                db.session.rollback()
-                return jsonify('error: Failed to process request'), 500
-        if request.method == 'PUT':
-            data = request.json
-            notification_id = data.get('notification_id',None)
-            if notification_id:
-                try:
-                    notification = Notification.query.get(notification_id)
-                    if notification:
-                        notification.status = False #Indica que el restaurante borro la notification
-                        db.session.commit()
-                        return jsonify({'msg': 'Notification updated'}), 200
-                    else:
-                        return jsonify({'msg':"Notification not found"}),400
-                except Exception as e:
-                    db.session.rollback()
-                    return jsonify('error: Failed to process request'), 500
+    title = data.get("title")
+    if not title:
+        return jsonify({"error": "Falta el campo 'title'"}), 400
 
-        
+    description = data.get("description", "")
+
+    try:
+        new_report = Report(
+            user_id=user_id,
+            title=title,
+            description=description
+        )
+        db.session.add(new_report)
+        db.session.commit()
+        return jsonify({"message": "Reporte creado exitosamente"}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "No se pudo crear el reporte"}), 500
+
+# Obtener todos los reportes del usuario
+@api.route('/reports', methods=['GET'])
+@jwt_required()
+def get_reports():
+    user_identity = get_jwt_identity()
+    user_id = int(user_identity)
+
+    reports = Report.query.filter_by(user_id=user_id).all()
+    serialized_reports = [r.serialize() for r in reports]
+
+    return jsonify(serialized_reports), 200
+
+# Eliminar un reporte
+@api.route('/reports/<int:report_id>', methods=['DELETE'])
+@jwt_required()
+def delete_report(report_id):
+    user_identity = get_jwt_identity()
+    user_id = int(user_identity)
+
+    report = Report.query.filter_by(id=report_id, user_id=user_id).first()
+    if not report:
+        return jsonify({"error": "Reporte no encontrado"}), 404
+
+    try:
+        db.session.delete(report)
+        db.session.commit()
+        return jsonify({"message": "Reporte eliminado"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "No se pudo eliminar el reporte"}), 500
+
+
+
+
+
+
 
