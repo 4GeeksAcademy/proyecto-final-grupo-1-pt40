@@ -53,7 +53,7 @@ const Layout = () => {
                         <Route element={<MenuPublicView />} path="/restaurant/:restaurant_username/menu/:menu_id" />
 
 
-                        <Route element={<MenuView />} path="/menu/:menuID" />
+                        <Route element={<MenuView />} path="/menu/:menu_id" />
 
                         <Route element={<ClientDashboard />} path="/client-dashboard" />
                         <Route element={<FavoritePage />} path="/favorites" />
