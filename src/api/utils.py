@@ -2,10 +2,12 @@ from flask import jsonify, url_for
 from mailjet_rest import Client
 from dotenv import load_dotenv
 import os
+from api.models import Admin, db
 load_dotenv()
 FRONTEND_URL = os.getenv('FRONTEND_URL')
 KEY = os.getenv('MAIL_KEY')
 SECRET = os.getenv('MAIL_SECRET')
+
 class APIException(Exception):
     status_code = 400
 
@@ -72,6 +74,17 @@ def send_email(to_email,token):
     }
     result = mailjet.send.create(data=data)
     return (result.status_code)
+
+def preload_admins():
+    ADMIN_EMAILS = {"felipe@alpunto.com":'felipe',"gloria@alpunto.com":'gloria',"laura@alpunto.com":'laura',"maria@alpunto.com":'maria'}
+    for email,password in ADMIN_EMAILS.items():
+        admin_exists = Admin.query.filter_by(email=email).first()
+        print(email)
+        if not admin_exists:
+            new_admin =  Admin(email=email,username=email)
+            new_admin.set_password(password)
+            db.session.add(new_admin)
+            db.session.commit()
 
 
     

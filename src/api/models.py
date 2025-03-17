@@ -36,6 +36,7 @@ class Client(db.Model):
     is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     favorites = relationship('Favorites', back_populates='client')
+    report =relationship('Report',back_populates='client')
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -72,6 +73,8 @@ class Restaurant(db.Model):
     menus = relationship('Menu', back_populates='restaurant', lazy ='dynamic')
     notifications = relationship('RestaurantNotifications', back_populates='restaurant')
     favorites = relationship('Favorites', back_populates='restaurant')
+    report = relationship('Report',back_populates='restaurant')
+    notification = relationship('Notification', back_populates='restaurant')
 
     def can_add_menu(self):
         if self.plan:
@@ -208,7 +211,7 @@ class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256), nullable=False)
+    password_hash = db.Column(db.String(256), nullable=True)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     def set_password(self, password):
@@ -216,9 +219,54 @@ class Admin(db.Model):
     
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+    def serialize(self):
+        return {
+            'email':self.email
+        }
+    
 
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    message = db.Column(db.String(255), nullable=False)
+    restaurant_id = db.Column(db.Integer,ForeignKey('restaurant.id'),nullable=False)
+    subject = db.Column(db.String(255), nullable=False)
+    message = db.Column(db.String(255), nullable=True)
+    status = db.Column(db.Boolean, default=True)
+    date = db.Column(db.DateTime,default=db.func.now())
+
+    restaurant = relationship('Restaurant',back_populates='notification')
+
+    def serialize(self):
+        return {
+            'notification_id':self.id,
+            'restaurant_id':self.restaurant_id,
+            'subject':self.subject,
+            'message':self.message,
+            'status': self.read,
+            'date': self.date
+        }
+
+
+class Report(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    client_id = db.Column(db.Integer,ForeignKey('client.id'),nullable=False)
+    restaurant_id = db.Column(db.Integer,ForeignKey('restaurant.id'),nullable=False)
+    subject = db.Column(db.String(255), nullable=False)
+    message = db.Column(db.String(255), nullable=True)
     read = db.Column(db.Boolean, default=False)
     date = db.Column(db.DateTime,default=db.func.now())
+
+    restaurant = relationship('Restaurant',back_populates='report')
+    client = relationship('Client',back_populates='report')
+
+    def serialize(self):
+        return {
+            'report_id':self.id,
+            'client_id':self.client_id,
+            'restaurant_id':self.restaurant_id,
+            'subject':self.subject,
+            'message':self.message,
+            'read': self.read,
+            'date': self.date
+        }
+
