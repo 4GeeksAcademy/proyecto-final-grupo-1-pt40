@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { Container, Row, Col, Form, Button, ListGroup, Tabs, Tab, Table } from "react-bootstrap";
 import NotificationModal from "../component/NotificationModal.jsx";
+import AdminNavbar from "../component/AdminNavbar.jsx";
 
 
 const AdminReports = () => {
@@ -28,7 +29,8 @@ const AdminReports = () => {
     return (
 
         <Container fluid>
-            {store.reports.length > 0 ? (<Table striped responsive>
+            <AdminNavbar />
+            {store.reports.length > 0 ? (<Table striped responsive className="my-4">
                 <thead>
                     <tr>
                         <th>ID</th>

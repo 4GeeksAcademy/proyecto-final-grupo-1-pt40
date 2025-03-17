@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { Container, Row, Col, Form, Button, ListGroup, Tabs, Tab, Table } from "react-bootstrap";
 import { Context } from "../store/appContext";
 import NotificationModal from "../component/NotificationModal.jsx";
+import AdminNavbar from "../component/AdminNavbar.jsx";
 
 const AdminDashboard = () => {
   const { store, actions } = useContext(Context);
@@ -47,7 +48,7 @@ const AdminDashboard = () => {
   }, [])
   return (
     <Container fluid>
-
+      <AdminNavbar/>
       <Row>
         <Tabs
           defaultActiveKey="restaurants"

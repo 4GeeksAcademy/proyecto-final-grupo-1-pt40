@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { Container, Row, Col, Form, Button, ListGroup, Tabs, Tab, Table } from "react-bootstrap";
 import NotificationModal from "../component/NotificationModal.jsx";
+import AdminNavbar from "../component/AdminNavbar.jsx";
 
 
 const AdminNotifications = () => {
@@ -10,7 +11,7 @@ const AdminNotifications = () => {
 
     const onLoad = async () => {
         const notifications = await actions.adminGetNotifications()
-        if (!notifications){
+        if (!notifications) {
             alert('Error cargando notificaciones'
             )
         }
@@ -28,7 +29,8 @@ const AdminNotifications = () => {
     return (
 
         <Container fluid>
-            {store.notifications.length > 0 ? (<Table striped responsive>
+            <AdminNavbar />
+            {store.notifications.length > 0 ? (<Table striped responsive className="my-4">
                 <thead>
                     <tr>
                         <th>ID</th>
