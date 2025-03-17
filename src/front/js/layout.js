@@ -29,8 +29,9 @@ import Contact from "./pages/Contact.jsx";
 import PasswordReset from "./pages/PasswordReset.jsx";
 import PasswordResetRequest from "./pages/PasswordResetRequest.jsx";
 
-
-
+import AdminLogin from "./pages/AdminLogin.jsx";
+import AdminReports from "./pages/AdminReports.jsx";
+import AdminNotifications from "./pages/AdminNotifications.jsx";
 
 //create your first component
 const Layout = () => {
@@ -57,7 +58,10 @@ const Layout = () => {
                         <Route element={<ClientDashboard />} path="/client-dashboard" />
                         <Route element={<FavoritePage />} path="/favorites" />
 
+                        <Route element={<AdminLogin />} path="/login/admin" />
                         <Route element={<AdminDashboard />} path="/admin-dashboard" />
+                        <Route element={<AdminReports />} path="/admin-reports" />
+                        <Route element={<AdminNotifications />} path="/admin-notifications" />
 
                         <Route element={<RestaurantDashboard />} path="/restaurant-dashboard" />
                         <Route element={<MenuBuilder />} path="/menu-builder/:menuID" />

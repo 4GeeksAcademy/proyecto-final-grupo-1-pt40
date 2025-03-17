@@ -10,13 +10,11 @@ const getState = ({ getStore, getActions, setStore }) => {
             restaurantMenu: [],
             menuRestaurant: [],
             restaurants: [],
+            clients: [],
             top: [],
             search: [],
-            notificaciones: [
-                "Nueva reserva en Restaurante A",
-                "Restaurante B ha actualizado su menú",
-                "Nuevo comentario en Restaurante A",
-            ],
+            notifications: [],
+            reports: [],
             notificacionesSeleccionadas: [],
             solicitudes: [], // Lista de solicitudes (reportes)
             showLimitToast: false,
@@ -719,17 +717,35 @@ const getState = ({ getStore, getActions, setStore }) => {
             deleteRestaurant: async (restaurantId) => {
                 const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001"; 
                 try {
-                    const response = await fetch(`${backendUrl}api/restaurants/${restaurantId}`, {
-
-                        method: "DELETE"
+                    const response = await fetch(`${backendUrl}api/admin/delete/restaurant/${restaurantId}`, {
+                        method: "DELETE",
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` }
                     });
                     if (!response.ok) throw new Error("Failed to delete restaurant");
                     const store = getStore();
-                    const updatedRestaurants = store.restaurants.filter(r => r.id !== restaurantId);
+                    const updatedRestaurants = store.restaurants.filter(r => r.restaurant_id !== restaurantId);
                     setStore({ ...store, restaurants: updatedRestaurants });
                     return true;
                 } catch (error) {
                     console.error("Error deleting restaurant:", error);
+                    return false;
+                }
+            },
+
+            deleteClient: async (clientId) => {
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001"; 
+                try {
+                    const response = await fetch(`${backendUrl}api/admin/delete/client/${clientId}`, {
+                        method: "DELETE",
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` }
+                    });
+                    if (!response.ok) throw new Error("Failed to delete client");
+                    const store = getStore();
+                    const updatedClients = store.clients.filter(r => r.client_id !== clientId);
+                    setStore({ ...store, clients: updatedClients });
+                    return true;
+                } catch (error) {
+                    console.error("Error deleting clients:", error);
                     return false;
                 }
             },
@@ -926,7 +942,169 @@ const getState = ({ getStore, getActions, setStore }) => {
                 } catch (error) {
                     return false;
                 }
+            },
+
+            loginAdmin: async (email,password) => {
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/login/admin`, {
+                        method: 'POST',
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ 'email': email, 'password': password })
+                    })
+                    if (!response.ok) {
+                        throw new Error(response.statusText)
+                    }
+                    const data = await response.json();
+                    sessionStorage.setItem("token", data.token);
+                    return true
+                } catch (error) {
+                    return false;
+                }
+            },
+
+            loadAdminData: async () => {
+                const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/restaurants`,);
+                    if (!response.ok) throw new Error("Failed to fetch restaurants");
+                    const responseClients = await fetch(`${process.env.BACKEND_URL}api/clients`)
+                    if (!responseClients.ok) throw new Error("Failed to fetch clients");
+                    const restaurants = await response.json();
+                    const clients = await responseClients.json()
+                    setStore({ store, restaurants:restaurants, clients:clients });
+                    return true
+                } catch (error) {
+                    console.error("Error loading restaurants:", error);
+
+
+                }
+            },
+
+            adminSendNotification: async (id,subject,message) => {
+                const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/admin/notifications`,
+                        {method: 'POST',
+                            headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
+                            body: JSON.stringify({"restaurant_id":id,"subject":subject,"message":message})
+                        }
+                    );
+                    if (!response.ok) throw new Error("Failed to send notification");
+                    
+                    return true
+                } catch (error) {
+                    console.error("Error sending notification:", error);
+                    return false
+
+            }},
+
+            adminGetReports: async ()=>{
+                const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/admin/reports`,
+                        {method: 'GET',
+                            headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
+                        }
+                    );
+                    if (!response.ok) throw new Error(response.statusText);
+                    const data = await response.json()
+                    setStore({...store,reports:data})
+                    return true
+                } catch (error) {
+                    console.error("Error getting reports:", error);
+                    return false
+
             }
+            },
+            deleteReport: async (reportId) => {
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001"; 
+                try {
+                    const response = await fetch(`${backendUrl}api/admin/reports`, {
+                        method: "DELETE",
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
+                        body: JSON.stringify({report_id:reportId})
+                    });
+                    if (!response.ok) throw new Error("Failed to delete report");
+                    const store = getStore();
+                    const updatedReports = store.reports.filter(r => r.report_id !== reportId);
+                    setStore({ ...store, reports: updatedReports });
+                    return true;
+                } catch (error) {
+                    console.error("Error deleting restaurant:", error);
+                    return false;
+                }
+            },
+
+            updateReport: async (reportId) => {
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001"; 
+                try {
+                    const response = await fetch(`${backendUrl}api/admin/reports`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
+                        body: JSON.stringify({report_id:reportId})
+                    });
+                    if (!response.ok) throw new Error("Failed to delete report");
+                    const store = getStore();
+                    const updatedReports = store.reports.map(r => r.report_id === reportId ? {...r,read:true}: r);
+                    setStore({ ...store, reports: updatedReports });
+                    return true;
+                } catch (error) {
+                    console.error("Error deleting restaurant:", error);
+                    return false;
+                }
+            },
+
+            adminGetNotifications: async ()=>{
+                const store = getStore()
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/admin/notifications`,
+                        {method: 'GET',
+                            headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
+                        }
+                    );
+                    if (!response.ok) throw new Error(response.statusText);
+                    const data = await response.json()
+                    setStore({...store,notifications:data})
+                    return true
+                } catch (error) {
+                    console.error("Error getting notifications:", error);
+                    return false
+
+            }
+            },
+
+            deleteNotification: async (notificationId) => {
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001"; 
+                try {
+                    const response = await fetch(`${backendUrl}api/admin/notifications`, {
+                        method: "DELETE",
+                        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
+                        body: JSON.stringify({notification_id:notificationId})
+                    });
+                    if (!response.ok) throw new Error("Failed to delete notification");
+                    const store = getStore();
+                    const updatedNotifications = store.notifications.filter(r => r.notification_id !== notificationId);
+                    setStore({ ...store, notifications: updatedNotifications });
+                    return true;
+                } catch (error) {
+                    console.error("Error deleting restaurant:", error);
+                    return false;
+                }
+            },
+
+            filterRestaurants: async (query) => {
+                const store = getStore()
+                const queryFilter = query.toLowerCase()
+
+                const filterRestaurants = store.restaurants.filter(res =>
+                    res.email.toLowerCase().includes(queryFilter) ||
+                    res.username.toLowerCase().includes(queryFilter)
+                )
+                setStore({...store, restaurants:filterRestaurants})
+                return true
+
+            }
+
         }
     };
 };

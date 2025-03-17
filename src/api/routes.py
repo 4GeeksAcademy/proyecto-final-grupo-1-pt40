@@ -495,7 +495,7 @@ def get_restaurants():
     try:
         restaurants = Restaurant.query.all()
         if not restaurants:
-            return jsonify({'message': 'No restaurants found'}), 404
+            return jsonify({'message': 'No restaurants found'}), 200
         return jsonify([res.serialize() for res in restaurants]), 200  
     except Exception as e:
         db.session.rollback()
@@ -505,8 +505,6 @@ def get_restaurants():
 def get_clients():
     try:
         clients = Client.query.all()
-        if not clients:
-            return jsonify({'message': 'No clients found'}), 404
         return jsonify([client.serialize() for client in clients]), 200  
     except Exception as e:
         db.session.rollback()
@@ -1148,7 +1146,7 @@ def admin_reports():
             return jsonify({"error": "Unauthorized: Access Restricted"}), 403
     if request.method == 'GET':
         try:
-            reports = db.session.query(Report.id,Report.subject,Report.message, Report.read,Report.date,Report.restaurant_id,
+            reports = db.session.query(Report.id,Report.subject,Report.message, Report.read,Report.date,Report.restaurant_id,Report.client_id,
                                        Restaurant.name.label("restaurant_name"), Restaurant.username.label("restaurant_username"), Restaurant.email.label("restaurant_email")).join(Restaurant, Report.restaurant_id == Restaurant.id).all()
             if reports:
                 result = [{"report_id": report.id,
@@ -1156,7 +1154,8 @@ def admin_reports():
                             "message":report.message,
                             "read":report.read,
                             "date":report.date,
-                            "restaurant":{"id":report.restaurant_id,
+                            "client_id":report.client_id,
+                            "restaurant":{"restaurant_id":report.restaurant_id,
                                           "name":report.restaurant_name,
                                           "username":report.restaurant_username,
                                           "email":report.restaurant_email}} for report in reports]
@@ -1324,5 +1323,6 @@ def restaurant_notifications():
                 except Exception as e:
                     db.session.rollback()
                     return jsonify('error: Failed to process request'), 500
+
         
 
