@@ -1133,6 +1133,92 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             },
 
+            clientMakeReport: async (restaurant_id, subject, message) => {
+                const token = sessionStorage.getItem("token");
+                if (!token) {
+                    alert("Debes iniciar sesión para hacer un reporte.");
+                    return false;
+                }
+                try {
+                    const response = await fetch(process.env.BACKEND_URL + "api/make-report", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({ restaurant_id, subject, message }),
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error("Error al enviar el reporte:", errorData);
+                        alert("Hubo un problema al enviar el reporte.");
+                        return false;
+                    }
+                    
+                    const data = await response.json();
+                    alert("Reporte enviado exitosamente.");
+                    return true;
+                } catch (error) {
+                    console.error("Error en la solicitud:", error);
+                    alert("No se pudo enviar el reporte. Intenta nuevamente.");
+                    return false;
+                }
+            },
+
+            getRestaurantNotifications: async () => {
+                const token = sessionStorage.getItem("token");
+                if (!token) return [];
+                
+                try {
+                    const response = await fetch(process.env.BACKEND_URL + "api/restaurant/notifications", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        console.error("Error al obtener notificaciones");
+                        return [];
+                    }
+                    
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error en la solicitud de notificaciones:", error);
+                    return [];
+                }
+            },
+            
+            
+            markNotificationAsRead: async (notification_id) => {
+                const token = sessionStorage.getItem("token");
+                if (!token) return false;
+                
+                try {
+                    const response = await fetch(process.env.BACKEND_URL + "api/restaurant/notifications", {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ notification_id })
+                    });
+                    
+                    if (!response.ok) {
+                        console.error("Error al actualizar notificación");
+                        return false;
+                    }
+                    
+                    return true;
+                } catch (error) {
+                    console.error("Error en la solicitud de actualización:", error);
+                    return false;
+                }
+            }
+
         }
     };
 };
