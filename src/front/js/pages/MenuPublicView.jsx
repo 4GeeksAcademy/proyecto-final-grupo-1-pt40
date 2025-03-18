@@ -5,7 +5,7 @@ import { Context } from "../store/appContext";
 import GoogleMapsModal from "../component/GoogleMapsModal.jsx";
 import MenuNavigation from "../component/MenuNavigation.jsx";
 import FavoriteButton from "../component/FavoriteButton.jsx";
-
+import ClientReportModal from "../component/ClientReportModal.jsx";
 
 const MenuPublicView = () => {
     const { menu_id, restaurant_username } = useParams();
@@ -85,7 +85,9 @@ const MenuPublicView = () => {
                                         <div className="p-0 m-0" key={index}>{`${day.day}: ${day.isClosed ? 'Cerrado' : `${convertToAmPm(day.open)} - ${convertToAmPm(day.close)}`}`}</div>
                                     ))}
 
-                                    <Button className="bg-secondary mt-3 self-align-center">Reportar Restaurante</Button>
+                                    
+                                        <ClientReportModal restaurant_id={restaurant.restaurant_id} />
+                                    
 
                                 </Card.Body></>)
 
