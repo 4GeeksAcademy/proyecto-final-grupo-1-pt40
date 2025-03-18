@@ -224,52 +224,6 @@ class Admin(db.Model):
         return {
             'email':self.email
         }
-    
-
-class Notification(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    restaurant_id = db.Column(db.Integer,ForeignKey('restaurant.id'),nullable=False)
-    subject = db.Column(db.String(255), nullable=False)
-    message = db.Column(db.String(255), nullable=True)
-    status = db.Column(db.Boolean, default=True)
-    date = db.Column(db.DateTime,default=db.func.now())
-
-    restaurant = relationship('Restaurant',back_populates='notification')
-
-    def serialize(self):
-        return {
-            'notification_id':self.id,
-            'restaurant_id':self.restaurant_id,
-            'subject':self.subject,
-            'message':self.message,
-            'status': self.read,
-            'date': self.date
-        }
-
-
-class Report(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    client_id = db.Column(db.Integer,ForeignKey('client.id'),nullable=False)
-    restaurant_id = db.Column(db.Integer,ForeignKey('restaurant.id'),nullable=False)
-    subject = db.Column(db.String(255), nullable=False)
-    message = db.Column(db.String(255), nullable=True)
-    read = db.Column(db.Boolean, default=False)
-    date = db.Column(db.DateTime,default=db.func.now())
-
-    restaurant = relationship('Restaurant',back_populates='report')
-    client = relationship('Client',back_populates='report')
-
-    def serialize(self):
-        return {
-            'report_id':self.id,
-            'client_id':self.client_id,
-            'restaurant_id':self.restaurant_id,
-            'subject':self.subject,
-            'message':self.message,
-            'read': self.read,
-            'date': self.date
-        }
-
 
 class Restaurant(db.Model):
     __tablename__ = 'restaurants'
@@ -287,4 +241,32 @@ class Restaurant(db.Model):
             "direccion": self.direccion,
             "telefono": self.telefono,
             "imagen": self.imagen
+        }
+        
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)  # Relación con un usuario (o admin)
+    message = db.Column(db.String(255), nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "message": self.message,
+            "is_read": self.is_read
+        }
+
+class Report(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)  # Relación con un usuario (o admin)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "title": self.title,
+            "description": self.description
         }
