@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import { Container, Card, Row, Col, Form, Button, Badge, Spinner } from "react-bootstrap";
 import RestaurantCard from "../component/RestaurantCard.jsx";
+import ClientNavbar from "../component/ClientNavbar.jsx";
 
 
 const ExplorePage = () => {
@@ -98,107 +99,109 @@ const ExplorePage = () => {
 
     return (
 
-
-        <Container>
-            <h1>Top Restaurantes en {top.city}</h1>
-            <Row className="flex-nowrap overflow-auto p-3" style={{ whiteSpace: 'nowrap' }}>
-                {top.restaurants && top.restaurants.length > 0 ? (
-                    top.restaurants.map((res, index) => (
-                        <Col key={index} className="d-inline-block">
-                            <RestaurantCard data={res}/>
+        <div>
+            <ClientNavbar />
+            <Container>
+                <h1>Top Restaurantes en {top.city}</h1>
+                <Row className="flex-nowrap overflow-auto p-3" style={{ whiteSpace: 'nowrap' }}>
+                    {top.restaurants && top.restaurants.length > 0 ? (
+                        top.restaurants.map((res, index) => (
+                            <Col key={index} className="d-inline-block">
+                                <RestaurantCard data={res} />
+                            </Col>
+                        ))
+                    ) : (
+                        <Col className="d-inline-block">
+                            <div>No se encontraron restaurantes</div>
                         </Col>
-                    ))
-                ) : (
-                    <Col className="d-inline-block">
-                        <div>No se encontraron restaurantes</div>
-                    </Col>
-                )}
-
-
-            </Row>
-            <Form className="mt-4">
-                <Row className="d-flex justify-content-center">
-                    <Col lg='3'>
-                        <Form.Group className="mb-3" controlId="Address">
-                            <Form.Select aria-label="Departments" onChange={handleDepartment} disabled={searchOn.department} value={search.department.id}>
-                                <option value=''>Departamento</option>
-                                {
-                                    deparments?.map((dep, index) => (
-                                        <option key={index} value={dep.id}>{dep.name}</option>
-                                    ))
-                                }
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
-
-                    <Col lg='2'>
-                        <Form.Group>
-                            <Form.Select aria-label="Cities" onChange={handleSelectCity} disabled={searchOn.city} value={search.city.id}>
-                                <option value=''>Ciudad</option>
-                                {
-                                    cities?.map((city, index) => (
-                                        <option key={city.id} value={city.id}>{city.name}</option>
-                                    ))
-                                }
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
-
-                    <Col lg='2'>
-                        <Form.Group>
-                            <Form.Select aria-label="Cuisine" onChange={handleSelectCuisine} disabled={searchOn.cuisine} value={search.cuisine}>
-                                <option value=''>Estilo</option>
-                                {
-                                    cuisine?.map((cuisine, index) => (
-                                        <option key={index} value={cuisine}>{cuisine}</option>
-                                    ))
-                                }
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
-
-                    <Col lg='4'>
-                        <Form.Group className="mb-3" controlId="Search Bar">
-                            <Form.Control type="text" placeholder="Buscar por restaurante o palabra clave" value={search.keyword} name='keyword' onChange={handleKeyword} disabled={searchOn.keyword} />
-                        </Form.Group>
-                    </Col>
-
-                    <Col lg='1'>
-                        <Button variant="primary" type="submit" onClick={handleSubmission}>
-                            Buscar
-                        </Button>
-                    </Col>
-                </Row>
-            </Form>
-
-            <Row>
-                <h3>Filtros</h3>
-                <div className="d-flex">
-                    {Object.entries(search).map((param, index) => {
-                        if (param[1] && searchOn[param[0]]) {
-                            if (typeof param[1] === 'string') {
-                                return <Badge bg="secondary" className="m-2" key={index}>{param[1]}</Badge>
-                            } else {
-                                return <Badge bg="secondary" className="m-2" key={index}>{param[1].name}</Badge>
-                            }
-                        }
-                        return
-                    }
-
                     )}
-                    <Button variant="danger" onClick={handleReset}>Eliminar Filtros</Button>
-                </div>
-            </Row>
-            <Row className="mt-4 justify-content-center">
-                {store.search?.map((res, index) => (
-                    <Col key={index} className="justify-content-center" lg='4'>
-                        <RestaurantCard data={res}/>
-                    </Col>
-                ))}
 
-            </Row>
 
-        </Container >
+                </Row>
+                <Form className="mt-4">
+                    <Row className="d-flex justify-content-center">
+                        <Col lg='3'>
+                            <Form.Group className="mb-3" controlId="Address">
+                                <Form.Select aria-label="Departments" onChange={handleDepartment} disabled={searchOn.department} value={search.department.id}>
+                                    <option value=''>Departamento</option>
+                                    {
+                                        deparments?.map((dep, index) => (
+                                            <option key={index} value={dep.id}>{dep.name}</option>
+                                        ))
+                                    }
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+
+                        <Col lg='2'>
+                            <Form.Group>
+                                <Form.Select aria-label="Cities" onChange={handleSelectCity} disabled={searchOn.city} value={search.city.id}>
+                                    <option value=''>Ciudad</option>
+                                    {
+                                        cities?.map((city, index) => (
+                                            <option key={city.id} value={city.id}>{city.name}</option>
+                                        ))
+                                    }
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+
+                        <Col lg='2'>
+                            <Form.Group>
+                                <Form.Select aria-label="Cuisine" onChange={handleSelectCuisine} disabled={searchOn.cuisine} value={search.cuisine}>
+                                    <option value=''>Estilo</option>
+                                    {
+                                        cuisine?.map((cuisine, index) => (
+                                            <option key={index} value={cuisine}>{cuisine}</option>
+                                        ))
+                                    }
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+
+                        <Col lg='4'>
+                            <Form.Group className="mb-3" controlId="Search Bar">
+                                <Form.Control type="text" placeholder="Buscar por restaurante o palabra clave" value={search.keyword} name='keyword' onChange={handleKeyword} disabled={searchOn.keyword} />
+                            </Form.Group>
+                        </Col>
+
+                        <Col lg='1'>
+                            <Button variant="primary" type="submit" onClick={handleSubmission}>
+                                Buscar
+                            </Button>
+                        </Col>
+                    </Row>
+                </Form>
+
+                <Row>
+                    <h3>Filtros</h3>
+                    <div className="d-flex">
+                        {Object.entries(search).map((param, index) => {
+                            if (param[1] && searchOn[param[0]]) {
+                                if (typeof param[1] === 'string') {
+                                    return <Badge bg="secondary" className="m-2" key={index}>{param[1]}</Badge>
+                                } else {
+                                    return <Badge bg="secondary" className="m-2" key={index}>{param[1].name}</Badge>
+                                }
+                            }
+                            return
+                        }
+
+                        )}
+                        <Button variant="danger" onClick={handleReset}>Eliminar Filtros</Button>
+                    </div>
+                </Row>
+                <Row className="mt-4 justify-content-center">
+                    {store.search?.map((res, index) => (
+                        <Col key={index} className="justify-content-center" lg='4'>
+                            <RestaurantCard data={res} />
+                        </Col>
+                    ))}
+
+                </Row>
+
+            </Container >
+        </div>
     )
 
 };
