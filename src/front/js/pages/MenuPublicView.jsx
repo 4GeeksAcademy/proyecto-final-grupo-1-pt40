@@ -101,7 +101,7 @@ const MenuPublicView = () => {
                                             </div>
                                         ))}
     
-                                        <Button className="bg-secondary mt-3 self-align-center">Reportar Restaurante</Button>
+                                        
                                         <ClientReportModal restaurant_id={restaurant.restaurant_id} />
                                     </Card.Body>
                                 </>
