@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 8910c6740bf0
+Revision ID: c048fe931fe1
 Revises: 
-Create Date: 2025-03-15 22:32:05.172762
+Create Date: 2025-03-17 19:32:57.097213
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '8910c6740bf0'
+revision = 'c048fe931fe1'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -39,13 +39,6 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
-    )
-    op.create_table('notification',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('message', sa.String(length=255), nullable=False),
-    sa.Column('read', sa.Boolean(), nullable=True),
-    sa.Column('date', sa.DateTime(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('restaurant',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -97,6 +90,28 @@ def upgrade():
     sa.ForeignKeyConstraint(['restaurant_id'], ['restaurant.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('notification',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('restaurant_id', sa.Integer(), nullable=False),
+    sa.Column('subject', sa.String(length=255), nullable=False),
+    sa.Column('message', sa.String(length=255), nullable=True),
+    sa.Column('status', sa.Boolean(), nullable=True),
+    sa.Column('date', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['restaurant_id'], ['restaurant.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('report',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('client_id', sa.Integer(), nullable=False),
+    sa.Column('restaurant_id', sa.Integer(), nullable=False),
+    sa.Column('subject', sa.String(length=255), nullable=False),
+    sa.Column('message', sa.String(length=255), nullable=True),
+    sa.Column('read', sa.Boolean(), nullable=True),
+    sa.Column('date', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['client_id'], ['client.id'], ),
+    sa.ForeignKeyConstraint(['restaurant_id'], ['restaurant.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('restaurant_notifications',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('restaurant_id', sa.Integer(), nullable=True),
@@ -111,7 +126,7 @@ def upgrade():
     op.create_table('dish',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('menu_id', sa.Integer(), nullable=False),
-    sa.Column('category', sa.String(length=100), nullable=False),
+    sa.Column('category', sa.String(length=100), nullable=True),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('price', sa.Float(), nullable=False),
     sa.Column('description', sa.String(length=255), nullable=True),
@@ -139,11 +154,12 @@ def downgrade():
     op.drop_table('favorites')
     op.drop_table('dish')
     op.drop_table('restaurant_notifications')
+    op.drop_table('report')
+    op.drop_table('notification')
     op.drop_table('menu')
     op.drop_table('client_notifications')
     op.drop_table('user')
     op.drop_table('restaurant')
-    op.drop_table('notification')
     op.drop_table('client')
     op.drop_table('admin')
     # ### end Alembic commands ###
