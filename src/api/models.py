@@ -270,3 +270,21 @@ class Report(db.Model):
             'date': self.date
         }
 
+
+class Restaurant(db.Model):
+    __tablename__ = 'restaurants'
+
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(120), nullable=False)
+    direccion = db.Column(db.String(200), nullable=False)
+    telefono = db.Column(db.String(20), nullable=False)
+    imagen = db.Column(db.String(256), nullable=False, default='https://via.x.com/')
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "direccion": self.direccion,
+            "telefono": self.telefono,
+            "imagen": self.imagen
+        }
