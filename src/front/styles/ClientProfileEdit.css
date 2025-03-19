@@ -1,0 +1,77 @@
+.client-profile-edit-page {
+    max-width: 1000px; 
+    margin: 50px auto;
+    padding: 0 15px; 
+}
+
+.client-profile-edit-container {
+    max-width: 500px; 
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.client-profile-edit-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff6200;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.client-profile-edit-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.client-profile-edit-form .form-group {
+    margin-bottom: 20px;
+}
+
+.client-profile-edit-form .form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.client-profile-edit-form .form-control,
+.client-profile-edit-form .form-select {
+    background-color: #f5f5f5 !important; 
+    border: none !important;
+    border-radius: 5px !important;
+    padding: 10px !important;
+    font-size: 14px !important;
+    color: #666 !important;
+}
+
+.client-profile-edit-form .form-control::placeholder,
+.client-profile-edit-form .form-select::placeholder {
+    color: #999 !important;
+}
+
+.client-profile-edit-form .form-control:disabled,
+.client-profile-edit-form .form-select:disabled {
+    background-color: #e9ecef !important; 
+    color: #999 !important;
+    cursor: not-allowed;
+}
+
+.client-profile-edit-button {
+    background-color: #ff6200 !important; 
+    border: none !important;
+    border-radius: 25px !important;
+    padding: 10px 0 !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    color: #fff !important;
+    text-transform: uppercase;
+    margin-top: 10px;
+    transition: background-color 0.3s ease !important;
+}
+
+.client-profile-edit-button:hover {
+    background-color: #e55a00 !important; 
+}

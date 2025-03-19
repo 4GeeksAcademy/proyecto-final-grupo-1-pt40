@@ -1,0 +1,99 @@
+.restaurant-profile-edit-page {
+    max-width: 1000px; 
+    margin: 50px auto;
+    padding: 0 15px; 
+}
+
+.restaurant-profile-edit-container {
+    max-width: 900px; 
+    margin: 0 auto;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.restaurant-profile-edit-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff6200;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.restaurant-profile-edit-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.restaurant-profile-edit-form .form-group {
+    margin-bottom: 25px;
+}
+
+.restaurant-profile-edit-form .form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.restaurant-profile-edit-form .form-control,
+.restaurant-profile-edit-form .form-select {
+    background-color: #f5f5f5 !important; 
+    border: none !important;
+    border-radius: 5px !important;
+    padding: 10px !important;
+    font-size: 14px !important;
+    color: #666 !important;
+}
+
+.restaurant-profile-edit-form .form-control::placeholder,
+.restaurant-profile-edit-form .form-select::placeholder {
+    color: #999 !important;
+}
+
+.restaurant-profile-edit-form .form-control:disabled,
+.restaurant-profile-edit-form .form-select:disabled {
+    background-color: #e9ecef !important; 
+    color: #999 !important;
+    cursor: not-allowed;
+}
+
+.restaurant-profile-edit-form .schedule-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap; 
+}
+
+.restaurant-profile-edit-form .schedule-row .form-label {
+    flex: 0 0 150px; 
+    margin-bottom: 0;
+}
+
+.restaurant-profile-edit-form .schedule-row .form-control {
+    flex: 0 0 180px; 
+    margin-right: 20px;
+}
+
+.restaurant-profile-edit-form .schedule-row .form-check {
+    margin-bottom: 0;
+    flex: 0 0 120px;
+}
+
+.restaurant-profile-edit-button {
+    background-color: #ff6200 !important; 
+    border: none !important;
+    border-radius: 25px !important;
+    padding: 10px 0 !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    color: #fff !important;
+    text-transform: uppercase;
+    margin-top: 20px;
+    transition: background-color 0.3s ease !important;
+}
+
+.restaurant-profile-edit-button:hover {
+    background-color: #e55a00 !important; 
+}

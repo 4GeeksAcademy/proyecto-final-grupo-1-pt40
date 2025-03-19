@@ -1,0 +1,37 @@
+.signup-page-container {
+    max-width: 1000px; 
+    margin: 50px auto;
+    padding: 0 15px; 
+}
+
+.signup-tabs {
+    border: none !important; 
+}
+
+.signup-tabs .nav-item {
+    margin: 0 5px;
+}
+
+.signup-tabs .nav-link {
+    background-color: #f5f5f5 !important; 
+    color: #666 !important; 
+    border: none !important; 
+    border-radius: 10px 10px 0 0 !important; 
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    padding: 10px 20px !important;
+    transition: background-color 0.3s ease, color 0.3s ease !important;
+}
+
+.signup-tabs .nav-link.active {
+    background-color: #ff6200 !important; 
+    color: #fff !important; 
+    border: none !important;
+}
+
+.signup-tab {
+    background-color: #fff !important; 
+    border-radius: 0 0 15px 15px !important; 
+    padding: 20px !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important; 
+}
