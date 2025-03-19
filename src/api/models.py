@@ -242,7 +242,7 @@ class Notification(db.Model):
             'restaurant_id':self.restaurant_id,
             'subject':self.subject,
             'message':self.message,
-            'status': self.read,
+            'status': self.status,
             'date': self.date
         }
 

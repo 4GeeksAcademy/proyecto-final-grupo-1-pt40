@@ -1329,7 +1329,8 @@ def restaurant_notifications():
                 return jsonify(result),200
             except Exception as e:
                 db.session.rollback()
-                return jsonify('error: Failed to process request'), 500
+                print("❌ Error en /restaurant/notifications (GET):", str(e))
+                return jsonify({'error': str(e)}), 500
         if request.method == 'PUT':
             data = request.json
             notification_id = data.get('notification_id',None)
@@ -1337,7 +1338,7 @@ def restaurant_notifications():
                 try:
                     notification = Notification.query.get(notification_id)
                     if notification:
-                        notification.status = False #Indica que el restaurante borro la notification
+                        notification.status = False
                         db.session.commit()
                         return jsonify({'msg': 'Notification updated'}), 200
                     else:
