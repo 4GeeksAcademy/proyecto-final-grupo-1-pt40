@@ -5,3 +5,97 @@
     
     
 }
+
+
+
+
+
+
+
+.custom-accordion-header .accordion-button:not(.collapsed) {
+  background-color:#FF6C40; /* Change this to your desired color */
+  color: black; /* Text color */
+}
+
+
+
+.custom-accordion-header .accordion-button {
+    background-color: #ECECEC;
+    color: #6B0C05;
+   
+}
+
+.custom-list-item:hover{
+    background-color: #ECECEC !important;
+}
+
+.bg-gray {
+    background-color: #ECECEC;
+}
+
+
+.bg-orange {
+    background-color: #FF6C40;
+}
+
+
+.text-bw {
+    color: #6B0C05;
+}
+
+.text-orange {
+color: #FF6C40;
+}
+
+.gray-dropdown button {
+    color: #6B0C05 !important;
+    background-color: #ECECEC !important;
+    border: none;
+}
+
+.gray-button {
+    color: #6B0C05 !important;
+    background-color: #ECECEC !important;
+    border: none !important;
+}
+
+.gray-button:hover {
+    color: black !important;
+    background-color: #FF6C40 !important;
+
+}
+
+.gray-dropdown .dropdown-item:hover {
+    background-color: #ECECEC !important;
+}
+
+.orange-button {
+    color: black !important;
+    background-color: #FF6C40 !important;
+    border: none !important;
+}
+
+.orange-button:hover{
+    background-color: #E65A36 !important;
+}
+
+
+.menu-builder-dish-card {
+    width: 100% !important; /* Keep all cards the same width */
+    height: 100% !important; /* Set a fixed height for uniformity */
+    margin: 0.5rem !important; /* Optional, consistent spacing between cards */
+
+}
+
+.menu-builder-dish-body {
+display: flex;
+  flex-direction: column; /* Stack content vertically */
+  justify-content: space-between; /* Space out content evenly */
+  height: 100%; /* Fill the card body */
+}
+
+.menu-builder-img {
+    height: 180px; /* Set a fixed height */
+    object-fit: cover; /* Ensures the image scales proportionally and crops if necessary */
+    width: 100%; /* Ensures the image fills the card's width */
+  }

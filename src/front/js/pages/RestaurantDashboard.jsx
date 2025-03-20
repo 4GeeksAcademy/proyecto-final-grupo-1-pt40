@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
-import { Button, Accordion, Alert, Modal, Form } from "react-bootstrap";
+import { Button, Accordion, Alert, Modal, Form, Container, Row, Col, Stack } from "react-bootstrap";
 import Spinner from 'react-bootstrap/Spinner';
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
@@ -67,90 +67,112 @@ const RestaurantDashboard = () => {
     }, [])
 
     return (
-        <div>
+        <>
             <RestaurantNavbar />
-            <div className="container mt-4">
-                
+            <Container fluid>
+
+                {alert === 'Public' ? (<Alert key={1} variant='success'>
+                    Menú publicado con éxito, se encuentra disponible para todo público
+                </Alert>) : ''}
 
 
-
-            {alert === 'Public' ? (<Alert key={1} variant='success'>
-                Menú publicado con éxito, se encuentra disponible para todo público
-            </Alert>) : ''}
-
-
-                {alert === 'Private' ? (<Alert key={2} variant='primary'>
+                {alert === 'Private' ? (<Alert key={2} variant='warning'>
                     Menú privatizado, no encuentra disponible para los clientes
                 </Alert>) : ''}
 
 
-            <h2 className="mb-4">Mis Menús</h2>
-            <div className="menu-list bg-white p-4 shadow rounded d-flex w-100">
-                {Array.isArray(store.restaurantMenus) ? (
-                    store.restaurantMenus.length > 0 ? (
-                        <Accordion className="w-100">
-                            {store.restaurantMenus.map((menu) => (
-                                <Accordion.Item eventKey={menu.menu_id} key={menu.menu_id}>
-                                    <Accordion.Header>{menu.name}</Accordion.Header>
-                                    <Accordion.Body>
-                                        <p>{`Creado: ${menu.created}`}</p>
-                                        <p>{`Última actialización: ${menu.last_updated}`}</p>
-                                        <p>{`Moneda: ${menu.currency}`}</p>
-                                        <p>{`Estatus: ${menu.is_active ? "Público" : 'Privado'}`}</p>
-                                        <div className="d-flex justify-content-between w-50">
-                                            <Button variant="light" onClick={() => handleView(menu.menu_id)}>Ver</Button>
-                                            <Button variant="primary" onClick={() => handleMenuDetails(menu.menu_id)}>Personalizar</Button>
-                                            <Button variant="success" onClick={() => handlePublish(menu.menu_id)}>Publicar</Button>
-                                            <Button variant="warning" onClick={() => handleUnpublish(menu.menu_id)}>Privatizar</Button>
-                                            <DeleteMenuModal data={menu} />
-                                            <Button variant="info" onClick={() => handleOpenEditModal(menu)}>Editar Información</Button>
-                                        </div>
-                                    </Accordion.Body>
-                                </Accordion.Item>
-                            ))}
-                        </Accordion>
+                <h2 className="mb-4 mx-2 fw-bold text-orange">Mis Menús</h2>
+                <Row className="menu-list p-4 shadow rounded d-flex mx-2">
+                    {Array.isArray(store.restaurantMenus) ? (
+                        store.restaurantMenus.length > 0 ? (
+                            <Accordion className="w-100">
+                                {store.restaurantMenus.map((menu) => (
+                                    <Accordion.Item eventKey={menu.menu_id} key={menu.menu_id}>
+                                        <Accordion.Header className="custom-accordion-header"><div className="fw-bold text-bw fs-5">{menu.name}</div></Accordion.Header>
+                                        <Accordion.Body>
+                                            <Row>
+                                                <Col xs md lg='2' className="d-flex justify-content-center">
+                                                    <div className="m-auto align-middle">
+                                                        <div className="mb-1"><strong>Moneda: </strong> {`${menu.currency}`}</div>
+                                                        <div><strong>Estatus: </strong> {`${menu.is_active ? "Público" : 'Privado'}`}</div>
+                                                    </div>
+                                                </Col>
+                                                <Col xs md lg='5' className="d-flex justify-content-center align-middle">
+                                                    <div className="m-auto align-middle">
+                                                        <div className="mb-1"><strong>Creado: </strong>{menu.created}</div>
+                                                        <div><strong>Actualizado: </strong> {menu.last_updated}</div>
+                                                    </div>
+
+                                                </Col>
+                                                <Col xs md className="text-center align-items-center">
+                                                    <Row className="align-items-center d-flex justify-content-center">
+                                                        <Stack direction="horizontal" gap={2} className="mx-auto d-flex justify-content-center align-middle" >
+                                                            <Button variant="light" size='md' onClick={() => handleView(menu.menu_id)}>Ver</Button>
+                                                            <Button variant="info" size='md' onClick={() => handleOpenEditModal(menu)}>Editar Información</Button>
+                                                            <Button variant="primary" size='md' onClick={() => handleMenuDetails(menu.menu_id)}>Editar Platillos</Button>
+
+                                                        </Stack>
+                                                    </Row>
+
+                                                    <Row className="align-items-center d-flex justify-content-center mt-3">
+                                                        <Stack direction="horizontal" gap={2} className="mx-auto d-flex justify-content-center align-middle">
+                                                            <Button variant="success" size='md' onClick={() => handlePublish(menu.menu_id)}>Publicar</Button>
+                                                            <Button variant="warning" size='md' onClick={() => handleUnpublish(menu.menu_id)}>Privatizar</Button>
+                                                            <DeleteMenuModal data={menu} />
+
+                                                        </Stack>
+                                                    </Row>
+                                                </Col>
+                                            </Row>
+
+                                        </Accordion.Body>
+                                    </Accordion.Item>
+                                ))}
+                            </Accordion>
+                        ) : (
+                            <Spinner animation="border" variant="danger" />
+                        )
                     ) : (
-                        <Spinner animation="border" variant="danger" />
-                    )
-                ) : (
-                    <h2>No hay menús guardados, haz click en Crear Menú</h2>
-                )}
-            </div>
-            <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Editar Menú</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Group>
-                            <Form.Label>Nombre del Menú</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={menuName}
-                                onChange={(e) => setMenuName(e.target.value)}
-                            />
-                        </Form.Group>
-
-                        <Form.Group>
-                            <Form.Label>Divisa</Form.Label>
-                            <Form.Select value={currency} onChange={(e) => setCurrency(e.target.value)}>
-                                <option value="USD">USD</option>
-                                <option value="COP">COP</option>
-                                <option value="EUR">EUR</option>
-                                <option value="CAD">CAD</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowEditModal(false)}>Cancelar</Button>
-                    <Button variant="primary" onClick={handleUpdateMenu}>Guardar Cambios</Button>
-                </Modal.Footer>
-            </Modal>
+                        <h2>No hay menús guardados, haz click en Nuevo Menú</h2>
+                    )}
+                </Row>
 
 
-            </div >
-        </div>
+
+
+                <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Editar Menú</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form>
+                            <Form.Group>
+                                <Form.Label className="fw-bold">Nombre del Menú</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={menuName}
+                                    onChange={(e) => setMenuName(e.target.value)}
+                                />
+                            </Form.Group>
+
+                            <Form.Group>
+                                <Form.Label className="fw-bold">Moneda</Form.Label>
+                                <Form.Select value={currency} onChange={(e) => setCurrency(e.target.value)} className="gray-dropdown">
+                                    <option value="COP">COP</option>
+                                    <option value="USD">USD</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="CAD">CAD</option>
+                                </Form.Select>
+                            </Form.Group>
+                        </Form>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowEditModal(false)}>Cancelar</Button>
+                        <Button className="orange-button" onClick={handleUpdateMenu}>Guardar Cambios</Button>
+                    </Modal.Footer>
+                </Modal>
+            </Container>
+        </>
     );
 };
 

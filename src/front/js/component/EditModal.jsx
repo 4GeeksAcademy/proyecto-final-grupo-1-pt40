@@ -4,6 +4,8 @@ import Button from 'react-bootstrap/Button';
 import { Form, ListGroup, Card } from "react-bootstrap";
 import Modal from 'react-bootstrap/Modal';
 import { Widget } from "@uploadcare/react-widget";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons'
 
 function EditModal({ dish }) {
     const { store, actions } = useContext(Context);
@@ -15,7 +17,7 @@ function EditModal({ dish }) {
 
 
     const handleEdit = async () => {
-        await actions.menuBuilderEditDish(dish.id, newDish, dish.category)
+        await actions.menuBuilderEditDish(dish.dish_id, newDish, dish.category)
         setShow(false)
     }
 
@@ -24,8 +26,8 @@ function EditModal({ dish }) {
     }
     return (
         <>
-            <Button variant="primary" onClick={handleShow}>
-                Editar Plato
+            <Button variant="warning" className="d-inline-block p-2" size="md" onClick={handleShow}>
+                <FontAwesomeIcon className='text-dark fs-5' icon={faPenToSquare} />
             </Button>
 
             <Modal

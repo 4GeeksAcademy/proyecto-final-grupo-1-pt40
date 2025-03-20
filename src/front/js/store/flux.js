@@ -19,6 +19,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             solicitudes: [], // Lista de solicitudes (reportes)
             showLimitToast: false,
             showLimitMenuToast: false,
+            plan: '',
         },
         actions: {
             registerUser: async (userType, registration) => {
@@ -92,14 +93,14 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
             menuBuilderLoad: async (menu_id) => {
                 const store = getStore()
-                if (!menu_id){
+                if (!menu_id) {
                     console.error("menu_id es undefined");
                     return false;
                 }
                 try {
                     const response = await fetch(`${process.env.BACKEND_URL}api/menu/${menu_id}`);
                     if (!response.ok) {
-                        const errorData = await response.text();  
+                        const errorData = await response.text();
                         console.error("Respuesta del servidor:", errorData);
                         throw new Error("Error al cargar el menú");
                     }
@@ -112,27 +113,27 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            menuBuilderCategories: async (menu_id, categories, old_categories=null) => {
+            menuBuilderCategories: async (menu_id, categories, old_categories = null) => {
                 const backendURL = process.env.BACKEND_URL
                 const store = getStore();
                 try {
                     const oldCats = old_categories || categories;
-                    
-                    const requestBody = { 
+
+                    const requestBody = {
                         'menu_id': menu_id,
                         'categories': categories,
                         'old_categories': oldCats
                     };
-                    
+
                     console.log("Enviando al backend:", requestBody);
-            
+
                     const response = await fetch(`${backendURL}api/menu/categories`,
                         {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(requestBody) 
+                            body: JSON.stringify(requestBody)
                         })
-            
+
                     if (!response.ok) {
                         const errorData = await response.text();
                         console.error("Error respuesta backend:", errorData);
@@ -218,7 +219,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
 
                     const updatedDishes = { ...store.menuBuilder.dishes };
-                    updatedDishes[category] = updatedDishes[category].filter(dish => dish.id !== dish_id);
+                    updatedDishes[category] = updatedDishes[category].filter(dish => dish.dish_id !== dish_id);
 
                     setStore({ ...store, menuBuilder: { ...store.menuBuilder, dishes: updatedDishes } });
                 }
@@ -254,7 +255,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const updatedDishes = { ...store.menuBuilder.dishes };
 
                     updatedDishes[category] = updatedDishes[category].map(dish =>
-                        dish.id === dish_id ? updatedDish : dish
+                        dish.dish_id === dish_id ? updatedDish : dish
                     );
 
                     setStore({ ...store, menuBuilder: { ...store.menuBuilder, dishes: updatedDishes } });
@@ -607,7 +608,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
                     const data = await response.json();
                     console.log("Datos recibidos del backend:", data);
-                    setStore({ ...store, restaurantDetails: data });
+                    setStore({ ...store, restaurantDetails: data, plan: data.plan });
 
                     return data;
                 } catch (error) {
@@ -734,7 +735,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             // Acción para eliminar un restaurante (o producto)
             deleteRestaurant: async (restaurantId) => {
-                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001"; 
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
                     const response = await fetch(`${backendUrl}api/admin/delete/restaurant/${restaurantId}`, {
                         method: "DELETE",
@@ -752,7 +753,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
             deleteClient: async (clientId) => {
-                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001"; 
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
                     const response = await fetch(`${backendUrl}api/admin/delete/client/${clientId}`, {
                         method: "DELETE",
@@ -962,7 +963,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return false;
                 }
             },
-            loginAdmin: async (email,password) => {
+            loginAdmin: async (email, password) => {
                 try {
                     const response = await fetch(`${process.env.BACKEND_URL}api/login/admin`, {
                         method: 'POST',
@@ -989,7 +990,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     if (!responseClients.ok) throw new Error("Failed to fetch clients");
                     const restaurants = await response.json();
                     const clients = await responseClients.json()
-                    setStore({ store, restaurants:restaurants, clients:clients });
+                    setStore({ store, restaurants: restaurants, clients: clients });
                     return true
                 } catch (error) {
                     console.error("Error loading restaurants:", error);
@@ -998,49 +999,52 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            adminSendNotification: async (id,subject,message) => {
+            adminSendNotification: async (id, subject, message) => {
                 const store = getStore()
                 try {
                     const response = await fetch(`${process.env.BACKEND_URL}api/admin/notifications`,
-                        {method: 'POST',
+                        {
+                            method: 'POST',
                             headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
-                            body: JSON.stringify({"restaurant_id":id,"subject":subject,"message":message})
+                            body: JSON.stringify({ "restaurant_id": id, "subject": subject, "message": message })
                         }
                     );
                     if (!response.ok) throw new Error("Failed to send notification");
-                    
+
                     return true
                 } catch (error) {
                     console.error("Error sending notification:", error);
                     return false
 
-            }},
+                }
+            },
 
-            adminGetReports: async ()=>{
+            adminGetReports: async () => {
                 const store = getStore()
                 try {
                     const response = await fetch(`${process.env.BACKEND_URL}api/admin/reports`,
-                        {method: 'GET',
+                        {
+                            method: 'GET',
                             headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
                         }
                     );
                     if (!response.ok) throw new Error(response.statusText);
                     const data = await response.json()
-                    setStore({...store,reports:data})
+                    setStore({ ...store, reports: data })
                     return true
                 } catch (error) {
                     console.error("Error getting reports:", error);
                     return false
 
-            }
+                }
             },
             deleteReport: async (reportId) => {
-                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001"; 
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
                     const response = await fetch(`${backendUrl}api/admin/reports`, {
                         method: "DELETE",
                         headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
-                        body: JSON.stringify({report_id:reportId})
+                        body: JSON.stringify({ report_id: reportId })
                     });
                     if (!response.ok) throw new Error("Failed to delete report");
                     const store = getStore();
@@ -1054,16 +1058,16 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
             updateReport: async (reportId) => {
-                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001"; 
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
                     const response = await fetch(`${backendUrl}api/admin/reports`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
-                        body: JSON.stringify({report_id:reportId})
+                        body: JSON.stringify({ report_id: reportId })
                     });
                     if (!response.ok) throw new Error("Failed to delete report");
                     const store = getStore();
-                    const updatedReports = store.reports.map(r => r.report_id === reportId ? {...r,read:true}: r);
+                    const updatedReports = store.reports.map(r => r.report_id === reportId ? { ...r, read: true } : r);
                     setStore({ ...store, reports: updatedReports });
                     return true;
                 } catch (error) {
@@ -1072,32 +1076,33 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            adminGetNotifications: async ()=>{
+            adminGetNotifications: async () => {
                 const store = getStore()
                 try {
                     const response = await fetch(`${process.env.BACKEND_URL}api/admin/notifications`,
-                        {method: 'GET',
+                        {
+                            method: 'GET',
                             headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
                         }
                     );
                     if (!response.ok) throw new Error(response.statusText);
                     const data = await response.json()
-                    setStore({...store,notifications:data})
+                    setStore({ ...store, notifications: data })
                     return true
                 } catch (error) {
                     console.error("Error getting notifications:", error);
                     return false
 
-            }
+                }
             },
 
             deleteNotification: async (notificationId) => {
-                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001"; 
+                const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
                 try {
                     const response = await fetch(`${backendUrl}api/admin/notifications`, {
                         method: "DELETE",
                         headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
-                        body: JSON.stringify({notification_id:notificationId})
+                        body: JSON.stringify({ notification_id: notificationId })
                     });
                     if (!response.ok) throw new Error("Failed to delete notification");
                     const store = getStore();
@@ -1118,7 +1123,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     res.email.toLowerCase().includes(queryFilter) ||
                     res.username.toLowerCase().includes(queryFilter)
                 )
-                setStore({...store, restaurants:filterRestaurants})
+                setStore({ ...store, restaurants: filterRestaurants })
                 return true
 
             },
@@ -1126,9 +1131,10 @@ const getState = ({ getStore, getActions, setStore }) => {
             logout: () => {
                 const store = getStore()
                 sessionStorage.clear()
-                if (!sessionStorage.getItem('token')){
-                    setStore({ client:null, restaurant:{} });
-                    return true}
+                if (!sessionStorage.getItem('token')) {
+                    setStore({ client: null, restaurant: {} });
+                    return true
+                }
                 return false
 
             },
@@ -1148,14 +1154,14 @@ const getState = ({ getStore, getActions, setStore }) => {
                         },
                         body: JSON.stringify({ restaurant_id, subject, message }),
                     });
-                    
+
                     if (!response.ok) {
                         const errorData = await response.json();
                         console.error("Error al enviar el reporte:", errorData);
                         alert("Hubo un problema al enviar el reporte.");
                         return false;
                     }
-                    
+
                     const data = await response.json();
                     alert("Reporte enviado exitosamente.");
                     return true;
@@ -1169,7 +1175,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             getRestaurantNotifications: async () => {
                 const token = sessionStorage.getItem("token");
                 if (!token) return [];
-                
+
                 try {
                     const response = await fetch(process.env.BACKEND_URL + "api/restaurant/notifications", {
                         method: "GET",
@@ -1178,12 +1184,12 @@ const getState = ({ getStore, getActions, setStore }) => {
                             "Authorization": `Bearer ${token}`
                         }
                     });
-                    
+
                     if (!response.ok) {
                         console.error("Error al obtener notificaciones");
                         return [];
                     }
-                    
+
                     const data = await response.json();
                     return data;
                 } catch (error) {
@@ -1191,12 +1197,12 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return [];
                 }
             },
-            
-            
+
+
             markNotificationAsRead: async (notification_id) => {
                 const token = sessionStorage.getItem("token");
                 if (!token) return false;
-                
+
                 try {
                     const response = await fetch(process.env.BACKEND_URL + "api/restaurant/notifications", {
                         method: "PUT",
@@ -1206,12 +1212,12 @@ const getState = ({ getStore, getActions, setStore }) => {
                         },
                         body: JSON.stringify({ notification_id })
                     });
-                    
+
                     if (!response.ok) {
                         console.error("Error al actualizar notificación");
                         return false;
                     }
-                    
+
                     return true;
                 } catch (error) {
                     console.error("Error en la solicitud de actualización:", error);

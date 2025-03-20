@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { Context } from "../store/appContext";
 import Button from 'react-bootstrap/Button';
-import { Form, Dropdown, DropdownButton, } from "react-bootstrap";
+import { Form, Dropdown, DropdownButton, Row, Col } from "react-bootstrap";
 import Modal from 'react-bootstrap/Modal';
 import { useNavigate } from "react-router-dom";
 
@@ -32,8 +32,8 @@ function CreateMenuModal() {
 
     return (
         <>
-            <Button variant="primary" onClick={handleShow}>
-                Crear Nuevo Menú
+            <Button className='orange-button' onClick={handleShow}>
+                Nuevo Menú
             </Button>
 
             <Modal
@@ -47,28 +47,35 @@ function CreateMenuModal() {
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
-                        <Form.Control
-                            type="text"
-                            placeholder="Nombre el Menú"
-                            value={newMenu.name}
-                            onChange={(e) => setNewMenu({ ...newMenu, name: e.target.value })}
-                        />
-                        <DropdownButton className="mt-3" id="dropdown-basic-button" title={newMenu.currency} onSelect={handleSelect}>
-                            <Dropdown.Item eventKey="COP">Pesos Colombianos</Dropdown.Item>
-                            <Dropdown.Item eventKey="USD">Dólares Americanos</Dropdown.Item>
-                            <Dropdown.Item eventKey="CAD">Dólares Canadienses</Dropdown.Item>
-                            <Dropdown.Item eventKey="EUR">Euros</Dropdown.Item>
-                        </DropdownButton>
+                        <Row className="d-flex justify-content-between">
+                            <Col xs md lg='6'>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Nombre del Menú"
+                                    value={newMenu.name}
+                                    onChange={(e) => setNewMenu({ ...newMenu, name: e.target.value })}
+                                />
+                            </Col>
+                            <Col xs md lg='6'>
+                                <DropdownButton id="dropdown-basic-button" title={newMenu.currency} onSelect={handleSelect} className="gray-dropdown">
+                                    <Dropdown.Item eventKey="COP">COP</Dropdown.Item>
+                                    <Dropdown.Item eventKey="USD">USD</Dropdown.Item>
+                                    <Dropdown.Item eventKey="EUR">EUR</Dropdown.Item>
+                                    <Dropdown.Item eventKey="CAD">CAD</Dropdown.Item>
+                                </DropdownButton>
+                            </Col>
+
+                        </Row>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
                         Cerrar
                     </Button>
-                    <Button variant="primary" onClick={handleCreate}>Crear Menú</Button>
+                    <Button variant="success" className="orange-button" onClick={handleCreate}>Crear Menú</Button>
                 </Modal.Footer>
             </Modal>
-                      
+
         </>
     );
 }

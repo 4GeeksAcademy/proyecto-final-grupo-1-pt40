@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { Button, Form, ListGroup, Card } from "react-bootstrap";
+import { Button, Form, ListGroup, Card, Col, Row, Container, Stack } from "react-bootstrap";
 import Spinner from 'react-bootstrap/Spinner';
 import { Context } from "../store/appContext";
 import { Widget } from "@uploadcare/react-widget";
 import EditModal from "../component/EditModal.jsx"
 import { useParams } from 'react-router-dom';
 import RestaurantNavbar from "../component/RestaurantNavbar.jsx";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrash, faPenToSquare, faXmark, faCheck } from '@fortawesome/free-solid-svg-icons'
 
 
 
@@ -124,112 +126,134 @@ const MenuBuilder = () => {
   return (
     <div>
       <RestaurantNavbar />
-      <div className="d-flex">
-        {Object.keys(store.menuBuilder).length > 0 && store.menuBuilder.menu.categories ? <div className="w-25 p-3 border-end">
-          <h4>Categorías</h4>
-          {store.menuBuilder.menu.categories.length > 0 ?
-            (<ListGroup>
-              {categories?.map((category, index) => (
-                <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
-                  {editingCategory === category ? (
-                    <>
-                      <input
-                        type="text"
-                        value={editedCategoryName}
-                        onChange={(e) => setEditedCategoryName(e.target.value)}
-                        className="form-control"
-                        style={{ width: "70%" }}
-                      />
-                      <div>
-                        <Button variant="success" size="sm" onClick={() => saveCategoryName(category)}>✔️</Button>
-                        <Button variant="secondary" size="sm" onClick={cancelEditing} className="ms-2">❌</Button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <span onClick={() => setSelectedCategory(category)} style={{ cursor: "pointer" }}>{category}</span>
-                      <div>
-                        <Button variant="warning" size="sm" onClick={() => startEditing(category)}>🖊️</Button>
-                        <Button variant="danger" size="sm" onClick={() => removeCategory(category)} className="ms-2">X</Button>
-                      </div>
-                    </>
-                  )}
-                </ListGroup.Item>
-              ))}
-            </ListGroup>) : (
-              <div>No hay categorías en este momento</div>)}
-          <Form.Control
-            type="text"
-            placeholder="Nueva categoría"
-            value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
-          />
-          <Button className="mt-2" onClick={addCategory}>Agregar Categoría</Button>
-        </div> : <Spinner animation="border" variant="danger" />}
+      <Container className="d-flex" fluid>
 
-        <div className="w-75 p-3">
-          <h4>{selectedCategory ? `Agregar Platillo a ${selectedCategory}` : "Seleccione una categoría"}</h4>
-          {selectedCategory && (
-            <Form>
-              <Form.Control
+        <Row className="w-100">
+          {Object.keys(store.menuBuilder).length > 0 && store.menuBuilder.menu.categories ?
+
+            <Col sm md lg='4' className="p-3 border-end">
+              <h2 className="text-orange fw-bold ">Categorías</h2>
+              {store.menuBuilder.menu.categories.length > 0 ?
+                (<ListGroup className="mt-3">
+                  {categories?.map((category, index) => (
+                    <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center fs-5 custom-list-item py-3">
+                      {editingCategory === category ? (
+                        <>
+                          <input
+                            type="text"
+                            value={editedCategoryName}
+                            onChange={(e) => setEditedCategoryName(e.target.value)}
+                            className="form-control fs-5"
+                            style={{ width: "70%" }}
+                          />
+                          <div>
+                            <Button variant="success" size="sm" onClick={() => saveCategoryName(category)}><FontAwesomeIcon className="fw-bold fs-5" icon={faCheck} /></Button>
+                            <Button variant="danger" size="sm" onClick={cancelEditing} className="ms-2 px-2 align-middle"><FontAwesomeIcon className="fw-bold fs-5" icon={faXmark} /></Button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <span onClick={() => setSelectedCategory(category)} style={{ cursor: "pointer" }}>{category}</span>
+                          <div>
+                            <Button variant="warning" size="sm" className="px-2" onClick={() => startEditing(category)}><FontAwesomeIcon className='text-dark fs-5' icon={faPenToSquare} /></Button>
+                            <Button variant="danger" size="sm" onClick={() => removeCategory(category)} className="ms-2 px-2 py-1"><FontAwesomeIcon className="fs-5" icon={faTrash} /></Button>
+                          </div>
+                        </>
+                      )}
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>) : (
+                  <div>No hay categorías en este momento</div>)}
+              <Form.Control className="mt-3 py-2 fs-5"
                 type="text"
-                placeholder="Nombre del Platillo"
-                value={newDish.name}
-                onChange={(e) => setNewDish({ ...newDish, name: e.target.value })}
+                placeholder="Nueva categoría"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
               />
-              <Widget publicKey='47bd03853371888b5541' onChange={handleFileChange} key={widgetKey} />
-              <Form.Control
-                as="textarea"
-                placeholder="Descripción del Platillo"
-                className="mt-2"
-                value={newDish.description}
-                onChange={(e) => setNewDish({ ...newDish, description: e.target.value })}
-              />
-              <Form.Control
-                type="text"
-                placeholder="Precio del Platillo"
-                className="mt-2"
-                value={newDish.price}
-                onChange={(e) => setNewDish({ ...newDish, price: e.target.value })}
-              />
-              <Button className="mt-2" onClick={addDish}>Agregar Platillo</Button>
-            </Form>
-          )}
+              <div className="mt-3 d-flex justify-content-center">
+                <Button className="gray-button fw-bold fs-5" onClick={addCategory}>Agregar Categoría</Button>
+              </div>
+            </Col> : <Spinner animation="border" variant="danger" />}
 
-          <h4 className="mt-4">Platillos</h4>
+          <Col sm md lg='8' className="p-3">
+            <h4 className="text-orange fw-bold">{selectedCategory ? `Agregar Platillo a ${selectedCategory}` : "Seleccione una categoría"}</h4>
+            {selectedCategory && (
+              <Form>
+                <Form.Control
+                  type="text"
+                  placeholder="Nombre del Platillo"
+                  value={newDish.name}
+                  className="mt-3"
+                  onChange={(e) => setNewDish({ ...newDish, name: e.target.value })}
+                />
+                <div className="mt-2">
+                  <Widget publicKey='47bd03853371888b5541' onChange={handleFileChange} key={widgetKey} />
+                </div>
+                <Form.Control
+                  as="textarea"
+                  placeholder="Descripción del Platillo"
+                  className="mt-2"
+                  value={newDish.description}
+                  onChange={(e) => setNewDish({ ...newDish, description: e.target.value })}
+                />
+                <Form.Control
+                  type="text"
+                  placeholder="Precio del Platillo"
+                  className="mt-2"
+                  value={newDish.price}
+                  onChange={(e) => setNewDish({ ...newDish, price: e.target.value })}
+                />
+                <div className="d-flex justify-content-center mt-3">
+                  <Button className=" gray-button fs-5 fw-bold" onClick={addDish}>Agregar Platillo</Button>
+                </div>
+              </Form>
+            )}
 
-          {selectedCategory && (<div>
-            <div className="d-flex flex-wrap">
-              {store.menuBuilder.dishes ? (
-                Array.isArray(store.menuBuilder.dishes[selectedCategory]) ? (
-                  store.menuBuilder.dishes[selectedCategory]?.length > 0 ? (
-                    store.menuBuilder.dishes[selectedCategory].map((dish, index) => (
-                      <Card key={index} style={{ width: "18rem" }} className="m-2">
-                        <Card.Img variant="top" src={dish.image} />
-                        <Card.Body>
-                          <Card.Title>{dish.name}</Card.Title>
-                          <Card.Text>{dish.description}</Card.Text>
-                          <Card.Text><strong>Precio:</strong> {`${dish.price} ${store.menuBuilder.menu.currency}`}</Card.Text>
-                          <EditModal dish={dish} />
-                          <Button variant="danger" size="sm" onClick={() => removeDish(menuID, dish.id, dish.category)}>
-                            Eliminar
-                          </Button>
-                        </Card.Body>
-                      </Card>
-                    ))
+            <h4 className="mt-4 text-orange fw-bold">Platillos</h4>
+            {selectedCategory && (<div>
+              <Row className="d-flex mt-3">
+                {store.menuBuilder.dishes ? (
+                  Array.isArray(store.menuBuilder.dishes[selectedCategory]) ? (
+                    store.menuBuilder.dishes[selectedCategory]?.length > 0 ? (
+                      store.menuBuilder.dishes[selectedCategory].map((dish, index) => (
+                        <Card className="my-2 menu-builder-dish-card" key={index}>
+                          <Row className="w-100 h-100">
+                            {dish.image &&
+                            <Col xs='12' md='4' lg='4' className="p-0 mx-0">
+                              <Card.Img src={dish.image} alt='Sin imagen' className="menu-builder-img m-auto" />
+                            </Col>
+                            }
+                            <Col xs="12" md={dish.image ? "8" : "11"} lg={dish.image ? "7" : "11"} className="p-0 m-0">
+                              <Card.Body>
+                                <Card.Title>{dish.name}</Card.Title>
+                                <Card.Text>{dish.description}</Card.Text>
+                                <Card.Text><strong>Precio:</strong> {`${dish.price} ${store.menuBuilder.menu.currency}`}</Card.Text>
+                              </Card.Body>
+                            </Col>
+                            <Col xs md lg='1' className="d-flex justify-content-center align-middle">
+                              <Stack direction="horizontal" gap={2} className="d-flex justify-content-center align-middle m-1">
+                                <EditModal dish={dish} />
+                                <Button variant="danger" className="d-inline-block p-2" size="md" onClick={() => removeDish(menuID, dish.dish_id, dish.category)}>
+                                  <FontAwesomeIcon className="fs-5" icon={faTrash} />
+                                </Button>
+                              </Stack>
+                            </Col>
+                          </Row>
+                        </Card>
+                      ))
+                    ) : (
+                      <p>Aun no hay platillos en esta categoría</p>
+                    )
                   ) : (
                     <p>Aun no hay platillos en esta categoría</p>
                   )
                 ) : (
-                  <p>Aun no hay platillos en esta categoría</p>
-                )
-              ) : (
-                <Spinner animation="border" variant="danger" />)}
-            </div>
-          </div>)}
-
-        </div>
-      </div>
+                  <Spinner animation="border" variant="danger" />)}
+              </Row>
+            </div>)}
+          </Col>
+        </Row>
+      </Container>
     </div>
   );
 };
