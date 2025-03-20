@@ -1,103 +1,131 @@
 import React, { useEffect, useContext, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
+import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import RestaurantNavbar from "../component/RestaurantNavbar.jsx";
+import "../../styles/RestaurantProfile.css";
 
 const RestaurantProfile = () => {
-    const { store, actions } = useContext(Context);
-    const [profile, setProfile] = useState(null)
-    const navigate = useNavigate();
+  const { store, actions } = useContext(Context);
+  const [profile, setProfile] = useState(null);
+  const navigate = useNavigate();
 
-    const onLoad = async () => {
-        const response = await actions.getRestaurantDetails()
-        if (response) setProfile(response)
+  const onLoad = async () => {
+    const response = await actions.getRestaurantDetails();
+    if (response) {
+      setProfile(response);
+      console.log("Datos del restaurante recibidos:", response);
     }
-    useEffect(() => {
-        onLoad()
-    }, []);
+  };
 
+  useEffect(() => {
+    onLoad();
+  }, []);
 
-    const convertToAmPm = (time) => {
-        if (!time) return "";
-        const [hour, minute] = time.split(":").map(Number);
-        const ampm = hour >= 12 ? "PM" : "AM";
-        const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
-        return `${formattedHour}:${minute.toString().padStart(2, "0")} ${ampm}`
-    }
-    useEffect(() => {
-        console.log("Perfil recibido:", profile);
-    }, [profile]);
+  const convertToAmPm = (time) => {
+    if (!time) return "";
+    const [hour, minute] = time.split(":").map(Number);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
+    return `${formattedHour}:${minute.toString().padStart(2, "0")} ${ampm}`;
+  };
 
-    if (!profile) {
-        return <div className="text-center mt-5">Cargando información del restaurante...</div>;
-    }
+  if (!profile) {
+    return <div className="text-center mt-5">Cargando información del restaurante...</div>;
+  }
 
-    return (
-        <div>
-            <RestaurantNavbar />
-            <div className="container mt-4">
-                <div className="profile-card text-center p-4 bg-white shadow rounded">
-                    <img
-                        src={profile.image ? profile.image.trim() : "https://i.pinimg.com/236x/59/b5/91/59b591cbaee5d0b308648cfbae25d78a.jpg"}
-                        alt="Profile"
-                        className="profile-img rounded-circle mb-3"
-                        style={{ width: "150px", height: "150px", objectFit: "cover" }}
-                        onError={(e) => { e.target.src = "https://i.pinimg.com/236x/59/b5/91/59b591cbaee5d0b308648cfbae25d78a.jpg"; }}
-                    />
-                    <h2>{profile.name}</h2>
-                    <p className="text-muted">@{profile.username}</p>
+  const departmentName = profile.department?.name || profile.department || "No disponible";
+  const cityName = profile.city?.name || profile.city || "No disponible";
 
-                    <div className="row mt-4 text-start">
-                        <div className="col-md-6">
-                            <p><strong>Departamento:</strong> {profile.department}</p>
-                            <p><strong>Ciudad:</strong> {profile.city}</p>
-                            <p><strong>Dirección:</strong> {profile.exact_address || "No disponible"}</p>
-                            <p><strong>Teléfono:</strong> {profile.phone || "No disponible"}</p>
-                        </div>
-                        <div className="col-md-6">
-                            {profile.schedule ? (
-                                <div>
-                                    <p>
-                                        <strong className="pb-1">Horario de Atención</strong>
-                                    </p>
-
-                                    <div>
-                                        {profile.schedule.map((day, index) => (
-                                            <div className="p-0" key={index}>{`${day.day}: ${day.isClosed ? 'Cerrado' : `${convertToAmPm(day.open)} - ${convertToAmPm(day.close)}`}`}</div>
-                                        ))}
-
-                                    </div>
-
-
-                                </div>
-                            ) : (
-                                <p>No disponible</p>
-                            )}
-                            <p><strong>Tipo de Cocina:</strong> {profile.cuisine_type || "No especificado"}</p>
-                            <p><strong>Descripción:</strong> {profile.description || "No disponible"}</p>
-                        </div>
-                    </div>
-
-                    <div className="social-icons mt-3">
-                        {profile.social_networks
-                            ? profile.social_networks.split(",").map((network, index) => (
-                                <a key={index} href={network.trim()} className="me-3" target="_blank" rel="noopener noreferrer">
-                                    <i className="fab fa-facebook fa-2x text-primary"></i>
-                                </a>
-                            ))
-                            : <p>No tiene redes sociales registradas</p>
-                        }
-                    </div>
-
-                    <div className="mt-4">
-                        <button className="btn btn-success" onClick={() => navigate(`/edit-restaurant/`)}>
-                            Editar perfil
-                        </button>
-                    </div>
-                </div>
+  return (
+    <div>
+      <RestaurantNavbar />
+      <div className="profile-container">
+        <Container className="profile-content mt-5">
+          <div className="profile-header">
+            <div className="profile-pic-container">
+              <img
+                src={profile.image ? profile.image.trim() : "https://i.pinimg.com/236x/59/b5/91/59b591cbaee5d0b308648cfbae25d78a.jpg"}
+                alt="Profile"
+                className="profile-pic"
+                onError={(e) => {
+                  e.target.src = "https://i.pinimg.com/236x/59/b5/91/59b591cbaee5d0b308648cfbae25d78a.jpg";
+                }}
+              />
             </div>
-        </div>
-    );
+            <div className="profile-info">
+              <h1 className="profile-name">{profile.name}</h1>
+              <p className="profile-username">@{profile.username}</p>
+              <div className="profile-meta">
+                <span className="meta-item">
+                  <i className="fas fa-map-marker-alt me-1"></i>
+                  {cityName}, {departmentName}
+                </span>
+                <span className="meta-item">
+                  <i className="fas fa-phone me-1"></i>
+                  {profile.phone || "No disponible"}
+                </span>
+                {profile.social_networks && (
+                  <span className="meta-item">
+                    <i className="fas fa-link me-1"></i>
+                    <a href={profile.social_networks} target="_blank" rel="noopener noreferrer">
+                      Ver en Google Maps
+                    </a>
+                  </span>
+                )}
+                <span className="cuisine-tag">{profile.cuisine_type || "No especificado"}</span>
+              </div>
+              <Button className="profile-button mt-3" onClick={() => navigate(`/edit-restaurant/`)}>
+                Editar Perfil
+              </Button>
+            </div>
+          </div>
+          <Row className="mt-5">
+            <Col md={12}>
+              <Card className="info-section mb-4">
+                <Card.Body>
+                  <Card.Title className="section-title">Descripción</Card.Title>
+                  <p>{profile.description || "No disponible"}</p>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col md={6}>
+              <Card className="info-section mb-4">
+                <Card.Body>
+                  <Card.Title className="section-title">Horario de Atención</Card.Title>
+                  {profile.schedule ? (
+                    profile.schedule.map((day, index) => (
+                      <p key={index} className="schedule-item">
+                        {`${day.day}: ${day.isClosed ? "Cerrado" : `${convertToAmPm(day.open)} - ${convertToAmPm(day.close)}`}`}
+                      </p>
+                    ))
+                  ) : (
+                    <p>No disponible</p>
+                  )}
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col md={6}>
+              <Card className="info-section mb-4">
+                <Card.Body>
+                  <Card.Title className="section-title">Redes Sociales</Card.Title>
+                  {profile.social_networks ? (
+                    profile.social_networks.split(",").map((network, index) => (
+                      <a key={index} href={network.trim()} className="me-3 social-link" target="_blank" rel="noopener noreferrer">
+                        <i className="fab fa-facebook fa-lg text-primary"></i>
+                      </a>
+                    ))
+                  ) : (
+                    <p>No tiene redes sociales registradas</p>
+                  )}
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        </Container>
+      </div>
+    </div>
+  );
 };
 
 export default RestaurantProfile;

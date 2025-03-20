@@ -1,0 +1,133 @@
+.profile-container {
+    max-width: 1000px !important;
+    margin: 0 auto;
+  }
+  
+  .profile-pic-container {
+    display: inline-block;
+    margin-right: 20px;
+  }
+  
+  .profile-pic {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-content {
+    padding: 20px;
+  }
+  
+  .profile-header {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  
+  .profile-info {
+    flex: 1;
+  }
+  
+  .profile-name {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+  }
+  
+  .profile-username {
+    font-size: 16px;
+    color: #999;
+    margin-bottom: 10px;
+  }
+  
+  .profile-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 15px;
+  }
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .meta-item i {
+    color: #ff6200;
+  }
+  
+  .meta-item a {
+    color: #ff6200;
+    text-decoration: none;
+  }
+  
+  .meta-item a:hover {
+    text-decoration: underline;
+  }
+  
+  .cuisine-tag {
+    background-color: #ff6200;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  
+  .info-section {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ff6200;
+    padding-bottom: 5px;
+  }
+  
+  .info-section p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+  }
+  
+  .schedule-item {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+  }
+  
+  .social-link {
+    transition: transform 0.3s ease;
+  }
+  
+  .social-link:hover {
+    transform: scale(1.2);
+  }
+  
+  .profile-button {
+    background-color: #ff6200 !important;
+    border: none !important;
+    border-radius: 25px !important;
+    padding: 8px 20px !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    color: #fff !important;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+  }
+  
+  .profile-button:hover {
+    background-color: #e55a00 !important;
+  }
