@@ -26,6 +26,9 @@ const RestaurantNavbar = () => {
               <CreateMenuModal />
             </li>
             <li className="nav-item">
+              <Link className="nav-link" to="/restaurant-news">Publicar Novedades</Link>
+            </li>
+            <li className="nav-item">
               <Link className="nav-link" to="/edit-restaurant/">
                 Agregar Información
               </Link>

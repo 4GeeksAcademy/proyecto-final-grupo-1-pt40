@@ -1,7 +1,7 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from api.models import db, Client, Restaurant, Menu, Dish,Favorites,Admin, Notification, Report
+from api.models import db, Client, Restaurant, Menu, Dish,Favorites,Admin, Notification, Report,RestaurantNews
 from flask import Flask, request, jsonify, url_for, Blueprint, Response,send_file
 from werkzeug.utils import secure_filename
 from sqlalchemy.exc import DataError,IntegrityError
@@ -1348,4 +1348,135 @@ def restaurant_notifications():
                     return jsonify('error: Failed to process request'), 500
 
         
+@api.route('/restaurant/news', methods=['POST', 'GET'])
+@jwt_required()
+def restaurant_news():
+    restaurant_id = get_jwt_identity()
+    claims = get_jwt()
+    role = claims.get("role")
+
+    if request.method == 'POST':
+        if role != "restaurant":
+            return jsonify({"error": "Unauthorized: Only restaurants can post news"}), 403
+
+        data = request.json
+        print("Datos recibidos en el backend:", data)
+        title = data.get('title')
+        description = data.get('description')
+        image = data.get('image', None)
+        category = data.get('category')
+        expiration_date = data.get('expirationDate')
+        
+        if expiration_date is None:
+            print("⚠️ La fecha de expiración NO está llegando correctamente")
+
+            return jsonify({"message": "Noticia creada"}), 201
+
+        if not title or not description or not category or not expiration_date:
+            return jsonify({"error": "Missing required fields"}), 400
+        
+        new_news = RestaurantNews(
+            restaurant_id=restaurant_id,
+            title=title,
+            description=description,
+            image=image,
+            category=category,
+            expiration_date=expiration_date
+        )
+
+        try:
+            db.session.add(new_news)
+            db.session.commit()
+            return jsonify({"msg": "News posted successfully"}), 201
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": "Failed to create news"}), 500
+
+    if request.method == 'GET':
+        if role != "client":
+            return jsonify({"error": "Unauthorized: Only clients can access news"}), 403
+
+        client = Client.query.get(restaurant_id)
+        if not client:
+            return jsonify({"error": "Client not found"}), 404
+
+        news = RestaurantNews.query.join(Restaurant).filter(Restaurant.city == client.city).order_by(RestaurantNews.created_at.desc()).all()
+        result = [n.serialize() for n in news]
+        return jsonify(result), 200
+
+@api.route('/restaurant/news/<int:news_id>', methods=['DELETE'])
+@jwt_required()
+def delete_news(news_id):
+    restaurant_id = get_jwt_identity()
+    claims = get_jwt()
+    role = claims.get("role")
+
+    if role != "restaurant":
+        return jsonify({"error": "Unauthorized: Only restaurants can delete news"}), 403
+
+    news = RestaurantNews.query.get(news_id)
+
+    if not news:
+        return jsonify({"error": "News not found"}), 404
+
+    if news.restaurant_id != restaurant_id:
+        return jsonify({"error": "Unauthorized: You can only delete your own news"}), 403
+
+    try:
+        db.session.delete(news)
+        db.session.commit()
+        return jsonify({"msg": "News deleted successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to delete news"}), 500
+
+@api.route('/restaurant/news/<int:news_id>', methods=['PUT'])
+@jwt_required()
+def update_news(news_id):
+    restaurant_id = get_jwt_identity()
+    claims = get_jwt()
+    role = claims.get("role")
+
+    if role != "restaurant":
+        return jsonify({"error": "Unauthorized: Only restaurants can edit news"}), 403
+
+    news = RestaurantNews.query.get(news_id)
+
+    if not news:
+        return jsonify({"error": "News not found"}), 404
+
+    if news.restaurant_id != restaurant_id:
+        return jsonify({"error": "Unauthorized: You can only edit your own news"}), 403
+
+    data = request.json
+    news.title = data.get('title', news.title)
+    news.description = data.get('description', news.description)
+    news.image = data.get('image', news.image)
+    news.category = data.get('category', news.category)
+
+    try:
+        db.session.commit()
+        return jsonify({"msg": "News updated successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to update news"}), 500    
+        
+@api.route('/news', methods=['GET'])
+@jwt_required()
+def get_news():
+    client_id = get_jwt_identity()
+    claims = get_jwt()
+    role = claims.get("role")
+
+    if role != "client":
+        return jsonify({"error": "Unauthorized: Only clients can access news"}), 403
+
+    client = Client.query.get(client_id)
+    if not client:
+        return jsonify({"error": "Client not found"}), 404
+
+    news = RestaurantNews.query.join(Restaurant).filter(Restaurant.city == client.city).order_by(RestaurantNews.created_at.desc()).all()
+    
+    result = [n.serialize() for n in news]
+    return jsonify(result), 200
 

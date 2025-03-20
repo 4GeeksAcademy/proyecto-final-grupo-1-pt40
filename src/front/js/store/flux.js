@@ -19,6 +19,8 @@ const getState = ({ getStore, getActions, setStore }) => {
             solicitudes: [], // Lista de solicitudes (reportes)
             showLimitToast: false,
             showLimitMenuToast: false,
+            news:[],
+            restaurantNews:[]
         },
         actions: {
             registerUser: async (userType, registration) => {
@@ -1216,6 +1218,117 @@ const getState = ({ getStore, getActions, setStore }) => {
                 } catch (error) {
                     console.error("Error en la solicitud de actualización:", error);
                     return false;
+                }
+            },
+
+            getNews: async () => {
+                try {
+                    const resp = await fetch(process.env.BACKEND_URL + "api/news", {
+                        method: "GET",
+                        headers: {
+                            Authorization: "Bearer " + sessionStorage.getItem("token"),
+                        },
+                    });
+            
+                    if (!resp.ok) throw new Error("Error fetching news");
+            
+                    const data = await resp.json();
+                    console.log("Noticias recibidas:", data);
+                    setStore({ news: data });
+            
+                } catch (error) {
+                    console.error("Error fetching news:", error);
+                }
+            },
+
+            getRestaurantNews: async () => {
+                try {
+                    const token = sessionStorage.getItem("token");
+                    const response = await fetch(process.env.BACKEND_URL + "api/restaurant/news", {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+            
+                    if (!response.ok) throw new Error("Error al obtener las novedades del restaurante");
+            
+                    const data = await response.json();
+                    setStore({ restaurantNews: data });
+            
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            },
+            
+            createRestaurantNews: async (newsData) => {
+                console.log("📤 Enviando al backend:", newsData);
+                try {
+                    console.log("Enviando al backend:", newsData);
+                    const token = sessionStorage.getItem("token");
+                    const response = await fetch(process.env.BACKEND_URL + "api/restaurant/news", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(newsData)
+                    });
+            
+                    if (!response.ok) throw new Error("Error al crear la novedad");
+            
+                    const data = await response.json();
+                    setStore({ restaurantNews: [...getStore().restaurantNews, data] });
+            
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            },
+            
+            editRestaurantNews: async (newsId, updatedData) => {
+                try {
+                    const token = sessionStorage.getItem("token");
+                    const response = await fetch(process.env.BACKEND_URL + `api/restaurant/news/${newsId}`, {
+                        method: "PUT",
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(updatedData)
+                    });
+            
+                    if (!response.ok) throw new Error("Error al actualizar la novedad");
+            
+                    const data = await response.json();
+                    setStore({
+                        restaurantNews: getStore().restaurantNews.map(news =>
+                            news.id === newsId ? data : news
+                        )
+                    });
+            
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            },
+            
+            deleteRestaurantNews: async (newsId) => {
+                try {
+                    const token = sessionStorage.getItem("token");
+                    const response = await fetch(process.env.BACKEND_URL + `api/restaurant/news/${newsId}`, {
+                        method: "DELETE",
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+            
+                    if (!response.ok) throw new Error("Error al eliminar la novedad");
+            
+                    setStore({
+                        restaurantNews: getStore().restaurantNews.filter(news => news.id !== newsId)
+                    });
+            
+                } catch (error) {
+                    console.error("Error:", error);
                 }
             }
 
