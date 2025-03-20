@@ -14,6 +14,14 @@ const FavoriteView = () => {
         actions.fetchFavorites();
     }, []);
 
+    const handleMenuClick = async (username) => {
+        const response = await actions.getRestaurantMenusPublic(username);
+        if (response && Array.isArray(response) && response.length > 0) {
+            navigate(`/restaurant/${username}/menu/${response[0].menu_id}`);
+        } else {
+            alert("El restaurante no tiene menús disponibles o no está activo.");
+        }
+    };
 
     const favorites = Array.isArray(store.favorites) ? store.favorites : [];
     const dishFavorites = favorites.filter(fav => fav.dish);
@@ -50,7 +58,7 @@ const FavoriteView = () => {
                                                     <div className="d-flex justify-content-between">
                                                         <Button
                                                             variant="primary"
-                                                            onClick={() => navigate(`/menu/${fav.restaurant.restaurant_id}`)}
+                                                            onClick={() => handleMenuClick(fav.restaurant.username)}
                                                         >
                                                             Ver Menú
                                                         </Button>
