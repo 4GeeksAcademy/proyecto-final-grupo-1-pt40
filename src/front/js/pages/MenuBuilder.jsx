@@ -131,7 +131,7 @@ const MenuBuilder = () => {
         <Row className="w-100">
           {Object.keys(store.menuBuilder).length > 0 && store.menuBuilder.menu.categories ?
 
-            <Col sm md lg='4' className="p-3 border-end">
+            <Col sm='12' md='12' lg='4' className="p-3 border-end">
               <h2 className="text-orange fw-bold ">Categorías</h2>
               {store.menuBuilder.menu.categories.length > 0 ?
                 (<ListGroup className="mt-3">

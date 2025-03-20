@@ -73,6 +73,7 @@ color: #FF6C40;
     color: black !important;
     background-color: #FF6C40 !important;
     border: none !important;
+    font-weight: bold !important;
 }
 
 .orange-button:hover{
@@ -87,15 +88,16 @@ color: #FF6C40;
 
 }
 
-.menu-builder-dish-body {
-display: flex;
-  flex-direction: column; /* Stack content vertically */
-  justify-content: space-between; /* Space out content evenly */
-  height: 100%; /* Fill the card body */
-}
 
 .menu-builder-img {
     height: 180px; /* Set a fixed height */
     object-fit: cover; /* Ensures the image scales proportionally and crops if necessary */
     width: 100%; /* Ensures the image fills the card's width */
+  }
+
+  .btn-small-text {
+    font-size: 0.875rem !important; /* Smaller font size (equivalent to 14px) */
+    white-space: nowrap !important; /* Prevents text from wrapping */
+    text-overflow: ellipsis !important; /* Adds "..." if the text overflows */
+    overflow: hidden !important; /* Hides overflowing text */
   }

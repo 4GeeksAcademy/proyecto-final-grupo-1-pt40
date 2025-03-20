@@ -91,37 +91,33 @@ const RestaurantDashboard = () => {
                                         <Accordion.Header className="custom-accordion-header"><div className="fw-bold text-bw fs-5">{menu.name}</div></Accordion.Header>
                                         <Accordion.Body>
                                             <Row>
-                                                <Col xs md lg='2' className="d-flex justify-content-center">
+                                                <Col xs='12' md='6' lg='2' className="justify-content-start mb-2">
                                                     <div className="m-auto align-middle">
                                                         <div className="mb-1"><strong>Moneda: </strong> {`${menu.currency}`}</div>
                                                         <div><strong>Estatus: </strong> {`${menu.is_active ? "Público" : 'Privado'}`}</div>
                                                     </div>
                                                 </Col>
-                                                <Col xs md lg='5' className="d-flex justify-content-center align-middle">
+                                                <Col xs='12' md='6' lg='4' className="justify-content-start align-middle mb-2">
                                                     <div className="m-auto align-middle">
                                                         <div className="mb-1"><strong>Creado: </strong>{menu.created}</div>
                                                         <div><strong>Actualizado: </strong> {menu.last_updated}</div>
                                                     </div>
 
                                                 </Col>
-                                                <Col xs md className="text-center align-items-center">
-                                                    <Row className="align-items-center d-flex justify-content-center">
-                                                        <Stack direction="horizontal" gap={2} className="mx-auto d-flex justify-content-center align-middle" >
-                                                            <Button variant="light" size='md' onClick={() => handleView(menu.menu_id)}>Ver</Button>
-                                                            <Button variant="info" size='md' onClick={() => handleOpenEditModal(menu)}>Editar Información</Button>
-                                                            <Button variant="primary" size='md' onClick={() => handleMenuDetails(menu.menu_id)}>Editar Platillos</Button>
-
+                                                <Col xs='12' md='6' lg='3' className="text-center align-items-center mt-2 px-2">
+                                                        <Stack direction="vertical" gap={2} className="m-auto justify-content-center align-middle flex-wrap" >
+                                                            <Button variant="secondary" size='md' className='btn-responsive btn-small-text' onClick={() => handleView(menu.menu_id)}>Ver Menú</Button>
+                                                            <Button variant="info" size='md' className='btn-responsive btn-small-text' onClick={() => handleOpenEditModal(menu)}>Cambiar Nombre/Moneda</Button>
+                                                            <Button variant="primary" size='md' className='btn-responsive btn-small-text' onClick={() => handleMenuDetails(menu.menu_id)}>Editar Platillos</Button>
                                                         </Stack>
-                                                    </Row>
-
-                                                    <Row className="align-items-center d-flex justify-content-center mt-3">
-                                                        <Stack direction="horizontal" gap={2} className="mx-auto d-flex justify-content-center align-middle">
-                                                            <Button variant="success" size='md' onClick={() => handlePublish(menu.menu_id)}>Publicar</Button>
-                                                            <Button variant="warning" size='md' onClick={() => handleUnpublish(menu.menu_id)}>Privatizar</Button>
+                                                        </Col>
+                                                <Col xs='12' md='6' lg='3' className="text-center align-items-center mt-2 px-2">
+                                                        <Stack direction="vertical" gap={2} className="m-auto d-flex justify-content-center align-middle flex-wrap">
+                                                            <Button variant="success" size='md' className='btn-responsive btn-small-text' onClick={() => handlePublish(menu.menu_id)}>Publicar</Button>
+                                                            <Button variant="warning" size='md' className='btn-responsive btn-small-text' onClick={() => handleUnpublish(menu.menu_id)}>Privatizar</Button>
                                                             <DeleteMenuModal data={menu} />
-
                                                         </Stack>
-                                                    </Row>
+                                                  
                                                 </Col>
                                             </Row>
 

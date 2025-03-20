@@ -37,28 +37,35 @@ function EditModal({ dish }) {
                 keyboard={false}
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Editar platillo</Modal.Title>
+                    <Modal.Title>Editar Platillo</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
+                        <Form.Label className="fw-bold">Nombre</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Nombre del Platillo"
                             value={newDish.name}
                             onChange={(e) => setNewDish({ ...newDish, name: e.target.value })}
                         />
+                        <Form.Group>
+                         <Form.Label className="fw-bold">Imagen: </Form.Label>
+                         <span className="ms-1">
                         <Widget publicKey='47bd03853371888b5541' value={newDish.image} onChange={handleFileChange} />
+                         </span>
+                        </Form.Group>
+
+                        <Form.Label className="fw-bold">Descripción</Form.Label>
                         <Form.Control
                             as="textarea"
                             placeholder="Descripción del Platillo"
-                            className="mt-2"
                             value={newDish.description}
                             onChange={(e) => setNewDish({ ...newDish, description: e.target.value })}
                         />
+                        <Form.Label className="fw-bold">Precio</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Precio del Platillo"
-                            className="mt-2"
                             value={newDish.price}
                             onChange={(e) => setNewDish({ ...newDish, price: e.target.value })}
                         />
@@ -68,7 +75,7 @@ function EditModal({ dish }) {
                     <Button variant="secondary" onClick={handleClose}>
                         Cerrar
                     </Button>
-                    <Button variant="primary" onClick={handleEdit}>Guardar Cambios</Button>
+                    <Button className="orange-button" onClick={handleEdit}>Guardar Cambios</Button>
                 </Modal.Footer>
             </Modal>
         </>

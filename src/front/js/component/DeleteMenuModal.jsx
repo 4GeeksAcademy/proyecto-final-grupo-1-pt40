@@ -18,7 +18,7 @@ function CreateMenuModal({ data }) {
 
     return (
         <>
-            <Button variant="danger" size='md' onClick={handleShow}>
+            <Button variant="danger" className='btn-responsive btn-small-text' size='md' onClick={handleShow}>
                 Eliminar
             </Button>
 
