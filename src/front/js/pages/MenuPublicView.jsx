@@ -140,7 +140,7 @@ const MenuPublicView = () => {
                                                     <Card className="my-2" key={dishIndex}>
                                                         <Row className="w-100">
                                                             <Col md='4'>
-                                                                <Card.Img variant="top" src={dish.image} alt='Sin imagen' style={{ 'width': '200px', 'height': '150px' }} />
+                                                                <Card.Img variant="top" src={dish.image} alt='Sin imagen'  className='rounded'style={{ 'width': '200px', 'height': '150px' }} />
                                                             </Col>
                                                             <Col md='7'>
                                                                 <Card.Body>
