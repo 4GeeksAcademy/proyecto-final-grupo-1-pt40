@@ -136,7 +136,7 @@ const MenuBuilder = () => {
               {store.menuBuilder.menu.categories.length > 0 ?
                 (<ListGroup className="mt-3">
                   {categories?.map((category, index) => (
-                    <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center fs-5 custom-list-item py-3">
+                    <ListGroup.Item key={index} className={`d-flex justify-content-between align-items-center fs-5 py-3 fw-bold ${category === selectedCategory ? "bg-orange" : ''}`}>
                       {editingCategory === category ? (
                         <>
                           <input
@@ -211,27 +211,27 @@ const MenuBuilder = () => {
 
             <h4 className="mt-4 text-orange fw-bold">Platillos</h4>
             {selectedCategory && (<div>
-              <Row className="d-flex mt-3">
+              <Row className="mt-3 g-0 w-100 px-3 d-flex justify-content-center">
                 {store.menuBuilder.dishes ? (
                   Array.isArray(store.menuBuilder.dishes[selectedCategory]) ? (
                     store.menuBuilder.dishes[selectedCategory]?.length > 0 ? (
                       store.menuBuilder.dishes[selectedCategory].map((dish, index) => (
                         <Card className="my-2 menu-builder-dish-card" key={index}>
-                          <Row className="w-100 h-100">
+                          <Row className="w-100 h-100 m-0">
                             {dish.image &&
-                            <Col xs='12' md='4' lg='4' className="p-0 mx-0">
-                              <Card.Img src={dish.image} alt='Sin imagen' className="menu-builder-img m-auto" />
-                            </Col>
+                              <Col xs='12' md='4' lg='4' className="p-0 m-0 ">
+                                <Card.Img src={dish.image} alt='Sin imagen' className="menu-builder-img m-auto" />
+                              </Col>
                             }
-                            <Col xs="12" md={dish.image ? "8" : "11"} lg={dish.image ? "7" : "11"} className="p-0 m-0">
+                            <Col xs="12" md={dish.image ? "6" : "10"} lg={dish.image ? "6" : "10"} className="m-auto h-100 ">
                               <Card.Body>
                                 <Card.Title>{dish.name}</Card.Title>
                                 <Card.Text>{dish.description}</Card.Text>
                                 <Card.Text><strong>Precio:</strong> {`${dish.price} ${store.menuBuilder.menu.currency}`}</Card.Text>
                               </Card.Body>
                             </Col>
-                            <Col xs md lg='1' className="d-flex justify-content-center align-middle">
-                              <Stack direction="horizontal" gap={2} className="d-flex justify-content-center align-middle m-1">
+                            <Col xs md='2' lg='2' className="d-flex justify-content-center align-middle mb-2">
+                              <Stack direction="horizontal" gap={2} className="d-flex justify-content-center align-middle mb-3">
                                 <EditModal dish={dish} />
                                 <Button variant="danger" className="d-inline-block p-2" size="md" onClick={() => removeDish(menuID, dish.dish_id, dish.category)}>
                                   <FontAwesomeIcon className="fs-5" icon={faTrash} />

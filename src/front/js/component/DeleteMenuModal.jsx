@@ -36,7 +36,7 @@ function CreateMenuModal({ data }) {
                     <p>¿Estas seguro de continuar?</p>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
+                    <Button className="close-modal-button" onClick={handleClose}>
                         Cerrar
                     </Button>
                     <Button variant="danger" onClick={handleDelete}>Eliminar</Button>

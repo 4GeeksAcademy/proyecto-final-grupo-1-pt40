@@ -163,8 +163,8 @@ const RestaurantDashboard = () => {
                         </Form>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={() => setShowEditModal(false)}>Cancelar</Button>
-                        <Button className="orange-button" onClick={handleUpdateMenu}>Guardar Cambios</Button>
+                        <Button className="close-modal-button mx-1"  onClick={() => setShowEditModal(false)}>Cancelar</Button>
+                        <Button className="orange-button mx-1"  onClick={handleUpdateMenu}>Guardar Cambios</Button>
                     </Modal.Footer>
                 </Modal>
             </Container>

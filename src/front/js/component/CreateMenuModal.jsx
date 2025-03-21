@@ -45,7 +45,7 @@ function CreateMenuModal() {
                 <Modal.Header closeButton>
                     <Modal.Title>Datos del Menú</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body className="py-4">
                     <Form>
                         <Row className="d-flex justify-content-between">
                             <Col xs md lg='6'>
@@ -69,10 +69,10 @@ function CreateMenuModal() {
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
+                    <Button className="close-modal-button mx-1" onClick={handleClose}>
                         Cerrar
                     </Button>
-                    <Button variant="success" className="orange-button" onClick={handleCreate}>Crear Menú</Button>
+                    <Button  className="orange-button mx-1" onClick={handleCreate}>Crear Menú</Button>
                 </Modal.Footer>
             </Modal>
 
