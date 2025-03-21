@@ -22,6 +22,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             plan: '',
             news:[],
             restaurantNews:[],
+            editNews: {}
         },
         actions: {
             registerUser: async (userType, registration) => {
@@ -1249,6 +1250,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             getRestaurantNews: async () => {
                 try {
+                    const store = getStore()
                     const token = sessionStorage.getItem("token");
                     const response = await fetch(process.env.BACKEND_URL + "api/restaurant/news", {
                         method: "GET",
@@ -1260,15 +1262,17 @@ const getState = ({ getStore, getActions, setStore }) => {
                     if (!response.ok) throw new Error("Error al obtener las novedades del restaurante");
             
                     const data = await response.json();
-                    setStore({ restaurantNews: data });
-            
+                    setStore({ ...store, restaurantNews: data });
+                    return true
                 } catch (error) {
                     console.error("Error:", error);
+                    return false
                 }
             },
             
             createRestaurantNews: async (newsData) => {
                 console.log("📤 Enviando al backend:", newsData);
+                const store = getStore()
                 try {
                     console.log("Enviando al backend:", newsData);
                     const token = sessionStorage.getItem("token");
@@ -1284,7 +1288,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     if (!response.ok) throw new Error("Error al crear la novedad");
             
                     const data = await response.json();
-                    setStore({ restaurantNews: [...getStore().restaurantNews, data] });
+                    setStore({ ...store, restaurantNews: [...getStore().restaurantNews, data] });
             
                 } catch (error) {
                     console.error("Error:", error);
@@ -1292,6 +1296,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
             
             editRestaurantNews: async (newsId, updatedData) => {
+                const store= getStore()
                 try {
                     const token = sessionStorage.getItem("token");
                     const response = await fetch(process.env.BACKEND_URL + `api/restaurant/news/${newsId}`, {
@@ -1306,7 +1311,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     if (!response.ok) throw new Error("Error al actualizar la novedad");
             
                     const data = await response.json();
-                    setStore({
+                    setStore({...store,
                         restaurantNews: getStore().restaurantNews.map(news =>
                             news.id === newsId ? data : news
                         )
@@ -1318,6 +1323,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
             
             deleteRestaurantNews: async (newsId) => {
+                const store = getStore()
                 try {
                     const token = sessionStorage.getItem("token");
                     const response = await fetch(process.env.BACKEND_URL + `api/restaurant/news/${newsId}`, {
@@ -1329,14 +1335,23 @@ const getState = ({ getStore, getActions, setStore }) => {
             
                     if (!response.ok) throw new Error("Error al eliminar la novedad");
             
-                    setStore({
+                    setStore({...store,
                         restaurantNews: getStore().restaurantNews.filter(news => news.id !== newsId)
                     });
-            
+                    return true
                 } catch (error) {
                     console.error("Error:", error);
+                    return false
                 }
+            },
+
+            editNewsRequest: async (data) => {
+                const store = getStore()
+                setStore({...store, editNews: data})
+                return true
             }
+
+
 
         }
     };

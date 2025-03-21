@@ -24,7 +24,7 @@ const NotificationBell = () => {
         const success = await actions.markNotificationAsRead(notification_id);
         if (success) {
             
-            setNotifications(notifications.filter(n => n.id !== notification_id));
+            setNotifications(notifications.filter(n => n.notification_id !== notification_id));
         }
     };
     
@@ -58,21 +58,21 @@ const NotificationBell = () => {
                 )}
             </Dropdown.Toggle>
 
-            <Dropdown.Menu style={{ minWidth: "300px", maxHeight: "400px", overflowY: "auto" }}>
+            <Dropdown.Menu style={{ minWidth: "400px", maxHeight: "400px", overflowY: "auto" }}>
                 {notifications.length === 0 ? (
                     <Dropdown.Item disabled>No hay notificaciones</Dropdown.Item>
                 ) : (
                     notifications.map((notification) => (
-                        <Dropdown.Item key={notification.id} className="d-flex flex-column border-bottom">
+                        <Dropdown.Item key={notification.notification_id} className="d-flex flex-column border-bottom">
                             <div className="fw-bold mb-1">{notification.subject}</div>
                             <div className="text-muted small">{notification.message}</div>
                             <div className="d-flex justify-content-between align-items-center mt-1">
-                                <small className="text-muted">{formatDate(notification.created_at)}</small>
+                                <small className="text-muted">{formatDate(notification.date)}</small>
                                 <button 
-                                    className="btn btn-sm btn-outline-secondary" 
+                                    className="btn btn-sm gray-button" 
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        handleMarkAsRead(notification.id);
+                                        handleMarkAsRead(notification.notification_id);
                                     }}
                                 >
                                     Marcar como leída
