@@ -15,6 +15,8 @@ import MenuView from "./pages/MenuView.jsx";
 import RestaurantDashboard from "./pages/RestaurantDashboard.jsx";
 import RestaurantProfile from "./pages/RestaurantProfile.jsx";
 import RestaurantForm from "./pages/RestaurantForm.jsx";
+import RestaurantNewsForm from "./pages/RestaurantNewsForm.jsx";
+
 import FavoritePage from "./pages/FavoritePage.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import RestaurantProfileEdit from "./pages/RestaurantProfileEdit.jsx";
@@ -23,6 +25,7 @@ import ClientProfileEdit from "./pages/ClientProfileEdit.jsx";
 import ClientProfile from "./pages/ClientProfile.jsx";
 import ExplorePage from "./pages/ExplorePage.jsx";
 import HelpPage from "./pages/HelpPage.jsx";
+import News from "./pages/News.jsx";
 
 import HowItWork from "./pages/HowItWork.jsx";
 import FrequentQuestions from "./pages/FrequentQuestions.jsx";
@@ -63,6 +66,7 @@ const Layout = () => {
                         <Route element={<ClientProfile />} path="/client-profile" />
                         <Route element={<ExplorePage />} path="/explore-page" />
                         <Route element={<HelpPage />} path="/help-page" />
+                        <Route  element={<News />} path="/news" />
 
                         <Route element={<AdminLogin />} path="/login/admin" />
                         <Route element={<AdminDashboard />} path="/admin-dashboard" />
@@ -75,6 +79,7 @@ const Layout = () => {
                         <Route element={<RestaurantProfile />} path="/restaurant-profile" />
                         <Route element={<RestaurantProfileEdit />} path="/edit-restaurant" />
                         <Route element={<RestaurantPurchasePlan />} path="/plan-purchase" />
+                        <Route  element={<RestaurantNewsForm />} path="/restaurant-news" />
                         <Route element={<ClientProfileEdit />} path="/edit-client" />
 
 
