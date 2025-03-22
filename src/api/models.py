@@ -70,6 +70,7 @@ class Restaurant(db.Model):
     image = db.Column(db.String(255), nullable=True)
     plan = db.Column(db.Boolean, default=False)
     
+    news = relationship('RestaurantNews', back_populates='restaurant', lazy='dynamic')
     menus = relationship('Menu', back_populates='restaurant', lazy ='dynamic')
     notifications = relationship('RestaurantNotifications', back_populates='restaurant')
     favorites = relationship('Favorites', back_populates='restaurant')
@@ -242,7 +243,7 @@ class Notification(db.Model):
             'restaurant_id':self.restaurant_id,
             'subject':self.subject,
             'message':self.message,
-            'status': self.read,
+            'status': self.status,
             'date': self.date
         }
 
@@ -270,3 +271,30 @@ class Report(db.Model):
             'date': self.date
         }
 
+class RestaurantNews(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
+    title = db.Column(db.String(255), nullable=False)  
+    description = db.Column(db.Text, nullable=False)  
+    image = db.Column(db.String(255), nullable=True)  
+    category = db.Column(db.String(50), nullable=False)  
+    created_at = db.Column(db.DateTime, default=db.func.now())
+    restaurant_username= db.Column(db.String(80),nullable=True)  
+    expiration_date = db.Column(db.DateTime, nullable=True) 
+
+    restaurant = relationship('Restaurant', back_populates='news')
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'restaurant_id': self.restaurant_id,
+            'restaurant_name': self.restaurant.name,
+            'restaurant_username': self.restaurant.username,
+            'title': self.title,
+            'description': self.description,
+            'image': self.image,
+            'category': self.category,
+            'created_at': self.created_at,
+            "expiration_date": self.expiration_date.strftime('%Y-%m-%d') if self.expiration_date else None
+            
+        }

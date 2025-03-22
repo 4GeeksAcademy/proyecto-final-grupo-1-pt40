@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: c61ae89b0eee
+Revision ID: 255496b9ea5b
 Revises: 
-Create Date: 2025-03-17 22:49:18.754509
+Create Date: 2025-03-21 20:59:03.506886
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c61ae89b0eee'
+revision = '255496b9ea5b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -112,6 +112,19 @@ def upgrade():
     sa.ForeignKeyConstraint(['restaurant_id'], ['restaurant.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('restaurant_news',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('restaurant_id', sa.Integer(), nullable=False),
+    sa.Column('title', sa.String(length=255), nullable=False),
+    sa.Column('description', sa.Text(), nullable=False),
+    sa.Column('image', sa.String(length=255), nullable=True),
+    sa.Column('category', sa.String(length=50), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('restaurant_username', sa.String(length=80), nullable=True),
+    sa.Column('expiration_date', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['restaurant_id'], ['restaurant.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('restaurant_notifications',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('restaurant_id', sa.Integer(), nullable=True),
@@ -154,6 +167,7 @@ def downgrade():
     op.drop_table('favorites')
     op.drop_table('dish')
     op.drop_table('restaurant_notifications')
+    op.drop_table('restaurant_news')
     op.drop_table('report')
     op.drop_table('notification')
     op.drop_table('menu')

@@ -13,15 +13,15 @@ function MenuNavigation({ username, menus, selected }) {
     }, [menu_id]);
 
     return (
-        <Nav>
+        <Nav variant='tabs' className='overflow-auto flex-nowrap'
+        style={{ whiteSpace: "nowrap" }}
+>
             {menus?.map((menu, menuIndex) => (
                 <Nav.Item key={menu.menu_id} >
                     <Nav.Link onClick={() => {
                         navigateTo(`/restaurant/${username}/menu/${menu.menu_id}`)
-                    }} className={menu.menu_id.toString() === activeMenu ? 'bg-secondary text-white' : ''}>{menu.name}</Nav.Link>
+                    }} className={menu.menu_id.toString() === activeMenu ? 'orange-button text-white fs-5 fw-bold' : 'gray-button text-dark fs-6 fw-bold'}>{menu.name}</Nav.Link>
                 </Nav.Item>
-
-
             ))}
         </Nav>
     );

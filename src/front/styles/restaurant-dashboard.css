@@ -1,0 +1,23 @@
+
+
+.gray-dropdown button {
+    color: black !important;
+    background-color: #f5f5f5 !important;
+    border: none;
+}
+
+.custom-accordion-header .accordion-button:not(.collapsed) {
+    background-color:#ff6200 !important; /* Change this to your desired color */
+    color: white !important; 
+  }
+
+  .custom-accordion-header .accordion-button {
+    background-color: #f5f5f5;
+    color: black;
+}
+
+
+.form-input{
+    background-color: #f5f5f5 !important;
+    color: #666 !important;
+}

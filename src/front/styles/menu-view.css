@@ -1,0 +1,29 @@
+.menu-view-dish-card {
+    width: 100% !important; /* Keep all cards the same width */
+    height: 100% !important; /* Set a fixed height for uniformity */
+    /* Optional, consistent spacing between cards */
+
+}
+
+.menu-view-img {
+    height: auto; /* Set a fixed height */
+    object-fit: cover; /* Ensures the image scales proportionally and crops if necessary */
+    width: 100%; /* Ensures the image fills the card's width */
+    display: block;
+    max-height: 200px;
+  }
+
+  .card-subtitle .badge {
+    background-color: #ff6200!important;
+    color: white !important;
+  }
+
+  .menu-view-card-img {
+    height: auto; /* Set a fixed height */
+    object-fit: cover; /* Ensures the image scales proportionally and crops if necessary */
+    width: 100%; /* Ensures the image fills the card's width */
+    display: block;
+    max-height: 300px;
+  }
+
+  
