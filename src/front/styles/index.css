@@ -178,6 +178,76 @@ table {
   font-size: 1.1rem;
 }
 
+/***********************REPORTS ADMIN******************************/
+/* Fondo general */
+body {
+  background-color: #ECECEC;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+/* Tabla de reportes */
+table {
+  background-color: #F8FAFC;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.table thead th {
+  background-color: #FF6C40;
+  color: #FFFFFF;
+  border: none;
+}
+
+.table tbody td {
+  vertical-align: middle;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f1f1f1;
+}
+
+/* Botón de acción */
+.btn-info {
+  background-color: #FF6C40 !important;
+  border: none !important;
+  font-weight: bold;
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.85rem;
+  color: white;
+  margin-right: 0.5rem;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.btn-info:hover {
+  background-color: #e65a30 !important;
+}
+
+.btn-danger {
+  background-color: #e63946 !important;
+  border: none !important;
+  font-weight: bold;
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.85rem;
+  color: white;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.btn-danger:hover {
+  background-color: #c5303b !important;
+}
+
+/* Mensaje si no hay reportes */
+.no-reports-message {
+  text-align: center;
+  color: #666;
+  padding: 2rem;
+  font-size: 1.1rem;
+}
+
 /***********************FREQUENT QUESTIONS*************************/
 /* Fondo general gris claro */
 body {
