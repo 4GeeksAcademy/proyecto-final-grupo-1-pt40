@@ -7,6 +7,16 @@
 }
 
 /* Generales */
+.navbar .navbar-brand {
+  color: #ff6200 !important; /* Use your desired color */
+  text-decoration: none; /* Optional: removes underline */
+}
+
+.img-logo-bullseye {
+  width: 2.95rem;
+  height:auto;
+  margin-bottom: 0.5rem;
+}
 
 .bg-gray {
     background-color: #f5f5f5 !important;

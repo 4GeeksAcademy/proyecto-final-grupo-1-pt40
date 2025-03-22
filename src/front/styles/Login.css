@@ -22,7 +22,7 @@
 .login-tabs .nav-link {
     font-size: 14px;
     font-weight: 600;
-    color: #666;
+    color: black!important;
     background-color: #f5f5f5;
     border-radius: 5px 5px 0 0;
     margin-right: 5px;
@@ -30,7 +30,7 @@
 
 .login-tabs .nav-link.active {
     background-color: #ff6200;
-    color: #fff;
+    color: #fff!important;
     border: none;
 }
 
