@@ -3,7 +3,7 @@ import { Context } from "../store/appContext";
 import { Container, Row, Col, Form, Button, ListGroup, Tabs, Tab, Table } from "react-bootstrap";
 import NotificationModal from "../component/NotificationModal.jsx";
 import AdminNavbar from "../component/AdminNavbar.jsx";
-
+import '../../styles/index.css';
 
 const AdminNotifications = () => {
 

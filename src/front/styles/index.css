@@ -125,6 +125,59 @@
   border: 2px solid #ff6200 !important;
 }
 
+/***********************NOTIFICATION ADMIN************************/
+/* Fondo general */
+body {
+  background-color: #ECECEC;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+/* Tabla de notificaciones */
+table {
+  background-color: #F8FAFC;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.table thead th {
+  background-color: #FF6C40;
+  color: #FFFFFF;
+  border: none;
+}
+
+.table tbody td {
+  vertical-align: middle;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f1f1f1;
+}
+
+/* Botón Eliminar */
+.btn-danger {
+  background-color: #FF6C40 !important;
+  border: none !important;
+  font-weight: bold;
+  border-radius: 1.5rem;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.85rem;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.btn-danger:hover {
+  background-color: #e55a00 !important;
+}
+
+/* Mensaje sin notificaciones */
+.no-notifications-message {
+  text-align: center;
+  color: #666;
+  padding: 2rem;
+  font-size: 1.1rem;
+}
+
 /***********************FREQUENT QUESTIONS*************************/
 /* Fondo general gris claro */
 body {
@@ -179,89 +232,3 @@ h1 {
   font-size: 0.95rem;
 }
 
-/*******************CONTACT************************/
-/* Fondo general */
-body {
-  background-color: #ECECEC;
-  font-family: 'Helvetica Neue', sans-serif;
-}
-
-/* Título principal */
-h1 {
-  color: #FF6C40;
-  font-weight: 800;
-}
-
-/* Subtítulos */
-h2 {
-  color: #333;
-  font-weight: 700;
-}
-
-/* Texto principal */
-.lead {
-  color: #444;
-  font-size: 1.1rem;
-}
-
-/* Formulario de contacto */
-form .form-label {
-  font-weight: 600;
-  color: #333;
-}
-
-form .form-control {
-  background-color: #F8FAFC;
-  border: 1px solid #ccc;
-  border-radius: 0.5rem;
-  padding: 0.75rem;
-  transition: border-color 0.2s ease-in-out;
-}
-
-form .form-control:focus {
-  border-color: #FF6C40;
-  box-shadow: 0 0 5px rgba(255, 108, 64, 0.4);
-  outline: none;
-}
-
-form button[type="submit"] {
-  background-color: #FF6C40;
-  border: none;
-  padding: 0.75rem;
-  font-weight: bold;
-  color: white;
-  border-radius: 999px;
-  transition: background-color 0.3s ease-in-out;
-}
-
-form button[type="submit"]:hover {
-  background-color: #e65a30;
-}
-
-/* Tarjeta de contacto */
-.card {
-  background-color: #F8FAFC;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: none;
-}
-
-.card-title {
-  color: #FF6C40;
-  font-weight: 700;
-  margin-bottom: 1rem;
-}
-
-.card li strong {
-  color: #333;
-}
-
-.card a {
-  color: #FF6C40;
-  transition: color 0.2s;
-}
-
-.card a:hover {
-  color: #e65a30;
-  text-decoration: underline;
-}
