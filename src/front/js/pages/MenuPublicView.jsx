@@ -131,8 +131,7 @@ const MenuPublicView = () => {
                                             </table>
                                         </div>
                                         <Card.Text className="d-flex justify-content-center">
-                                            <ClientReportModal restaurant_id={restaurant.restaurant_id} />
-
+                                            {isLogged && <ClientReportModal restaurant_id={restaurant.restaurant_id} />}
                                         </Card.Text>
                                     </Card.Body></>)
 
