@@ -7,22 +7,22 @@ import '../../styles/index.css';
 
 function AdminNavbar() {
     return (
-        <Navbar expand="lg" style={{ backgroundColor: 'F8FAFC' }}>
-            <Container>
-                <Navbar.Brand href="/" style={{ color: '#FF6C40', fontWeight: 900, fontSize: '1.8rem' }}>AlPunto</Navbar.Brand>
+        <Navbar expand="lg" className='admin-navbar'>
+            <Container fluid>
+                <Navbar.Brand href="/" style={{ color: '#FFFFFF', fontWeight: 900, fontSize: '1.8rem' }} className='admin-navbar-brand'>AlPunto</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" className="custom-toggler">
                     <span className="navbar-toggler-icon custom-toggler-icon"></span>
                 </Navbar.Toggle>
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
-                    <Nav.Link href="/admin-dashboard">
+                    <Nav.Link href="/admin-dashboard" className='admin-nav-link'>
                         <FaHome className="me-1" /> Panel de Control
                     </Nav.Link>
-                        <Nav.Link href="/admin-reports">
+                        <Nav.Link href="/admin-reports" className="admin-nav-link">
                             <FaExclamationTriangle className="me-1" /> Reportes
                         </Nav.Link>
 
-                        <Nav.Link href="/admin-notifications">
+                        <Nav.Link href="/admin-notifications" className="admin-nav-link">
                             <FaBell className="me-1" />Centro de Notificaciones
                         </Nav.Link>
                     </Nav>

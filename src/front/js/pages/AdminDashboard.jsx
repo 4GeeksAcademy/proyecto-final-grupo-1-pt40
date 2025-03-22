@@ -47,7 +47,7 @@ const AdminDashboard = () => {
     onLoad()
   }, [])
   return (
-    <Container fluid>
+    <Container fluid style={{ backgroundColor: '#ECECEC', minHeight: '100vh' }}>
       <AdminNavbar/>
       <Row>
         <Tabs
