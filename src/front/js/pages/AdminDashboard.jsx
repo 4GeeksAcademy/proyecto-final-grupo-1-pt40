@@ -3,6 +3,7 @@ import { Container, Row, Col, Form, Button, ListGroup, Tabs, Tab, Table } from "
 import { Context } from "../store/appContext";
 import NotificationModal from "../component/NotificationModal.jsx";
 import AdminNavbar from "../component/AdminNavbar.jsx";
+import '../../styles/index.css';
 
 const AdminDashboard = () => {
   const { store, actions } = useContext(Context);
@@ -58,8 +59,8 @@ const AdminDashboard = () => {
         >
           <Tab eventKey="restaurants" title="Restaurantes">
 
-            <Row className="my-4">
-              <Col lg='6' className="align-middle">
+            <Row className="my-4 align-items-end">
+              <Col lg='6'>
                 <Form>
                   <Form.Label>Buscar por Email o Username</Form.Label>
                   <Form.Control
@@ -70,7 +71,7 @@ const AdminDashboard = () => {
                   />
                 </Form>
               </Col>
-              <Col lg='3' className="align-bottom d-flex justify-content-around">
+              <Col lg='3' className="d-flex gap-2 mt-3 mt-lg-0">
                 <Button variant="primary" onClick={handleQuery}>Buscar</Button>
                 <Button variant="danger" onClick={resetQuery}>Volver a Buscar</Button>
               </Col>

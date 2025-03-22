@@ -125,6 +125,107 @@
   border: 2px solid #ff6200 !important;
 }
 
+/***********************DASHBOARD ADMIN**************************/
+/* Fondo general */
+body {
+  background-color: #ECECEC;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+/* Tabs */
+.nav-tabs .nav-link.active {
+  background-color: #FF6C40;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.nav-tabs .nav-link {
+  color: #FF6C40;
+  border: none;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.nav-tabs .nav-link:hover {
+  background-color: #FFECE6;
+}
+
+/* Input de búsqueda */
+form .form-label {
+  font-weight: 600;
+  color: #333;
+}
+
+form .form-control {
+  background-color: #F8FAFC;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  transition: border-color 0.2s ease-in-out;
+}
+
+form .form-control:focus {
+  border-color: #FF6C40;
+  box-shadow: 0 0 5px rgba(255, 108, 64, 0.4);
+  outline: none;
+}
+
+/* Botones */
+.btn-primary {
+  background-color: #5ed281 !important;
+  border: none !important;
+  font-weight: bold;
+  border-radius: 1.5rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  height: 42px;
+  line-height: 1.2;
+}
+
+.btn-primary:hover {
+  background-color: #30a967 !important;
+}
+
+.btn-danger {
+  background-color: #ff6200 !important;
+  border: none !important;
+  font-weight: bold;
+  border-radius: 1.5rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+  height: 42px; 
+  line-height: 1.2;
+}
+
+.btn-danger:hover {
+  background-color: #e55a00 !important;
+}
+
+/* Tablas */
+table {
+  background-color: #F8FAFC;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.table thead th {
+  background-color: #FF6C40;
+  color: #FFFFFF;
+  border: none;
+}
+
+.table tbody td {
+  vertical-align: middle;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f1f1f1;
+}
+
 /***********************NOTIFICATION ADMIN************************/
 /* Fondo general */
 body {
