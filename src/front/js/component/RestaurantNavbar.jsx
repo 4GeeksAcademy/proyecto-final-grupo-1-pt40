@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import CreateMenuModal from "./CreateMenuModal.jsx"; // Ajusta la ruta según tu estructura
 import LogoutButton from "./LogoutButton.jsx";
+import NotificationBell from "./NotificationBell.jsx";
 
 const RestaurantNavbar = () => {
   return (
@@ -25,6 +26,9 @@ const RestaurantNavbar = () => {
               <CreateMenuModal />
             </li>
             <li className="nav-item">
+              <Link className="nav-link" to="/restaurant-news">Publicar Novedades</Link>
+            </li>
+            <li className="nav-item">
               <Link className="nav-link" to="/edit-restaurant/">
                 Agregar Información
               </Link>
@@ -38,6 +42,9 @@ const RestaurantNavbar = () => {
               <Link className="nav-link" to="/plan-purchase/">
                 AlPunto+
               </Link>
+            </li>
+            <li className="nav-item">
+              <NotificationBell/>
             </li>
             <li className="nav-item">
               <Link className="nav-link">

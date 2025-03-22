@@ -74,9 +74,10 @@ const PayPal = () => {
       } else {
         const transaction = orderData;
         setMessage('Pago exitoso')
+        setPlan(true)
         const payment = await actions.premiumPlan()
         if (payment) {
-          setPlan(true)
+          const response = await actions.getRestaurantDetails()
         }
       }
     } catch (error) {

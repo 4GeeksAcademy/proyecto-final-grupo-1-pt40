@@ -4,6 +4,8 @@ import Button from 'react-bootstrap/Button';
 import { Form, ListGroup, Card } from "react-bootstrap";
 import Modal from 'react-bootstrap/Modal';
 import { Widget } from "@uploadcare/react-widget";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons'
 
 function EditModal({ dish }) {
     const { store, actions } = useContext(Context);
@@ -15,7 +17,7 @@ function EditModal({ dish }) {
 
 
     const handleEdit = async () => {
-        await actions.menuBuilderEditDish(dish.id, newDish, dish.category)
+        await actions.menuBuilderEditDish(dish.dish_id, newDish, dish.category)
         setShow(false)
     }
 
@@ -24,8 +26,8 @@ function EditModal({ dish }) {
     }
     return (
         <>
-            <Button variant="primary" onClick={handleShow}>
-                Editar Plato
+            <Button variant="warning" className="d-inline-block p-2" size="md" onClick={handleShow}>
+                <FontAwesomeIcon className='text-dark fs-5' icon={faPenToSquare} />
             </Button>
 
             <Modal
@@ -35,38 +37,45 @@ function EditModal({ dish }) {
                 keyboard={false}
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Editar platillo</Modal.Title>
+                    <Modal.Title>Editar Platillo</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
+                        <Form.Label className="fw-bold">Nombre</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Nombre del Platillo"
                             value={newDish.name}
                             onChange={(e) => setNewDish({ ...newDish, name: e.target.value })}
                         />
+                        <Form.Group>
+                         <Form.Label className="fw-bold">Imagen: </Form.Label>
+                         <span className="ms-1">
                         <Widget publicKey='47bd03853371888b5541' value={newDish.image} onChange={handleFileChange} />
+                         </span>
+                        </Form.Group>
+
+                        <Form.Label className="fw-bold">Descripción</Form.Label>
                         <Form.Control
                             as="textarea"
                             placeholder="Descripción del Platillo"
-                            className="mt-2"
                             value={newDish.description}
                             onChange={(e) => setNewDish({ ...newDish, description: e.target.value })}
                         />
+                        <Form.Label className="fw-bold">Precio</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Precio del Platillo"
-                            className="mt-2"
                             value={newDish.price}
                             onChange={(e) => setNewDish({ ...newDish, price: e.target.value })}
                         />
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
+                    <Button className="close-modal-button mx-1" onClick={handleClose}>
                         Cerrar
                     </Button>
-                    <Button variant="primary" onClick={handleEdit}>Guardar Cambios</Button>
+                    <Button className="orange-button mx-1" onClick={handleEdit}>Guardar Cambios</Button>
                 </Modal.Footer>
             </Modal>
         </>

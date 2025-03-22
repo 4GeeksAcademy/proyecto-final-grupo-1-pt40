@@ -28,7 +28,10 @@ const ClientNavbar = () => {
               <Link className="nav-link" to="/explore-page/">Explora</Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/client-profile/">Perfil</Link>
+              <Link className="nav-link" to="/news">Novedades</Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/client-profile/ ">Perfil</Link>
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/favorites/">Favoritos</Link>
