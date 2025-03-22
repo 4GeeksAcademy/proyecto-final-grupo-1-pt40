@@ -100,7 +100,7 @@ const FavoriteButton = ({ dish_id, restaurant_id }) => {
     };
 
     return (
-        <button onClick={handleFavorite} className="btn btn-outline-danger">
+        <button onClick={handleFavorite} className="btn btn-outline-danger p-2">
             {isFavorite ? "❤️" : "🤍"}
         </button>
     );

@@ -6,6 +6,7 @@ import Modal from 'react-bootstrap/Modal';
 import { Widget } from "@uploadcare/react-widget";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons'
+import '../../styles/menu-builder.css'
 
 function EditModal({ dish }) {
     const { store, actions } = useContext(Context);
@@ -37,7 +38,7 @@ function EditModal({ dish }) {
                 keyboard={false}
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Editar Platillo</Modal.Title>
+                    <Modal.Title className="text-orange fw-bold">EDITAR PLATILLO</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
@@ -46,6 +47,7 @@ function EditModal({ dish }) {
                             type="text"
                             placeholder="Nombre del Platillo"
                             value={newDish.name}
+                            className="form-input"
                             onChange={(e) => setNewDish({ ...newDish, name: e.target.value })}
                         />
                         <Form.Group>
@@ -60,6 +62,7 @@ function EditModal({ dish }) {
                             as="textarea"
                             placeholder="Descripción del Platillo"
                             value={newDish.description}
+                            className="form-input"
                             onChange={(e) => setNewDish({ ...newDish, description: e.target.value })}
                         />
                         <Form.Label className="fw-bold">Precio</Form.Label>
@@ -67,6 +70,7 @@ function EditModal({ dish }) {
                             type="text"
                             placeholder="Precio del Platillo"
                             value={newDish.price}
+                            className="form-input"
                             onChange={(e) => setNewDish({ ...newDish, price: e.target.value })}
                         />
                     </Form>

@@ -1478,4 +1478,20 @@ def get_news():
     
     result = [n.serialize() for n in news]
     return jsonify(result), 200
+@api.route('/token-validation', methods=['GET'])
+@jwt_required()
+def validate_client():
+    try:
+        client_id = get_jwt_identity()
+        claims = get_jwt()
+        role = claims.get("role")
+        if role != "client":
+            return jsonify({"status": False}), 403
+        return jsonify({"status":True}), 200
+    except ExpiredSignatureError:
+        return jsonify({'msg':'Token is expired'}),401
+    except InvalidTokenError:
+        return jsonify({'msg':'Token is invalid'}),401
+    except Exception as e:
+        return jsonify({"msg": f"Server error: {e}"}), 500
 
