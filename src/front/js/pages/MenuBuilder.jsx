@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom';
 import RestaurantNavbar from "../component/RestaurantNavbar.jsx";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash, faPenToSquare, faXmark, faCheck } from '@fortawesome/free-solid-svg-icons'
+import '../../styles/menu-builder.css'
 
 
 
@@ -143,7 +144,7 @@ const MenuBuilder = () => {
                             type="text"
                             value={editedCategoryName}
                             onChange={(e) => setEditedCategoryName(e.target.value)}
-                            className="form-control fs-5"
+                            className="form-control form-input fs-5"
                             style={{ width: "70%" }}
                           />
                           <div>
@@ -153,7 +154,7 @@ const MenuBuilder = () => {
                         </>
                       ) : (
                         <>
-                          <span onClick={() => setSelectedCategory(category)} style={{ cursor: "pointer" }}>{category}</span>
+                          <span onClick={() => setSelectedCategory(category)} className={`${category === selectedCategory ? "text-white" : ''}`} style={{ cursor: "pointer" }}>{category}</span>
                           <div>
                             <Button variant="warning" size="sm" className="px-2" onClick={() => startEditing(category)}><FontAwesomeIcon className='text-dark fs-5' icon={faPenToSquare} /></Button>
                             <Button variant="danger" size="sm" onClick={() => removeCategory(category)} className="ms-2 px-2 py-1"><FontAwesomeIcon className="fs-5" icon={faTrash} /></Button>
@@ -164,7 +165,7 @@ const MenuBuilder = () => {
                   ))}
                 </ListGroup>) : (
                   <div>No hay categorías en este momento</div>)}
-              <Form.Control className="mt-3 py-2 fs-5"
+              <Form.Control className="mt-3 py-2 fs-5 form-input"
                 type="text"
                 placeholder="Nueva categoría"
                 value={newCategory}
@@ -183,7 +184,7 @@ const MenuBuilder = () => {
                   type="text"
                   placeholder="Nombre del Platillo"
                   value={newDish.name}
-                  className="mt-3"
+                  className="mt-3 form-input"
                   onChange={(e) => setNewDish({ ...newDish, name: e.target.value })}
                 />
                 <div className="mt-2">
@@ -192,14 +193,14 @@ const MenuBuilder = () => {
                 <Form.Control
                   as="textarea"
                   placeholder="Descripción del Platillo"
-                  className="mt-2"
+                  className="mt-2 form-input"
                   value={newDish.description}
                   onChange={(e) => setNewDish({ ...newDish, description: e.target.value })}
                 />
                 <Form.Control
                   type="text"
                   placeholder="Precio del Platillo"
-                  className="mt-2"
+                  className="mt-2 form-input"
                   value={newDish.price}
                   onChange={(e) => setNewDish({ ...newDish, price: e.target.value })}
                 />

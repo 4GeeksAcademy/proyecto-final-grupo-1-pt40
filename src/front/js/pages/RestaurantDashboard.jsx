@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
 import { Button, Accordion, Alert, Modal, Form, Container, Row, Col, Stack } from "react-bootstrap";
 import Spinner from 'react-bootstrap/Spinner';
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
-import CreateMenuModal from "../component/CreateMenuModal.jsx";
 import DeleteMenuModal from "../component/DeleteMenuModal.jsx"
 import RestaurantNavbar from "../component/RestaurantNavbar.jsx";
+import "../../styles/restaurant-dashboard.css"
 
 const RestaurantDashboard = () => {
     const { store, actions } = useContext(Context);
@@ -100,7 +99,7 @@ const RestaurantDashboard = () => {
                 </Alert>) : ''}
 
 
-                <h2 className="mb-4 mx-2 fw-bold text-orange">Mis Menús</h2>
+                <h2 className="mb-4 mx-2 fw-bold text-orange">MENÚS</h2>
                 <Row className="menu-list p-4 shadow rounded d-flex mx-2">
                     {Array.isArray(store.restaurantMenus) ? (
                         store.restaurantMenus.length > 0 ? (
@@ -153,7 +152,7 @@ const RestaurantDashboard = () => {
                     )}
                 </Row>
 
-                <h2 className="mb-4 mx-2 mt-4 fw-bold text-orange">Mis Novedades y Anuncios</h2>
+                <h2 className="mb-4 mx-2 mt-4 fw-bold text-orange">NOVEDADES Y ANUNCIOS</h2>
                 <Row className="menu-list p-4 shadow rounded d-flex mx-2">
                     {Array.isArray(store.restaurantNews) ? (
                         store.restaurantNews.length > 0 ? (

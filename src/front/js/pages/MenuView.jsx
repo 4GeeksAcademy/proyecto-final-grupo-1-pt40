@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Tabs, Tab, Card, Button, Container, Row, Col, Badge, Nav } from "react-bootstrap";
+import { Card, Button, Container, Row, Col, Badge, Nav, Stack } from "react-bootstrap";
 import Spinner from 'react-bootstrap/Spinner';
 import { useParams } from 'react-router-dom';
 import { Context } from "../store/appContext";
 import GoogleMapsModal from "../component/GoogleMapsModal.jsx";
 import RestaurantNavbar from "../component/RestaurantNavbar.jsx";
+import "../../styles/menu-view.css"
+
 
 
 const MenuView = () => {
@@ -13,10 +15,10 @@ const MenuView = () => {
     const [menu, setMenu] = useState(null)
     const [dishes, setDishes] = useState(null)
     const [restaurant, setRestaurant] = useState(null)
+    const [selected, setSelected] = useState('')
 
 
     const onLoad = async () => {
-        console.log('here')
         const response = await actions.menuViewLoad(menu_id)
         if (response) {
             setMenu(store.menu.menu)
@@ -38,6 +40,7 @@ const MenuView = () => {
         const scrollTo = document.getElementById(catID)
         if (scrollTo) {
             scrollTo.scrollIntoView({ "behavior": "smooth", "block": "start" })
+            setSelected(catID)
         }
     }
 
@@ -57,22 +60,28 @@ const MenuView = () => {
     return (
         <div>
             <RestaurantNavbar />
-            <Container fluid className="m-1">
+            <Container fluid>
                 <Row className="w-25">
                     <div className={menu.is_active ? ('bg-success') : ('bg-danger')}>
                         <span className="fs-5"><strong>Estatus:</strong> {`${menu.is_active ? ('PÚBLICO') : ('PRIVADO')}`}</span>
                     </div>
                 </Row>
+
                 <Row className="w-100 h-100">
-                    <Col xs md lg="5" className="justify-content-start h-100">
-                        <Card className="w-100">
+                    <Col xs md lg="4" className="justify-content-start h-100">
+                        <Card className="w-100 shadow">
                             {dishes && restaurant && menu ?
                                 (<>
                                     <Card.Img variant="top" src={restaurant.image} />
                                     <Card.Body>
-                                        <Card.Title>{restaurant.name}</Card.Title>
-                                        <Card.Subtitle> <Badge bg="light" className="p-3 text-dark">{restaurant.cuisine_type}</Badge> <GoogleMapsModal addressLink={restaurant.social_networks} /></Card.Subtitle>
-                                        <Card.Text>{`${restaurant.exact_address}  ${restaurant.city}, ${restaurant.department}`} </Card.Text>
+                                        <Card.Title className="fs-2 fw-bold mt-2 text-center">{restaurant.name}</Card.Title>
+                                        <Card.Subtitle className="d-flex justify-content-around mt-3"> <Badge  className="py-2 px-4 text-dark gray-button align-items-center align-middle fs-6">{restaurant.cuisine_type}</Badge> <GoogleMapsModal addressLink={restaurant.social_networks} /></Card.Subtitle>
+                                        <Card.Text className="mt-2 fs-5">
+                                            
+                                            <strong>Dirección: </strong>{`${restaurant.exact_address}${restaurant.city}, ${restaurant.department}`} </Card.Text>
+                                        <Card.Text className="mt-2 fs-5">
+                                            <strong>Teléfono: </strong>
+                                            {`${restaurant.phone}`} </Card.Text>
 
                                         {restaurant.schedule.map((day, index) => (
                                             <div className="p-0 m-0" key={index}>{`${day.day}: ${day.isClosed ? 'Cerrado' : `${convertToAmPm(day.open)} - ${convertToAmPm(day.close)}`}`}</div>
@@ -89,13 +98,13 @@ const MenuView = () => {
                         </Card>
 
                     </Col>
-                    <Col xs md lg="7">
+                    <Col xs md lg="8">
                         <Row className="sticky-top py-2 w-100">
                             {menu && dishes && menu.categories && menu.categories.length > 0 ? (
-                                <Nav variant="pills" className="mb-3 bg-white p-3 rounded">
+                                <Nav variant="pills" className="mb-3 bg-white shadow p-3 rounded">
                                     {menu.categories.map((cat, index) => (
                                         <Nav.Item key={index} className="mx-2">
-                                            <Button onClick={() => handleScroll(cat)}>{cat}</Button>
+                                            <Button className={selected===cat? "orange-button fs-5": "gray-button fs-5"} onClick={() => handleScroll(cat)}>{cat}</Button>
                                         </Nav.Item>
                                     ))}
                                 </Nav>
@@ -105,22 +114,24 @@ const MenuView = () => {
 
                         </Row>
 
-                        <Row className="w-100">
+                        <Row className="mt-1 g-0 w-100 px-3 d-flex justify-content-center">
                             {dishes && menu && menu.categories && menu.categories.length > 0 ? (
-                                <Col style={{ height: '100vh', overflowY: 'auto' }}>
-                                    {menu.categories.map((cat, index) => (
+                                    menu.categories.map((cat, index) => (
                                         <React.Fragment key={index}>
                                             <div id={cat}>
                                                 <h3 className="my-2">{cat}</h3>
                                             </div>
+
                                             {Array.isArray(dishes[cat]) && dishes[cat].length > 0 ? (
                                                 dishes[cat].map((dish, dishIndex) => (
-                                                    <Card className="my-2" key={dishIndex}>
-                                                        <Row className="w-100">
-                                                            <Col md='4'>
-                                                                <Card.Img variant="top" src={dish.image} alt='Sin imagen' style={{ 'width': '200px', 'height': '150px' }} />
-                                                            </Col>
-                                                            <Col md='7'>
+                                                    <Card className="my-2 menu-builder-dish-card" key={dishIndex}>
+                                                        <Row className="w-100 h-100 m-0">
+                                                            {dish.image &&
+                                                                <Col xs='12' md='4' lg='4' className="p-0 m-0 ">
+                                                                    <Card.Img src={dish.image} alt='Sin imagen' className="menu-builder-img m-auto" />
+                                                                </Col>
+                                                            }
+                                                            <Col xs="12" md={dish.image ? "6" : "10"} lg={dish.image ? "8" : "10"} className="m-auto h-100 ">
                                                                 <Card.Body>
                                                                     <Card.Title>{dish.name}</Card.Title>
                                                                     <Card.Text>{dish.description}</Card.Text>
@@ -129,13 +140,14 @@ const MenuView = () => {
                                                             </Col>
                                                         </Row>
                                                     </Card>
+
                                                 ))
                                             ) : (
                                                 <div>No hay platillos en esta categoria</div>
                                             )}
                                         </React.Fragment>
-                                    ))}
-                                </Col>
+                                    ))
+                           
                             ) : (
                                 <div>Menu sin elementos</div>
                             )}

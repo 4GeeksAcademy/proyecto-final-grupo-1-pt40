@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import { Form, Dropdown, DropdownButton, Row, Col } from "react-bootstrap";
 import Modal from 'react-bootstrap/Modal';
 import { useNavigate } from "react-router-dom";
+import '../../styles/menu-builder.css'
 
 function CreateMenuModal() {
     const { store, actions } = useContext(Context);
@@ -42,7 +43,7 @@ function CreateMenuModal() {
                 keyboard={false}
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Datos del Menú</Modal.Title>
+                    <Modal.Title className="text-orange fw-bold">NUEVO MENÚ</Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="py-4">
                     <Form>
@@ -51,6 +52,7 @@ function CreateMenuModal() {
                                 <Form.Control
                                     type="text"
                                     placeholder="Nombre del Menú"
+                                    className="form-input"
                                     value={newMenu.name}
                                     onChange={(e) => setNewMenu({ ...newMenu, name: e.target.value })}
                                 />
