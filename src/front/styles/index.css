@@ -3,33 +3,50 @@
     margin: auto;
     text-align: left;
 }
-
-/*icono hamburguesa*/
-.custom-toggler {
-    background-color: #212529 !important; /* Fondo naranja */
-    border-color: #99999958 !important;
-    border-width: 2px !important;
-    box-shadow: none !important;
-}
-
-/*icono hamburguesa*/
-.custom-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%236B0C05' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
-}
-
+/***********************NAVBAR ADMIN************************/
+/* Estilo general del navbar */
 .admin-navbar {
   background-color: #212529;
   border-radius: 10px;
+  color: #FFFFFF;
 }
 
+/* Marca del navbar */
 .admin-navbar-brand {
   color: #FFFFFF;
   font-weight: 900;
   font-size: 1.8rem;
 }
 
+/* Enlaces del navbar */
+.admin-navbar .nav-link {
+  color: #FFFFFF !important;
+  transition: color 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-navbar .nav-link:hover {
+  color: #CCCCCC !important;
+}
+
+/* Íconos dentro de los enlaces */
+.admin-navbar .nav-link svg {
+  color: #FFFFFF !important;
+  transition: color 0.3s ease-in-out;
+}
+
+.admin-navbar .nav-link:hover svg {
+  color: #CCCCCC !important;
+}
+
+/* Botón hamburguesa */
 .custom-toggler {
-  border-color: #D3D3D3;
+  background-color: #383838;
+  border-color: #99999958;
+  border-width: 2px;
+  box-shadow: none;
   transition: border-color 0.3s ease-in-out;
 }
 
@@ -37,16 +54,214 @@
   border-color: #FF6C40;
 }
 
-.custom-toggler .custom-toggler-icon {
-  filter: invert(90%);
+/* Icono hamburguesa en SVG */
+.custom-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23CCCCCC' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 1.5em;
+  height: 1.5em;
   transition: filter 0.3s ease-in-out;
 }
 
-.admin-nav-link {
-  color: #FFFFFF;
-  transition: color 0.3s ease-in-out;
+/* Hover suave del icono */
+.custom-toggler:hover .custom-toggler-icon {
+  filter: brightness(1.5);
 }
 
-.admin-nav-link:hover {
+/***********************LOGIN ADMIN************************/
+/* Fondo oscuro detrás del login */
+.login-background {
+  background-color: #212529;
+}
+
+/* Card del login */
+.login-card {
+  width: 24rem;
+  padding: 2rem;
+  background-color: #F8FAFC !important;
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Inputs gris claro */
+.login-input {
+  background-color: #e0e0e0 !important;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+}
+
+/* Botón naranja */
+.login-button {
+  background-color: #ff6200 !important;
+  border: 2px solid #ff6200 !important;
+  border-radius: 1.5rem !important;
+  padding: 0.6rem 1.5rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease-in-out;
+  color: white;
+}
+
+.login-button:hover {
+  background-color: #e55a00 !important;
+  border: 2px solid #e55a00 !important;
+  box-shadow: 0 0 8px #e55a00;
+}
+
+.login-button:focus,
+.login-button:focus-visible,
+.login-button:active {
+  outline: none !important;
+  box-shadow: 0 0 10px #ff6200 !important;
+  border-color: #ff6200 !important;
+}
+
+.login-input:focus {
+  outline: none !important;
+  box-shadow: 0 0 6px #ff6200 !important;
+  border: 2px solid #ff6200 !important;
+}
+
+/***********************FREQUENT QUESTIONS*************************/
+/* Fondo general gris claro */
+body {
+  background-color: #ECECEC !important;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+/* Título principal */
+h1 {
+  color: #ff6200;
+  font-weight: 800;
+}
+
+/* Estilo para el texto principal */
+.lead {
+  color: #333;
+  font-size: 1.1rem;
+}
+
+/* Acordeón */
+.accordion-item {
+  border: 1px solid #ff6200;
+  border-radius: 1rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.accordion-button {
+  background-color: #ffffff;
+  color: #ff6200;
+  font-weight: bold;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.accordion-button:focus {
+  box-shadow: 0 0 0 0.25rem rgba(255, 108, 64, 0.25);
+}
+
+/* Botón activo (cuando está expandido) */
+.accordion-button:not(.collapsed) {
+  background-color: #ff6200 !important; 
+  color: #FFFFFF !important;
+  font-weight: bold;
+  box-shadow: none;
+}
+
+/* Fondo y texto del contenido del acordeón */
+.accordion-body {
+  background-color: #FFFFFF; 
+  color: black;            
+  padding: 1rem 1.25rem;
+  font-size: 0.95rem;
+}
+
+/*******************CONTACT************************/
+/* Fondo general */
+body {
+  background-color: #ECECEC;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+/* Título principal */
+h1 {
   color: #FF6C40;
+  font-weight: 800;
+}
+
+/* Subtítulos */
+h2 {
+  color: #333;
+  font-weight: 700;
+}
+
+/* Texto principal */
+.lead {
+  color: #444;
+  font-size: 1.1rem;
+}
+
+/* Formulario de contacto */
+form .form-label {
+  font-weight: 600;
+  color: #333;
+}
+
+form .form-control {
+  background-color: #F8FAFC;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  transition: border-color 0.2s ease-in-out;
+}
+
+form .form-control:focus {
+  border-color: #FF6C40;
+  box-shadow: 0 0 5px rgba(255, 108, 64, 0.4);
+  outline: none;
+}
+
+form button[type="submit"] {
+  background-color: #FF6C40;
+  border: none;
+  padding: 0.75rem;
+  font-weight: bold;
+  color: white;
+  border-radius: 999px;
+  transition: background-color 0.3s ease-in-out;
+}
+
+form button[type="submit"]:hover {
+  background-color: #e65a30;
+}
+
+/* Tarjeta de contacto */
+.card {
+  background-color: #F8FAFC;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: none;
+}
+
+.card-title {
+  color: #FF6C40;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.card li strong {
+  color: #333;
+}
+
+.card a {
+  color: #FF6C40;
+  transition: color 0.2s;
+}
+
+.card a:hover {
+  color: #e65a30;
+  text-decoration: underline;
 }
