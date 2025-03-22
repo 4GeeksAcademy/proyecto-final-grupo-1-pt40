@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import { Form, Button } from "react-bootstrap";
+import ClientNavbar from "../component/ClientNavbar.jsx";
+import "../../styles/ClientProfileEdit.css"; 
 
 const ClientProfileEdit = () => {
   const { store, actions } = useContext(Context);
@@ -93,61 +95,70 @@ const ClientProfileEdit = () => {
   }, []);
 
   return (
-    <Form onSubmit={handleSubmission}>
-      <Form.Group className="mb-3" controlId="Email">
-        <Form.Label>Correo Electrónico</Form.Label>
-        <Form.Control
-          type="email"
-          placeholder="Ingresa un correo electrónico"
-          value={registration.email}
-          name="email"
-          disabled // Email typically shouldn’t be editable
-        />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="Username">
-        <Form.Label>Nombre de Usuario</Form.Label>
-        <Form.Control
-          type="text"
-          placeholder="Ingresa un nombre de usuario"
-          value={registration.username}
-          name="username"
-          disabled // Username typically shouldn’t be editable
-        />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="Address">
-        <Form.Label>Ubicación</Form.Label>
-        <Form.Select
-          aria-label="Departments"
-          onChange={handleDepartment}
-          value={
-            departments.find((dep) => dep.name === registration.department)?.id || ""
-          }
-        >
-          <option value="">Selecciona un departamento</option>
-          {departments?.map((dep, index) => (
-            <option key={index} value={dep.id}>
-              {dep.name}
-            </option>
-          ))}
-        </Form.Select>
-        <Form.Select
-          aria-label="Cities"
-          onChange={handleSelectCity}
-          disabled={cities.length === 0}
-          value={cities.find((city) => city.name === registration.city)?.id || ""}
-        >
-          <option value="">Selecciona una ciudad</option>
-          {cities?.map((city, index) => (
-            <option key={city.id} value={city.id}>
-              {city.name}
-            </option>
-          ))}
-        </Form.Select>
-      </Form.Group>
-      <Button variant="primary" type="submit">
-        Actualizar Perfil
-      </Button>
-    </Form>
+    <div>
+      <ClientNavbar />
+      <div className="client-profile-edit-page">
+        <div className="client-profile-edit-container">
+          <h2 className="client-profile-edit-title">EDITAR PERFIL</h2>
+          <Form className="client-profile-edit-form" onSubmit={handleSubmission}>
+            <Form.Group className="mb-3" controlId="Email">
+              <Form.Label>Email</Form.Label>
+              <Form.Control
+                type="email"
+                placeholder="Ingresa tu email"
+                value={registration.email}
+                name="email"
+                disabled
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="Username">
+              <Form.Label>Username</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Escoge tu nombre de usuario"
+                value={registration.username}
+                name="username"
+                disabled
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="Location">
+              <Form.Label>Ubicación</Form.Label>
+              <Form.Select
+                aria-label="Departments"
+                onChange={handleDepartment}
+                value={
+                  departments.find((dep) => dep.name === registration.department)?.id || ""
+                }
+                className="mb-2"
+              >
+                <option value="">Selecciona un departamento</option>
+                {departments?.map((dep, index) => (
+                  <option key={index} value={dep.id}>
+                    {dep.name}
+                  </option>
+                ))}
+              </Form.Select>
+              <Form.Select
+                aria-label="Cities"
+                onChange={handleSelectCity}
+                disabled={cities.length === 0}
+                value={cities.find((city) => city.name === registration.city)?.id || ""}
+              >
+                <option value="">Selecciona una ciudad</option>
+                {cities?.map((city, index) => (
+                  <option key={city.id} value={city.id}>
+                    {city.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+            <Button className="client-profile-edit-button" type="submit">
+              ACTUALIZAR PERFIL
+            </Button>
+          </Form>
+        </div>
+      </div>
+    </div>
   );
 };
 
