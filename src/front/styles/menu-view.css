@@ -18,4 +18,12 @@
     color: white !important;
   }
 
+  .menu-view-card-img {
+    height: auto; /* Set a fixed height */
+    object-fit: cover; /* Ensures the image scales proportionally and crops if necessary */
+    width: 100%; /* Ensures the image fills the card's width */
+    display: block;
+    max-height: 300px;
+  }
+
   

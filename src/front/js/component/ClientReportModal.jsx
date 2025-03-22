@@ -37,38 +37,40 @@ function ClientReportModal({ restaurant_id }) {
 
     return (
         <>
-            <Button className="bg-secondary mt-3" onClick={handleShow}>Reportar Restaurante</Button>
+            <Button  variant='danger' className="mt-3 fw-bold" onClick={handleShow}>Reportar Restaurante</Button>
 
             <Modal show={show} onHide={handleClose} backdrop="static" keyboard={false}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Reportar Restaurante</Modal.Title>
+                    <Modal.Title className="text-orange fw-bold">REPORTAR RESTAURANTE</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Form.Group>
-                            <Form.Label>Asunto</Form.Label>
+                            <Form.Label className="fw-bold">Asunto</Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="Escribe el motivo del reporte"
                                 value={subject}
                                 onChange={(e) => setSubject(e.target.value)}
+                                className="form-input"
                             />
                         </Form.Group>
                         <Form.Group className="mt-3">
-                            <Form.Label>Mensaje</Form.Label>
+                            <Form.Label className="fw-bold">Mensaje</Form.Label>
                             <Form.Control
                                 as="textarea"
                                 rows={3}
                                 placeholder="Describe el problema"
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
+                                className="form-input"
                             />
                         </Form.Group>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>Cerrar</Button>
-                    <Button variant="primary" onClick={handleSendReport}>Enviar</Button>
+                    <Button className="close-modal-button" onClick={handleClose}>Cerrar</Button>
+                    <Button variant="danger" className="fw-bold" onClick={handleSendReport}>Enviar</Button>
                 </Modal.Footer>
             </Modal>
         </>

@@ -13,8 +13,8 @@ const GoogleMapsModal = ({ addressLink }) => {
 
   return (
     <>
-      <Button variant="light" className='text-dark gray-button py-3 px-4 align-items-center' onClick={handleShow}>
-        <FontAwesomeIcon className='fs-4 mx-1' icon={faLocationDot} /> Google Maps
+      <Button variant="light" className='text-dark gray-button py-2 px-5 align-items-center' onClick={handleShow}>
+        <FontAwesomeIcon className='fs-4 mx-1' icon={faLocationDot} /> Ubicación
       </Button>
 
       <Modal show={show} onHide={handleClose}>

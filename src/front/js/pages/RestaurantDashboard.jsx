@@ -106,7 +106,7 @@ const RestaurantDashboard = () => {
                             <Accordion className="w-100">
                                 {store.restaurantMenus.map((menu) => (
                                     <Accordion.Item eventKey={menu.menu_id} key={menu.menu_id}>
-                                        <Accordion.Header className="custom-accordion-header"><div className="fw-bold text-bw fs-5">{menu.name}</div></Accordion.Header>
+                                        <Accordion.Header className="custom-accordion-header"><div className="fw-bold text-bw fs-5">{`${menu.name} (ID: ${menu.menu_id})`}</div></Accordion.Header>
                                         <Accordion.Body>
                                             <Row>
                                                 <Col xs='12' md='6' lg='2' className="justify-content-start mb-2">
@@ -159,7 +159,7 @@ const RestaurantDashboard = () => {
                             <Accordion className="w-100">
                                 {store.restaurantNews.map((item, index) => (
                                     <Accordion.Item eventKey={item.id} key={item.id}>
-                                        <Accordion.Header className="custom-accordion-header"><div className="fw-bold text-bw fs-5">{item.title}</div></Accordion.Header>
+                                        <Accordion.Header className="custom-accordion-header"><div className="fw-bold text-bw fs-5">{`${item.title} (ID: ${item.id})`}</div></Accordion.Header>
                                         <Accordion.Body>
                                             <Row>
                                                 <Col xs='12' md='6' lg='4' className="justify-content-start mb-2">

@@ -41,7 +41,7 @@ const RestaurantNewsForm = () => {
             setErrorMessage("");
             await actions.createRestaurantNews(newsData);
             setSuccessMessage("¡La publicación se ha creado exitosamente!");
-            setNewsData({ title: "", description: "", category: "", image: "", expirationDate: "" });
+            setNewsData({ title: "", description: "", category: "", image: "", expirationDate: "" , expiration_date:""});
             setWidgetKey(prev => 1 + prev)
             setTimeout(() => {
                 setSuccessMessage("");
@@ -65,7 +65,7 @@ const RestaurantNewsForm = () => {
             setTimeout(() => {
                 setSuccessMessage("");
                 navigateTo("/restaurant-dashboard")
-            }, 6000);
+            }, 4000);
 
         } catch (error) {
             setErrorMessage("Ocurrió un error al actualizar la publicación. Por favor intente nuevamente.");
@@ -108,7 +108,7 @@ const RestaurantNewsForm = () => {
                     </h3>
 
                     <input type="text" name="title" value={newsData.title} onChange={handleChange} placeholder="Título de la publicación" className="form-control form-input mb-2" required />
-                    <select name="category" value={newsData.category} onChange={handleChange} className="form-control mt-3" required>
+                    <select name="category" value={newsData.category} onChange={handleChange} className="form-control mt-3 bg-gray input-form" required>
                         <option value="">Seleccionar una categoría categoría</option>
                         <option value="Descuentos">Descuentos</option>
                         <option value="Eventos">Eventos</option>

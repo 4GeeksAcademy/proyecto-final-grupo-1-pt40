@@ -1353,9 +1353,31 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const store = getStore()
                 setStore({ ...store, editNews: data })
                 return true
-            }
+            },
 
+            checkClient: async () => {
+                const token = sessionStorage.getItem("token");
+                if (!token) {
+                    return false
+                }
+                try {
+                    const response = await fetch(process.env.BACKEND_URL + `api/token-validation`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
 
+                    if (!response.ok) throw new Error("Client is not logged in");
+
+                    return true
+
+                } catch (error) {
+                    console.error("Error:", error);
+                    return false
+
+                }
+            },
 
         }
     };
