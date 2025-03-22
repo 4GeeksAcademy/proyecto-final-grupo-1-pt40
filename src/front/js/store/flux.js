@@ -20,8 +20,9 @@ const getState = ({ getStore, getActions, setStore }) => {
             showLimitToast: false,
             showLimitMenuToast: false,
             plan: '',
-            news:[],
-            restaurantNews:[],
+            news: [],
+            restaurantNews: [],
+            editNews: {}
         },
         actions: {
             registerUser: async (userType, registration) => {
@@ -331,6 +332,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                     if (!response.ok) {
                         throw new Error(res.statusText);
                     }
+
+                    const updatedMenus = [...store.restaurantMenus].filter(menu => menu.menu_id !== menu_id);
+                    setStore({ ...store, restaurantMenus: updatedMenus })
                     return true
                 }
                 catch (error) {
@@ -1235,13 +1239,13 @@ const getState = ({ getStore, getActions, setStore }) => {
                             Authorization: "Bearer " + sessionStorage.getItem("token"),
                         },
                     });
-            
+
                     if (!resp.ok) throw new Error("Error fetching news");
-            
+
                     const data = await resp.json();
                     console.log("Noticias recibidas:", data);
                     setStore({ news: data });
-            
+
                 } catch (error) {
                     console.error("Error fetching news:", error);
                 }
@@ -1249,6 +1253,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             getRestaurantNews: async () => {
                 try {
+                    const store = getStore()
                     const token = sessionStorage.getItem("token");
                     const response = await fetch(process.env.BACKEND_URL + "api/restaurant/news", {
                         method: "GET",
@@ -1256,19 +1261,21 @@ const getState = ({ getStore, getActions, setStore }) => {
                             "Authorization": `Bearer ${token}`
                         }
                     });
-            
+
                     if (!response.ok) throw new Error("Error al obtener las novedades del restaurante");
-            
+
                     const data = await response.json();
-                    setStore({ restaurantNews: data });
-            
+                    setStore({ ...store, restaurantNews: data });
+                    return true
                 } catch (error) {
                     console.error("Error:", error);
+                    return false
                 }
             },
-            
+
             createRestaurantNews: async (newsData) => {
                 console.log("📤 Enviando al backend:", newsData);
+                const store = getStore()
                 try {
                     console.log("Enviando al backend:", newsData);
                     const token = sessionStorage.getItem("token");
@@ -1280,18 +1287,19 @@ const getState = ({ getStore, getActions, setStore }) => {
                         },
                         body: JSON.stringify(newsData)
                     });
-            
+
                     if (!response.ok) throw new Error("Error al crear la novedad");
-            
+
                     const data = await response.json();
-                    setStore({ restaurantNews: [...getStore().restaurantNews, data] });
-            
+                    setStore({ ...store, restaurantNews: [...getStore().restaurantNews, data] });
+
                 } catch (error) {
                     console.error("Error:", error);
                 }
             },
-            
+
             editRestaurantNews: async (newsId, updatedData) => {
+                const store = getStore()
                 try {
                     const token = sessionStorage.getItem("token");
                     const response = await fetch(process.env.BACKEND_URL + `api/restaurant/news/${newsId}`, {
@@ -1302,22 +1310,23 @@ const getState = ({ getStore, getActions, setStore }) => {
                         },
                         body: JSON.stringify(updatedData)
                     });
-            
+
                     if (!response.ok) throw new Error("Error al actualizar la novedad");
-            
+
                     const data = await response.json();
-                    setStore({
-                        restaurantNews: getStore().restaurantNews.map(news =>
-                            news.id === newsId ? data : news
-                        )
-                    });
-            
+                    // setStore({...store,
+                    //     restaurantNews: getStore().restaurantNews.map(news =>
+                    //         news.id === newsId ? data : news
+                    //     )
+                    // });
+
                 } catch (error) {
                     console.error("Error:", error);
                 }
             },
-            
+
             deleteRestaurantNews: async (newsId) => {
+                const store = getStore()
                 try {
                     const token = sessionStorage.getItem("token");
                     const response = await fetch(process.env.BACKEND_URL + `api/restaurant/news/${newsId}`, {
@@ -1326,17 +1335,27 @@ const getState = ({ getStore, getActions, setStore }) => {
                             "Authorization": `Bearer ${token}`
                         }
                     });
-            
+
                     if (!response.ok) throw new Error("Error al eliminar la novedad");
-            
+
                     setStore({
+                        ...store,
                         restaurantNews: getStore().restaurantNews.filter(news => news.id !== newsId)
                     });
-            
+                    return true
                 } catch (error) {
                     console.error("Error:", error);
+                    return false
                 }
+            },
+
+            editNewsRequest: async (data) => {
+                const store = getStore()
+                setStore({ ...store, editNews: data })
+                return true
             }
+
+
 
         }
     };

@@ -543,8 +543,6 @@ def get_restaurant_menus():
             return jsonify({"error": "Unauthorized: Only restaurants can create menus"}), 403
     try:
         menus = Menu.query.filter_by(restaurant_id=restaurant_id).order_by(Menu.id).all()
-        if not menus:
-            return jsonify({'message': 'No menus at the moment'}), 200
         
         return jsonify([menu.serialize() for menu in menus]), 200
     except Exception as e:
@@ -1393,14 +1391,14 @@ def restaurant_news():
             return jsonify({"error": "Failed to create news"}), 500
 
     if request.method == 'GET':
-        if role != "client":
-            return jsonify({"error": "Unauthorized: Only clients can access news"}), 403
+        if role != "restaurant":
+            return jsonify({"error": "Unauthorized: Only restaurants can access news"}), 403
 
-        client = Client.query.get(restaurant_id)
-        if not client:
-            return jsonify({"error": "Client not found"}), 404
+        restaurant = Restaurant.query.get(restaurant_id)
+        if not restaurant:
+            return jsonify({"error": "Restaurant not found"}), 404
 
-        news = RestaurantNews.query.join(Restaurant).filter(Restaurant.city == client.city).order_by(RestaurantNews.created_at.desc()).all()
+        news = RestaurantNews.query.join(Restaurant).filter(RestaurantNews.restaurant_id == restaurant_id).order_by(RestaurantNews.created_at.desc()).all()
         result = [n.serialize() for n in news]
         return jsonify(result), 200
 
@@ -1419,7 +1417,7 @@ def delete_news(news_id):
     if not news:
         return jsonify({"error": "News not found"}), 404
 
-    if news.restaurant_id != restaurant_id:
+    if str(news.restaurant_id) != restaurant_id:
         return jsonify({"error": "Unauthorized: You can only delete your own news"}), 403
 
     try:
@@ -1445,7 +1443,7 @@ def update_news(news_id):
     if not news:
         return jsonify({"error": "News not found"}), 404
 
-    if news.restaurant_id != restaurant_id:
+    if str(news.restaurant_id) != restaurant_id:
         return jsonify({"error": "Unauthorized: You can only edit your own news"}), 403
 
     data = request.json
@@ -1453,7 +1451,8 @@ def update_news(news_id):
     news.description = data.get('description', news.description)
     news.image = data.get('image', news.image)
     news.category = data.get('category', news.category)
-
+    news.expiration_date = data.get('expiration_date', news.expiration_date)
+    
     try:
         db.session.commit()
         return jsonify({"msg": "News updated successfully"}), 200

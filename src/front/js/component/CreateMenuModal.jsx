@@ -22,7 +22,6 @@ function CreateMenuModal() {
         const response = await actions.createMenu(newMenu)
         if (response) {
             navigate(`/menu-builder/${response.menu_id}`)
-            setShow(false)
         }
     }
 
