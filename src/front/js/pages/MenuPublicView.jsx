@@ -43,7 +43,7 @@ const MenuPublicView = () => {
         const clientStatus = await actions.checkClient()
         if (clientStatus) {
             setIsLogged(true)
-        }else{
+        } else {
             setIsLogged(false)
         }
     }
@@ -80,18 +80,18 @@ const MenuPublicView = () => {
 
     return (
         <div>
-           {isLogged ? <ClientNavbar />:<MainNavbar/>} 
+            {isLogged ? <ClientNavbar /> : <MainNavbar />}
             <Container fluid>
                 <Row className="w-100 text-center d-flex justify-content-start my-2">
                     <Col xs md lg='4'>
-                    <MenuNavigation username={restaurant_username} menus={menuList} />
+                        <MenuNavigation username={restaurant_username} menus={menuList} />
                     </Col>
 
                     <Col xs md lg='8' className="d-flex justify-content-center">
-                    <div className="d-flex justify-content-between align-items-center bg-gray px-3 py-2 mt-3 rounded">
-                        <span className="mx-2 fs-6 fw-bold">Agregar Restaurante a Favoritos</span>
-                        {isLogged && <FavoriteButton dish_id={null} restaurant_id={restaurant.restaurant_id} />}
-                    </div>
+                        {isLogged && <div className="d-flex justify-content-between align-items-center bg-gray px-3 py-2 mt-3 rounded">
+                            <span className="mx-2 fs-6 fw-bold">Agregar Restaurante a Favoritos</span>
+                             <FavoriteButton dish_id={null} restaurant_id={restaurant.restaurant_id} />
+                        </div>}
                     </Col>
                 </Row>
 
@@ -191,6 +191,9 @@ const MenuPublicView = () => {
                                                         </tbody>
                                                     </table>
                                                 </div>
+                                                <Card.Text className="d-flex justify-content-center">
+                                                    {isLogged && <ClientReportModal restaurant_id={restaurant.restaurant_id} />}
+                                                </Card.Text>
                                             </Card.Body></>)
 
                                         : (<Card.Body>
@@ -248,9 +251,9 @@ const MenuPublicView = () => {
                                                             </Card.Body>
                                                         </Col>
                                                         <Col xs md='1' lg='1' className="align-middle text-center align-items-center d-flex justify-content-center">
-                                                        <div className="m-2">
-                                                            {isLogged && <FavoriteButton dish_id={dish.dish_id} restaurant_id={null} />}
-                                                        </div>
+                                                            <div className="m-2">
+                                                                {isLogged && <FavoriteButton dish_id={dish.dish_id} restaurant_id={null} />}
+                                                            </div>
                                                         </Col>
                                                     </Row>
                                                 </Card>
