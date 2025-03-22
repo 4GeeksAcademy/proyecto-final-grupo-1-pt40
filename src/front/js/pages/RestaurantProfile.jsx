@@ -65,14 +65,6 @@ const RestaurantProfile = () => {
                   <i className="fas fa-phone me-1"></i>
                   {profile.phone || "No disponible"}
                 </span>
-                {profile.social_networks && (
-                  <span className="meta-item">
-                    <i className="fas fa-link me-1"></i>
-                    <a href={profile.social_networks} target="_blank" rel="noopener noreferrer">
-                      Ver en Google Maps
-                    </a>
-                  </span>
-                )}
                 <span className="cuisine-tag">{profile.cuisine_type || "No especificado"}</span>
               </div>
               <Button className="profile-button mt-3" onClick={() => navigate(`/edit-restaurant/`)}>
@@ -89,7 +81,7 @@ const RestaurantProfile = () => {
                 </Card.Body>
               </Card>
             </Col>
-            <Col md={6}>
+            <Col md={12}> 
               <Card className="info-section mb-4">
                 <Card.Body>
                   <Card.Title className="section-title">Horario de Atención</Card.Title>
@@ -101,22 +93,6 @@ const RestaurantProfile = () => {
                     ))
                   ) : (
                     <p>No disponible</p>
-                  )}
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={6}>
-              <Card className="info-section mb-4">
-                <Card.Body>
-                  <Card.Title className="section-title">Redes Sociales</Card.Title>
-                  {profile.social_networks ? (
-                    profile.social_networks.split(",").map((network, index) => (
-                      <a key={index} href={network.trim()} className="me-3 social-link" target="_blank" rel="noopener noreferrer">
-                        <i className="fab fa-facebook fa-lg text-primary"></i>
-                      </a>
-                    ))
-                  ) : (
-                    <p>No tiene redes sociales registradas</p>
                   )}
                 </Card.Body>
               </Card>

@@ -1,37 +1,36 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
-import { Button, Form, Card } from "react-bootstrap";
+import { Tabs, Tab, Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import "../../styles/Login.css"; 
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { store, actions } = useContext(Context);
-
+  const { actions } = useContext(Context);
   const navigate = useNavigate();
 
-  const handleLogin = async (role) => {
-    if (email && password) {
-      const success = await actions.loginUser(role, email, password);
-      if (success) {
-        if (role === "client") {
-          navigate("/client-dashboard");
-        } else if (role === "restaurant") {
-          navigate("/restaurant-dashboard");
+  const LoginForm = ({ role }) => {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleLogin = async () => {
+      if (email && password) {
+        const success = await actions.loginUser(role, email, password);
+        if (success) {
+          if (role === "client") {
+            navigate("/client-dashboard");
+          } else if (role === "restaurant") {
+            navigate("/restaurant-dashboard");
+          }
+        } else {
+          alert("Error en el login. Verifica tus credenciales.");
         }
       } else {
-        alert("Error en el login. Verifica tus credenciales.");
+        alert("Por favor, ingrese su email y contraseña.");
       }
-    } else {
-      alert("Por favor, ingrese su email y contraseña.");
-    }
-  };
+    };
 
-  return (
-    <div className="login-container">
-      <h2 className="login-title">INICIAR SESIÓN</h2>
+    return (
       <Form className="login-form">
         <Form.Group className="mb-3">
           <Form.Label>Email</Form.Label>
@@ -54,18 +53,42 @@ const Login = () => {
             <Link to="/password-reset-request">¿Olvidaste tu contraseña?</Link>
           </Form.Text>
         </Form.Group>
-        <div className="d-flex justify-content-between">
-          <Button className="login-button" onClick={() => handleLogin("client")}>
-            CLIENTE
-          </Button>
-          <Button
-            className="login-button"
-            onClick={() => handleLogin("restaurant")}
-          >
-            RESTAURANTE
-          </Button>
-        </div>
+        <Button 
+          className="login-button w-100" 
+          onClick={handleLogin}
+        >
+          INICIAR SESIÓN
+        </Button>
       </Form>
+    );
+  };
+
+  return (
+    <div className="login-container">
+      <h2 className="login-title">INICIAR SESIÓN</h2>
+      <Tabs
+        defaultActiveKey="client"
+        id="login-tabs"
+        className="login-tabs mb-3"
+        fill
+      >
+        <Tab
+          eventKey="client"
+          title="Cliente"
+          key="client"
+          className="login-tab"
+        >
+          <LoginForm role="client" />
+        </Tab>
+        <Tab
+          eventKey="restaurant"
+          title="Restaurante"
+          key="restaurant"
+          className="login-tab"
+        >
+          <LoginForm role="restaurant" />
+        </Tab>
+      </Tabs>
     </div>
   );
 };
