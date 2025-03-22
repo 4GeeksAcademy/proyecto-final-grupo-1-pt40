@@ -70,8 +70,8 @@ const RestaurantDashboard = () => {
 
     const handleDeleteNews = async (id) => {
         const response = await actions.deleteRestaurantNews(id)
-        if (!response){
-            alert('No se eliminó correctamente')
+        if (!response) {
+            console.log('Error eliminando anuncio')
         }
 
     }
@@ -145,10 +145,11 @@ const RestaurantDashboard = () => {
                                 ))}
                             </Accordion>
                         ) : (
-                            <Spinner animation="border" variant="danger" />
+                            <h2>No hay menús guardados, haz click en Nuevo Menú</h2>
+
                         )
                     ) : (
-                        <h2>No hay menús guardados, haz click en Nuevo Menú</h2>
+                        <Spinner animation="border" variant="danger" />
                     )}
                 </Row>
 
@@ -189,10 +190,10 @@ const RestaurantDashboard = () => {
                                             </Row>
 
                                             <Row className="text-center align-items-center mt-2 px-2">
-                                                    <Stack direction="horizontal" gap={2} className="m-auto justify-content-center align-middle flex-wrap" >
-                                                        <Button variant="danger" size='md' className='btn-responsive btn-small-text' onClick={() => handleDeleteNews(item.id)}>Eliminar</Button>
-                                                        <Button variant="primary" size='md' className='btn-responsive btn-small-text' onClick={() => handleEditNews(item)}>Editar</Button>
-                                                    </Stack>
+                                                <Stack direction="horizontal" gap={2} className="m-auto justify-content-center align-middle flex-wrap" >
+                                                    <Button variant="danger" size='md' className='btn-responsive btn-small-text' onClick={() => handleDeleteNews(item.id)}>Eliminar</Button>
+                                                    <Button variant="primary" size='md' className='btn-responsive btn-small-text' onClick={() => handleEditNews(item)}>Editar</Button>
+                                                </Stack>
                                             </Row>
 
                                         </Accordion.Body>
@@ -200,10 +201,11 @@ const RestaurantDashboard = () => {
                                 ))}
                             </Accordion>
                         ) : (
-                            <Spinner animation="border" variant="danger" />
+                            <h2>No hay novedades guardadas, haz click en Publicar Novedad</h2>
                         )
                     ) : (
-                        <h2>No hay novedades guardadas, haz click en Publicar Novedad</h2>
+                        <Spinner animation="border" variant="danger" />
+
                     )}
                 </Row>
 

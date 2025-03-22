@@ -543,8 +543,6 @@ def get_restaurant_menus():
             return jsonify({"error": "Unauthorized: Only restaurants can create menus"}), 403
     try:
         menus = Menu.query.filter_by(restaurant_id=restaurant_id).order_by(Menu.id).all()
-        if not menus:
-            return jsonify({'message': 'No menus at the moment'}), 200
         
         return jsonify([menu.serialize() for menu in menus]), 200
     except Exception as e:
