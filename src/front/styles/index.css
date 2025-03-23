@@ -7,50 +7,63 @@
 }
 
 /* Generales */
+.navbar .navbar-brand {
+  color: #ff6200 !important; /* Use your desired color */
+  text-decoration: none; /* Optional: removes underline */
+}
+
+.img-logo-bullseye {
+  width: 2.95rem;
+  height:auto;
+  margin-bottom: 0.5rem;
+}
 
 .bg-gray {
-    background-color: #ECECEC;
+    background-color: #f5f5f5 !important;
 }
 
 .bg-orange {
-    background-color: #FF6C40!important;
-}
-
-.text-bw {
-    color: #6B0C05;
+    background-color: #ff6200!important;
 }
 
 .text-orange {
-color: #FF6C40;
+color: #ff6200!important;
 }
 
 .gray-button {
-    color: #6B0C05 !important;
-    background-color: #ECECEC !important;
+    color: black !important;
+    background-color: #f5f5f5 !important;
     border: none !important;
+    transition: background-color 0.3s ease !important;
+    font-weight: bold !important;
+    text-transform: capitalize;
 }
 
 .gray-button:hover {
-    color: black !important;
-    background-color: #FF6C40 !important;
+    color: white !important;
+    background-color: #ff6200 !important;
 
 }
 
 .orange-button {
-    color: black !important;
-    background-color: #FF6C40 !important;
+    color: white !important;
+    background-color: #ff6200 !important;
     border: none !important;
     font-weight: bold !important;
+    text-transform: capitalize;
+    transition: background-color 0.3s ease !important;
 }
 
 .orange-button:hover{
-    background-color: #E65A36 !important;
+    background-color: #e55a00 !important;
 }
 
   .close-modal-button {
-    color: #6B0C05 !important;
-    background-color: #ECECEC !important;
+    color: black !important;
+    background-color: #f5f5f5 !important;
     border: none !important;
+    text-transform: capitalize;
+    transition: background-color 0.3s ease !important;
   }
 
   .close-modal-button:hover{
@@ -58,47 +71,6 @@ color: #FF6C40;
   }
 
   /* Restaurante */
-
-  
-.gray-dropdown .dropdown-item:hover {
-    background-color: #ECECEC !important;
-}
-
-.gray-dropdown button {
-    color: #6B0C05 !important;
-    background-color: #ECECEC !important;
-    border: none;
-}
-
-.custom-accordion-header .accordion-button:not(.collapsed) {
-    background-color:#FF6C40; /* Change this to your desired color */
-    color: black; /* Text color */
-  }
-
-  .custom-accordion-header .accordion-button {
-    background-color: #ECECEC;
-    color: #6B0C05;
-   
-}
-
-.custom-list-item:hover{
-    background-color: #ECECEC !important;
-}
-
-.menu-builder-dish-card {
-    width: 100% !important; /* Keep all cards the same width */
-    height: 100% !important; /* Set a fixed height for uniformity */
-    /* Optional, consistent spacing between cards */
-
-}
-
-.menu-builder-img {
-    height: auto; /* Set a fixed height */
-    object-fit: cover; /* Ensures the image scales proportionally and crops if necessary */
-    width: 100%; /* Ensures the image fills the card's width */
-    display: block;
-    max-height: 200px;
-  }
 
   .btn-small-text {
     font-size: 0.875rem !important; /* Smaller font size (equivalent to 14px) */
