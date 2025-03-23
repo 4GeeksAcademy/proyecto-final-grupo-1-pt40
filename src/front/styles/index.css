@@ -12,11 +12,23 @@
   color: #FFFFFF;
 }
 
+
 /* Marca del navbar */
 .admin-navbar-brand {
   color: #FFFFFF;
   font-weight: 900;
   font-size: 1.8rem;
+}
+/* Generales */
+.navbar .navbar-brand {
+  color: #ff6200 !important; /* Use your desired color */
+  text-decoration: none; /* Optional: removes underline */
+}
+
+.img-logo-bullseye {
+  width: 2.95rem;
+  height:auto;
+  margin-bottom: 0.5rem;
 }
 
 /* Enlaces del navbar */
@@ -406,10 +418,6 @@ h1 {
   padding: 1rem 1.25rem;
   font-size: 0.95rem;
 }
-
-/*********************CONTACT**********************/
-
-/*********************ABOUT US**********************/
 
 /*******************LANDING PAGE********************/
 body, .landing-page {

@@ -520,10 +520,24 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
 
                     const data = await response.json();
-                    setStore({ ...store, favorites: data });
-                    return data;
+                    const favoritesArray = Array.isArray(data) ? data : [];
+                    setStore({ ...store, favorites: favoritesArray });
+                    
+                    sessionStorage.setItem('userFavorites', JSON.stringify(data));
+                    return favoritesArray;
                 } catch (error) {
                     console.error("Error al obtener favoritos:", error);
+                    const cachedFavorites = sessionStorage.getItem('userFavorites');
+                    if (cachedFavorites) {
+                        try {
+                            const parsedFavorites = JSON.parse(cachedFavorites);
+                            const favoritesArray = Array.isArray(parsedFavorites) ? parsedFavorites : [];
+                            setStore({ ...store, favorites: favoritesArray });
+                            return favoritesArray;
+                        } catch (e) {
+                            console.error("Error al parsear favoritos guardados:", e);
+                        }
+                    }
                     setStore({ ...store, favorites: [] });
                     return [];
                 }
@@ -571,7 +585,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 
                     const newFavorite = await response.json();
                     const store = getStore();
-
+                    const currentFavorites = Array.isArray(store.favorites) ? store.favorites : [];
+    
+                    setStore({ ...store, favorites: [...currentFavorites, newFavorite] });
+                    
+                    sessionStorage.setItem('userFavorites', JSON.stringify([...currentFavorites, newFavorite]));
 
                     setStore({ favorites: [...store.favorites, newFavorite] });
                 } catch (error) {
@@ -594,7 +612,12 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
 
                     const store = getStore();
-                    setStore({ favorites: store.favorites.filter(fav => fav.id !== favoriteId) });
+                    const currentFavorites = Array.isArray(store.favorites) ? store.favorites : [];
+                    const updatedFavorites = currentFavorites.filter(fav => fav.id !== favoriteId);
+                    
+                    setStore({ ...store, favorites: updatedFavorites });
+                    
+                    sessionStorage.setItem('userFavorites', JSON.stringify(updatedFavorites));
                 } catch (error) {
                     console.error("Error al eliminar favorito:", error);
                 }
@@ -1347,6 +1370,26 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error("Error:", error);
                     return false
                 }
+            },
+
+            initializeApp: () => {
+                const token = sessionStorage.getItem('token');
+                if (token) {
+                    // Si hay token, carga la información del cliente
+                    getActions().fetchCurrentClient();
+                    
+                    // Y también carga los favoritos
+                    getActions().fetchFavorites();
+                }
+            },
+            
+            // Después de iniciar sesión exitosamente
+            loginSuccess: (userData, token) => {
+                sessionStorage.setItem('token', token);
+                setStore({ client: userData });
+                
+                // Cargar favoritos inmediatamente después del login
+                getActions().fetchFavorites();
             },
 
             editNewsRequest: async (data) => {
