@@ -9,7 +9,7 @@ const ClientNavbar = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-4 p-3 shadow rounded">
       <div className="container-fluid">
-        <Link to="/restaurant-dashboard"
+        <Link to="/client-dashboard"
           className="navbar-brand text-danger fs-3 fw-bold">ALPUNT<img className='img-logo-bullseye' src={Logo} /></Link>
         <button
           className="navbar-toggler"
