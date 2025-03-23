@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import { Button, Form, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import '../../styles/index.css';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -25,8 +26,8 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
-      <Card style={{ width: "24rem" }} className="p-4 shadow">
+    <div className="d-flex justify-content-center align-items-center vh-100 login-background">
+      <Card className="login-card">
         <h3 className="text-center mb-3">Iniciar Sesión</h3>
         <Form>
           <Form.Group className="mb-3">
@@ -36,6 +37,7 @@ const AdminLogin = () => {
               placeholder="Ingrese su email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="login-input"
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -45,10 +47,11 @@ const AdminLogin = () => {
               placeholder="Ingrese su contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="login-input"
             />
           </Form.Group>
           <div className="d-flex justify-content-center">
-            <Button variant="primary" onClick={() => handleLogin()}>
+            <Button className="login-button" onClick={() => handleLogin()}>
                 Iniciar Sesión
             </Button>
           </div>

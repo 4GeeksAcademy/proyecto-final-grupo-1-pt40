@@ -3,6 +3,7 @@ import { Container, Row, Col, Form, Button, ListGroup, Tabs, Tab, Table } from "
 import { Context } from "../store/appContext";
 import NotificationModal from "../component/NotificationModal.jsx";
 import AdminNavbar from "../component/AdminNavbar.jsx";
+import '../../styles/index.css';
 
 const AdminDashboard = () => {
   const { store, actions } = useContext(Context);
@@ -47,7 +48,7 @@ const AdminDashboard = () => {
     onLoad()
   }, [])
   return (
-    <Container fluid>
+    <Container fluid style={{ backgroundColor: '#ECECEC', minHeight: '100vh' }}>
       <AdminNavbar/>
       <Row>
         <Tabs
@@ -58,9 +59,9 @@ const AdminDashboard = () => {
         >
           <Tab eventKey="restaurants" title="Restaurantes">
 
-            <Row className="my-4">
-              <Col lg='6' className="align-middle">
-                <Form>
+            <Row className="my-4 align-items-end">
+              <Col lg='6'>
+                <Form className="form-1">
                   <Form.Label>Buscar por Email o Username</Form.Label>
                   <Form.Control
                     type="text"
@@ -70,13 +71,13 @@ const AdminDashboard = () => {
                   />
                 </Form>
               </Col>
-              <Col lg='3' className="align-bottom d-flex justify-content-around">
-                <Button variant="primary" onClick={handleQuery}>Buscar</Button>
-                <Button variant="danger" onClick={resetQuery}>Volver a Buscar</Button>
+              <Col lg='3' className="d-flex gap-2 mt-3 mt-lg-0">
+                <Button className="primary1" onClick={handleQuery}>Buscar</Button>
+                <Button className="danger1" onClick={resetQuery}>Volver a Buscar</Button>
               </Col>
             </Row>
 
-            {store.restaurants.length > 0 ? (<Table striped mt-3>
+            {store.restaurants.length > 0 ? (<Table className="mt-3 table-1" striped>
               <thead>
                 <tr>
                   <th>ID</th>
@@ -97,7 +98,7 @@ const AdminDashboard = () => {
                     <td>
                       <div className="justify-content-around d-flex">
                         <NotificationModal contact={res} />
-                        <Button variant="danger" onClick={() => handleDelete('restaurant', res.restaurant_id)}>Eliminar</Button>
+                        <Button className="danger1" onClick={() => handleDelete('restaurant', res.restaurant_id)}>Eliminar</Button>
                       </div>
                     </td>
                   </tr>
@@ -127,13 +128,13 @@ const AdminDashboard = () => {
                     <td>{client.client_id}</td>
                     <td>{client.username}</td>
                     <td>{client.email}</td>
-                    <td><Button variant="danger" onClick={() => handleDelete('client', client.client_id)}>Eliminar</Button></td>
+                    <td><Button className="danger1" onClick={() => handleDelete('client', client.client_id)}>Eliminar</Button></td>
                   </tr>
                 ))
                 }
               </tbody>
             </Table>
-            ) : (<div>No hay clientes en estos momentos en estos momentos</div>)}
+            ) : (<div>No hay clientes en estos momentos</div>)}
           </Tab>
         </Tabs>
       </Row>
