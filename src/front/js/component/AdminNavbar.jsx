@@ -9,7 +9,7 @@ function AdminNavbar() {
     return (
         <Navbar expand="lg" className='admin-navbar'>
             <Container fluid>
-                <Navbar.Brand href="/" style={{ color: '#FFFFFF', fontWeight: 900, fontSize: '1.8rem' }} className='admin-navbar-brand'>AlPunto</Navbar.Brand>
+                <Navbar.Brand href="/admin-dashboard" style={{ color: '#FFFFFF', fontWeight: 900, fontSize: '1.8rem' }} className='admin-navbar-brand'>AlPunto</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" className="custom-toggler">
                     <span className="navbar-toggler-icon custom-toggler-icon"></span>
                 </Navbar.Toggle>
