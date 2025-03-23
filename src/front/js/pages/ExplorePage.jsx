@@ -102,7 +102,7 @@ const ExplorePage = () => {
         <div>
             <ClientNavbar />
             <Container>
-                <h1>Top Restaurantes en {top.city}</h1>
+                <h1 className="mb-4 fw-bold text-orange" >Top Restaurantes en {top.city}</h1>
                 <Row className="flex-nowrap overflow-auto p-3" style={{ whiteSpace: 'nowrap' }}>
                     {top.restaurants && top.restaurants.length > 0 ? (
                         top.restaurants.map((res, index) => (
@@ -118,11 +118,11 @@ const ExplorePage = () => {
 
 
                 </Row>
-                <Form className="mt-4">
-                    <Row className="d-flex justify-content-center">
-                        <Col lg='3'>
+                <Form className="mt-4 mb-4">
+                    <Row className="d-flex justify-content-center g-3">
+                        <Col xs={12} md={6} lg={3}>
                             <Form.Group className="mb-3" controlId="Address">
-                                <Form.Select aria-label="Departments" onChange={handleDepartment} disabled={searchOn.department} value={search.department.id}>
+                                <Form.Select aria-label="Departments" onChange={handleDepartment} disabled={searchOn.department} value={search.department.id} className="form-select-custom">
                                     <option value=''>Departamento</option>
                                     {
                                         deparments?.map((dep, index) => (
@@ -133,9 +133,9 @@ const ExplorePage = () => {
                             </Form.Group>
                         </Col>
 
-                        <Col lg='2'>
+                        <Col xs={12} md={6} lg={2}>
                             <Form.Group>
-                                <Form.Select aria-label="Cities" onChange={handleSelectCity} disabled={searchOn.city} value={search.city.id}>
+                                <Form.Select aria-label="Cities" onChange={handleSelectCity} disabled={searchOn.city} value={search.city.id} className="form-select-custom">
                                     <option value=''>Ciudad</option>
                                     {
                                         cities?.map((city, index) => (
@@ -146,9 +146,9 @@ const ExplorePage = () => {
                             </Form.Group>
                         </Col>
 
-                        <Col lg='2'>
+                        <Col xs={12} md={6} lg={2}>
                             <Form.Group>
-                                <Form.Select aria-label="Cuisine" onChange={handleSelectCuisine} disabled={searchOn.cuisine} value={search.cuisine}>
+                                <Form.Select aria-label="Cuisine" onChange={handleSelectCuisine} disabled={searchOn.cuisine} value={search.cuisine}className="form-select-custom">
                                     <option value=''>Estilo</option>
                                     {
                                         cuisine?.map((cuisine, index) => (
@@ -159,23 +159,23 @@ const ExplorePage = () => {
                             </Form.Group>
                         </Col>
 
-                        <Col lg='4'>
+                        <Col xs={12} md={6} lg={4}>
                             <Form.Group className="mb-3" controlId="Search Bar">
-                                <Form.Control type="text" placeholder="Buscar por restaurante o palabra clave" value={search.keyword} name='keyword' onChange={handleKeyword} disabled={searchOn.keyword} />
+                                <Form.Control type="text" placeholder="Buscar por restaurante o palabra clave" value={search.keyword} name='keyword' onChange={handleKeyword} disabled={searchOn.keyword}className="search-input-custom" />
                             </Form.Group>
                         </Col>
 
-                        <Col lg='1'>
-                            <Button variant="primary" type="submit" onClick={handleSubmission}>
+                        <Col xs={12} md={12} lg={1} className="d-flex justify-content-center">
+                            <Button variant="primary" type="submit" onClick={handleSubmission}className="menu-button" >
                                 Buscar
                             </Button>
                         </Col>
                     </Row>
                 </Form>
 
-                <Row>
-                    <h3>Filtros</h3>
-                    <div className="d-flex">
+                <Row className="mb-4" >
+                    <h3 className="fw-bold text-orange" >Filtros</h3>
+                    <div className="d-flex flex-wrap">
                         {Object.entries(search).map((param, index) => {
                             if (param[1] && searchOn[param[0]]) {
                                 if (typeof param[1] === 'string') {
@@ -188,12 +188,12 @@ const ExplorePage = () => {
                         }
 
                         )}
-                        <Button variant="danger" onClick={handleReset}>Eliminar Filtros</Button>
+                        <Button variant="danger" onClick={handleReset} className="m-2">Eliminar Filtros</Button>
                     </div>
                 </Row>
-                <Row className="mt-4 justify-content-center">
+                <Row className="g-4 justify-content-center">
                     {store.search?.map((res, index) => (
-                        <Col key={index} className="justify-content-center" lg='4'>
+                        <Col key={index}xs={12} sm={6} md={6} lg={4} xl={3} className="justify-content-center" >
                             <RestaurantCard data={res} />
                         </Col>
                     ))}
