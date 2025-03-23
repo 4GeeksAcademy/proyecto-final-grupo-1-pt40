@@ -7,7 +7,7 @@ import MenuBuilder from "./pages/MenuBuilder.jsx";
 import MenuPublicView from "./pages/MenuPublicView.jsx"
 import SignUpPage from './pages/SignUpPage.jsx';
 import ClientDashboard from "./pages/ClientDashboard.jsx";
-import { Home } from "./pages/home";
+import { Home } from "./pages/Home.jsx";
 import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
 import LoginPage from "./pages/LoginPage.jsx";

@@ -61,8 +61,8 @@ const AdminReports = () => {
                             <td>
                                 <div className="action-buttons">
                                     <NotificationModal contact={re.restaurant} />
-                                    <Button variant="info" size="sm" onClick={() => handleUpdate(re.report_id)}>Marcar en Revisión</Button>
-                                    <Button variant="danger" size="sm" onClick={() => handleDelete(re.report_id)}>Eliminar</Button>
+                                    <Button className="info2" size="sm" onClick={() => handleUpdate(re.report_id)}>Marcar en Revisión</Button>
+                                    <Button className="danger2" size="sm" onClick={() => handleDelete(re.report_id)}>Eliminar</Button>
                                 </div>
                             </td>
                         </tr>

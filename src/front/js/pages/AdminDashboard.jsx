@@ -72,8 +72,8 @@ const AdminDashboard = () => {
                 </Form>
               </Col>
               <Col lg='3' className="d-flex gap-2 mt-3 mt-lg-0">
-                <Button variant="primary" onClick={handleQuery}>Buscar</Button>
-                <Button variant="danger" onClick={resetQuery}>Volver a Buscar</Button>
+                <Button className="primary1" onClick={handleQuery}>Buscar</Button>
+                <Button className="danger1" onClick={resetQuery}>Volver a Buscar</Button>
               </Col>
             </Row>
 
@@ -98,7 +98,7 @@ const AdminDashboard = () => {
                     <td>
                       <div className="justify-content-around d-flex">
                         <NotificationModal contact={res} />
-                        <Button variant="danger" onClick={() => handleDelete('restaurant', res.restaurant_id)}>Eliminar</Button>
+                        <Button className="danger1" onClick={() => handleDelete('restaurant', res.restaurant_id)}>Eliminar</Button>
                       </div>
                     </td>
                   </tr>
@@ -128,7 +128,7 @@ const AdminDashboard = () => {
                     <td>{client.client_id}</td>
                     <td>{client.username}</td>
                     <td>{client.email}</td>
-                    <td><Button variant="danger" onClick={() => handleDelete('client', client.client_id)}>Eliminar</Button></td>
+                    <td><Button className="danger1" onClick={() => handleDelete('client', client.client_id)}>Eliminar</Button></td>
                   </tr>
                 ))
                 }

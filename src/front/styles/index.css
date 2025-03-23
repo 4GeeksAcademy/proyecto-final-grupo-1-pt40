@@ -173,7 +173,7 @@ body {
 }
 
 /* Botones */
-.btn-primary {
+.primary1 {
   background-color: #ff6200 !important;
   border: none !important;
   font-weight: bold;
@@ -184,11 +184,11 @@ body {
   line-height: 1.2;
 }
 
-.btn-primary:hover {
+.primary1:hover {
   background-color: #e55a00 !important;
 }
 
-.btn-danger {
+.danger1 {
   background-color: #ff6200 !important;
   border: none !important;
   font-weight: bold;
@@ -200,7 +200,7 @@ body {
   line-height: 1.2;
 }
 
-.btn-danger:hover {
+.danger1:hover {
   background-color: #e55a00 !important;
 }
 
@@ -299,7 +299,7 @@ body {
 }
 
 /* Botón de acción */
-.btn-info {
+.info2 {
   background-color: #FF6C40 !important;
   border: none !important;
   font-weight: bold;
@@ -311,11 +311,11 @@ body {
   transition: background-color 0.3s ease-in-out;
 }
 
-.btn-info:hover {
+.info2:hover {
   background-color: #e65a30 !important;
 }
 
-.btn-danger {
+.danger2 {
   background-color: #e63946 !important;
   border: none !important;
   font-weight: bold;
@@ -326,7 +326,7 @@ body {
   transition: background-color 0.3s ease-in-out;
 }
 
-.btn-danger:hover {
+.danger2:hover {
   background-color: #c5303b !important;
 }
 
@@ -405,4 +405,51 @@ h1 {
   color: black;            
   padding: 1rem 1.25rem;
   font-size: 0.95rem;
+}
+
+/*********************CONTACT**********************/
+
+/*********************ABOUT US**********************/
+
+/*******************LANDING PAGE********************/
+body, .landing-page {
+	background-color: #ECECEC;
+	font-family: 'Helvetica Neue', sans-serif;
+}
+
+.hero-section {
+	background-color: #FF6200;
+	color: white;
+}
+
+.features-section {
+	background-color: #F8FAFC;
+}
+
+.cta-section {
+	background-color: #FFECE6;
+}
+
+.text-orange {
+	color: #FF6200;
+}
+
+.btn-orange {
+	background-color: #FF6200;
+	border: none;
+	color: white;
+	font-weight: bold;
+	border-radius: 1.5rem;
+	transition: background-color 0.3s ease-in-out;
+}
+
+.btn-orange:hover {
+	background-color: #e55a00;
+	color: white;
+}
+
+.feature-card {
+	border: none;
+	border-radius: 1rem;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
