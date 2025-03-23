@@ -32,8 +32,8 @@ function CreateMenuModal() {
 
     return (
         <>
-            <Button className='orange-button' onClick={handleShow}>
-                Nuevo Menú
+            <Button className='orange-button d-inline-block' onClick={handleShow}>
+                + Nuevo Menú
             </Button>
 
             <Modal

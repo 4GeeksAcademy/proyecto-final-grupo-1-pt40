@@ -6,6 +6,7 @@ import { Context } from "../store/appContext";
 import DeleteMenuModal from "../component/DeleteMenuModal.jsx"
 import RestaurantNavbar from "../component/RestaurantNavbar.jsx";
 import "../../styles/restaurant-dashboard.css"
+import CreateMenuModal from "../component/CreateMenuModal.jsx";
 
 const RestaurantDashboard = () => {
     const { store, actions } = useContext(Context);
@@ -99,7 +100,8 @@ const RestaurantDashboard = () => {
                 </Alert>) : ''}
 
 
-                <h2 className="mb-4 mx-2 fw-bold text-orange">MENÚS</h2>
+                <div className="d-flex"><h2 className="mb-4 me-5 fw-bold text-orange">MENÚS</h2> <span><CreateMenuModal /></span></div>
+                
                 <Row className="menu-list p-4 shadow rounded d-flex mx-2">
                     {Array.isArray(store.restaurantMenus) ? (
                         store.restaurantMenus.length > 0 ? (

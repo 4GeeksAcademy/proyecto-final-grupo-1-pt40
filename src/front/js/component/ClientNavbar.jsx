@@ -2,12 +2,15 @@ import React from "react";
 import { Link } from "react-router-dom";
 import LogoutButton from "./LogoutButton.jsx";
 import "../../styles/ClientNavbar.css";
+import Logo from "../../img/logo.png"
+
 
 const ClientNavbar = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-4 p-3 shadow rounded">
       <div className="container-fluid">
-        <Link to="/client-dashboard/" className="navbar-brand fw-bold">Al punto</Link>
+        <Link to="/restaurant-dashboard"
+          className="navbar-brand text-danger fs-3 fw-bold">ALPUNT<img className='img-logo-bullseye' src={Logo} /></Link>
         <button
           className="navbar-toggler"
           type="button"
@@ -20,7 +23,7 @@ const ClientNavbar = () => {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto align-items-center">
+          <ul className="navbar-nav ms-auto align-items-center d-flex flex-wrap gap-3">
             <li className="nav-item">
               <Link className="nav-link" to="/client-dashboard/">Restaurantes</Link>
             </li>
