@@ -153,12 +153,12 @@ body {
 }
 
 /* Input de búsqueda */
-form .form-label {
+.form-1 .form-label {
   font-weight: 600;
   color: #333;
 }
 
-form .form-control {
+.form-1 .form-control {
   background-color: #F8FAFC;
   border: 1px solid #ccc;
   border-radius: 0.5rem;
@@ -166,15 +166,15 @@ form .form-control {
   transition: border-color 0.2s ease-in-out;
 }
 
-form .form-control:focus {
-  border-color: #FF6C40;
+.form-1 .form-control:focus {
+  border-color: #FF6200;
   box-shadow: 0 0 5px rgba(255, 108, 64, 0.4);
   outline: none;
 }
 
 /* Botones */
 .btn-primary {
-  background-color: #5ed281 !important;
+  background-color: #ff6200 !important;
   border: none !important;
   font-weight: bold;
   border-radius: 1.5rem;
@@ -185,7 +185,7 @@ form .form-control:focus {
 }
 
 .btn-primary:hover {
-  background-color: #30a967 !important;
+  background-color: #e55a00 !important;
 }
 
 .btn-danger {
@@ -205,7 +205,7 @@ form .form-control:focus {
 }
 
 /* Tablas */
-table {
+.table-1 {
   background-color: #F8FAFC;
   border-radius: 0.5rem;
   overflow: hidden;
@@ -228,14 +228,8 @@ table {
 }
 
 /***********************NOTIFICATION ADMIN************************/
-/* Fondo general */
-body {
-  background-color: #ECECEC;
-  font-family: 'Helvetica Neue', sans-serif;
-}
-
 /* Tabla de notificaciones */
-table {
+.table-2 {
   background-color: #F8FAFC;
   border-radius: 0.5rem;
   overflow: hidden;
@@ -281,14 +275,8 @@ table {
 }
 
 /***********************REPORTS ADMIN******************************/
-/* Fondo general */
-body {
-  background-color: #ECECEC;
-  font-family: 'Helvetica Neue', sans-serif;
-}
-
 /* Tabla de reportes */
-table {
+.table-3 {
   background-color: #F8FAFC;
   border-radius: 0.5rem;
   overflow: hidden;
@@ -348,6 +336,21 @@ table {
   color: #666;
   padding: 2rem;
   font-size: 1.1rem;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .action-buttons {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 /***********************FREQUENT QUESTIONS*************************/

@@ -30,7 +30,7 @@ const AdminNotifications = () => {
 
         <Container fluid>
             <AdminNavbar />
-            {store.notifications.length > 0 ? (<Table striped responsive className="my-4">
+            {store.notifications.length > 0 ? (<Table striped responsive className="my-4 table-2">
                 <thead>
                     <tr>
                         <th>ID</th>

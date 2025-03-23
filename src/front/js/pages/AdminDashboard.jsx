@@ -61,7 +61,7 @@ const AdminDashboard = () => {
 
             <Row className="my-4 align-items-end">
               <Col lg='6'>
-                <Form>
+                <Form className="form-1">
                   <Form.Label>Buscar por Email o Username</Form.Label>
                   <Form.Control
                     type="text"
@@ -77,7 +77,7 @@ const AdminDashboard = () => {
               </Col>
             </Row>
 
-            {store.restaurants.length > 0 ? (<Table striped mt-3>
+            {store.restaurants.length > 0 ? (<Table className="mt-3 table-1" striped>
               <thead>
                 <tr>
                   <th>ID</th>
@@ -134,7 +134,7 @@ const AdminDashboard = () => {
                 }
               </tbody>
             </Table>
-            ) : (<div>No hay clientes en estos momentos en estos momentos</div>)}
+            ) : (<div>No hay clientes en estos momentos</div>)}
           </Tab>
         </Tabs>
       </Row>
