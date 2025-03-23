@@ -3,7 +3,7 @@ import { Context } from "../store/appContext";
 import { Container, Row, Col, Form, Button, ListGroup, Tabs, Tab, Table } from "react-bootstrap";
 import NotificationModal from "../component/NotificationModal.jsx";
 import AdminNavbar from "../component/AdminNavbar.jsx";
-
+import '../../styles/index.css';
 
 const AdminNotifications = () => {
 
@@ -30,7 +30,7 @@ const AdminNotifications = () => {
 
         <Container fluid>
             <AdminNavbar />
-            {store.notifications.length > 0 ? (<Table striped responsive className="my-4">
+            {store.notifications.length > 0 ? (<Table striped responsive className="my-4 table-2">
                 <thead>
                     <tr>
                         <th>ID</th>

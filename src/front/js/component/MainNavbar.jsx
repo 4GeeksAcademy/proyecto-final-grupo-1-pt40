@@ -6,15 +6,15 @@ const MainNavbar = () => {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-4 p-3 shadow rounded">
             <div className="container-fluid">
-                <Link to="/"
-                    className="navbar-brand text-danger fs-3 fw-bold">ALPUNT<img className='img-logo-bullseye' src={Logo} /></Link>
-                <button
-                    className="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav"
-                    aria-controls="navbarNav"
-                    aria-expanded="false"
+               <Link to="/"
+                         className="navbar-brand text-danger fs-3 fw-bold">ALPUNT<img className='img-logo-bullseye' src={Logo}/></Link>
+                <button 
+                    className="navbar-toggler" 
+                    type="button" 
+                    data-bs-toggle="collapse" 
+                    data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" 
+                    aria-expanded="false" 
                     aria-label="Toggle navigation"
                 >
                     <span className="navbar-toggler-icon"></span>

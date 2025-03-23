@@ -3,7 +3,7 @@ import { Context } from "../store/appContext";
 import { Container, Row, Col, Form, Button, ListGroup, Tabs, Tab, Table } from "react-bootstrap";
 import NotificationModal from "../component/NotificationModal.jsx";
 import AdminNavbar from "../component/AdminNavbar.jsx";
-
+import '../../styles/index.css';
 
 const AdminReports = () => {
 
@@ -30,7 +30,7 @@ const AdminReports = () => {
 
         <Container fluid>
             <AdminNavbar />
-            {store.reports.length > 0 ? (<Table striped responsive className="my-4">
+            {store.reports.length > 0 ? (<Table striped responsive className="my-4 table-3">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -59,10 +59,10 @@ const AdminReports = () => {
                             <td>{re.date}</td>
                             <td>{re.read ? 'En revision' : 'Sin revisar'}</td>
                             <td>
-                                <div className="justify-content-around d-flex align-middle">
+                                <div className="action-buttons">
                                     <NotificationModal contact={re.restaurant} />
-                                    <Button variant="info" size="sm" onClick={() => handleUpdate(re.report_id)}>Marcar en Revisión</Button>
-                                    <Button variant="danger" size="sm" onClick={() => handleDelete(re.report_id)}>Eliminar</Button>
+                                    <Button className="info2" size="sm" onClick={() => handleUpdate(re.report_id)}>Marcar en Revisión</Button>
+                                    <Button className="danger2" size="sm" onClick={() => handleDelete(re.report_id)}>Eliminar</Button>
                                 </div>
                             </td>
                         </tr>

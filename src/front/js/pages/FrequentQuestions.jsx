@@ -1,6 +1,7 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css'; 
 import MainNavbar from '../component/MainNavbar.jsx';
+import '../../styles/index.css';
 
 const FrequentQuestions = () => {
     return (

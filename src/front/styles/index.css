@@ -2,10 +2,23 @@
     width: 70%;
     margin: auto;
     text-align: left;
-    
-    
+
+}
+/***********************NAVBAR ADMIN************************/
+/* Estilo general del navbar */
+.admin-navbar {
+  background-color: #212529;
+  border-radius: 10px;
+  color: #FFFFFF;
 }
 
+
+/* Marca del navbar */
+.admin-navbar-brand {
+  color: #FFFFFF;
+  font-weight: 900;
+  font-size: 1.8rem;
+}
 /* Generales */
 .navbar .navbar-brand {
   color: #ff6200 !important; /* Use your desired color */
@@ -18,17 +31,25 @@
   margin-bottom: 0.5rem;
 }
 
-.bg-gray {
-    background-color: #f5f5f5 !important;
+/* Enlaces del navbar */
+.admin-navbar .nav-link {
+  color: #FFFFFF !important;
+  transition: color 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.bg-orange {
-    background-color: #ff6200!important;
+.admin-navbar .nav-link:hover {
+  color: #CCCCCC !important;
 }
 
-.text-orange {
-color: #ff6200!important;
+/* Íconos dentro de los enlaces */
+.admin-navbar .nav-link svg {
+  color: #FFFFFF !important;
+  transition: color 0.3s ease-in-out;
 }
+
 
 .gray-button {
     color: black !important;
@@ -37,13 +58,25 @@ color: #ff6200!important;
     transition: background-color 0.3s ease !important;
     font-weight: bold !important;
     text-transform: capitalize;
-}
 
-.gray-button:hover {
-    color: white !important;
-    background-color: #ff6200 !important;
+.admin-navbar .nav-link:hover svg {
+  color: #CCCCCC !important;
 
 }
+
+/* Botón hamburguesa */
+.custom-toggler {
+  background-color: #383838;
+  border-color: #99999958;
+  border-width: 2px;
+  box-shadow: none;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.custom-toggler:hover {
+  border-color: #FF6C40;
+}
+
 
 .orange-button  {
     color: white !important;
@@ -52,29 +85,399 @@ color: #ff6200!important;
     font-weight: bold !important;
     text-transform: capitalize;
     transition: background-color 0.3s ease !important;
+
+/* Icono hamburguesa en SVG */
+.custom-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23CCCCCC' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 1.5em;
+  height: 1.5em;
+  transition: filter 0.3s ease-in-out;
+
 }
 
-.orange-button:hover{
-    background-color: #e55a00 !important;
+/* Hover suave del icono */
+.custom-toggler:hover .custom-toggler-icon {
+  filter: brightness(1.5);
 }
 
-  .close-modal-button {
-    color: black !important;
-    background-color: #f5f5f5 !important;
-    border: none !important;
-    text-transform: capitalize;
-    transition: background-color 0.3s ease !important;
-  }
+/***********************LOGIN ADMIN************************/
+/* Fondo oscuro detrás del login */
+.login-background {
+  background-color: #212529;
+}
 
-  .close-modal-button:hover{
-    background-color: #D9D9D9 !important;
-  }
+/* Card del login */
+.login-card {
+  width: 24rem;
+  padding: 2rem;
+  background-color: #F8FAFC !important;
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
 
-  /* Restaurante */
+/* Inputs gris claro */
+.login-input {
+  background-color: #e0e0e0 !important;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+}
 
-  .btn-small-text {
-    font-size: 0.875rem !important; /* Smaller font size (equivalent to 14px) */
-    white-space: nowrap !important; /* Prevents text from wrapping */
-    text-overflow: ellipsis !important; /* Adds "..." if the text overflows */
-    overflow: hidden !important; /* Hides overflowing text */
+/* Botón naranja */
+.login-button {
+  background-color: #ff6200 !important;
+  border: 2px solid #ff6200 !important;
+  border-radius: 1.5rem !important;
+  padding: 0.6rem 1.5rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease-in-out;
+  color: white;
+}
+
+.login-button:hover {
+  background-color: #e55a00 !important;
+  border: 2px solid #e55a00 !important;
+  box-shadow: 0 0 8px #e55a00;
+}
+
+.login-button:focus,
+.login-button:focus-visible,
+.login-button:active {
+  outline: none !important;
+  box-shadow: 0 0 10px #ff6200 !important;
+  border-color: #ff6200 !important;
+}
+
+.login-input:focus {
+  outline: none !important;
+  box-shadow: 0 0 6px #ff6200 !important;
+  border: 2px solid #ff6200 !important;
+}
+
+/***********************DASHBOARD ADMIN**************************/
+/* Fondo general */
+body {
+  background-color: #ECECEC;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+/* Tabs */
+.nav-tabs .nav-link.active {
+  background-color: #FF6C40;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.nav-tabs .nav-link {
+  color: #FF6C40;
+  border: none;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.nav-tabs .nav-link:hover {
+  background-color: #FFECE6;
+}
+
+/* Input de búsqueda */
+.form-1 .form-label {
+  font-weight: 600;
+  color: #333;
+}
+
+.form-1 .form-control {
+  background-color: #F8FAFC;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.form-1 .form-control:focus {
+  border-color: #FF6200;
+  box-shadow: 0 0 5px rgba(255, 108, 64, 0.4);
+  outline: none;
+}
+
+/* Botones */
+.primary1 {
+  background-color: #ff6200 !important;
+  border: none !important;
+  font-weight: bold;
+  border-radius: 1.5rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  height: 42px;
+  line-height: 1.2;
+}
+
+.primary1:hover {
+  background-color: #e55a00 !important;
+}
+
+.danger1 {
+  background-color: #ff6200 !important;
+  border: none !important;
+  font-weight: bold;
+  border-radius: 1.5rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+  height: 42px; 
+  line-height: 1.2;
+}
+
+.danger1:hover {
+  background-color: #e55a00 !important;
+}
+
+/* Tablas */
+.table-1 {
+  background-color: #F8FAFC;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.table thead th {
+  background-color: #FF6C40;
+  color: #FFFFFF;
+  border: none;
+}
+
+.table tbody td {
+  vertical-align: middle;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f1f1f1;
+}
+
+/***********************NOTIFICATION ADMIN************************/
+/* Tabla de notificaciones */
+.table-2 {
+  background-color: #F8FAFC;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.table thead th {
+  background-color: #FF6C40;
+  color: #FFFFFF;
+  border: none;
+}
+
+.table tbody td {
+  vertical-align: middle;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f1f1f1;
+}
+
+/* Botón Eliminar */
+.btn-danger {
+  background-color: #FF6C40 !important;
+  border: none !important;
+  font-weight: bold;
+  border-radius: 1.5rem;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.85rem;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.btn-danger:hover {
+  background-color: #e55a00 !important;
+}
+
+/* Mensaje sin notificaciones */
+.no-notifications-message {
+  text-align: center;
+  color: #666;
+  padding: 2rem;
+  font-size: 1.1rem;
+}
+
+/***********************REPORTS ADMIN******************************/
+/* Tabla de reportes */
+.table-3 {
+  background-color: #F8FAFC;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.table thead th {
+  background-color: #FF6C40;
+  color: #FFFFFF;
+  border: none;
+}
+
+.table tbody td {
+  vertical-align: middle;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f1f1f1;
+}
+
+/* Botón de acción */
+.info2 {
+  background-color: #FF6C40 !important;
+  border: none !important;
+  font-weight: bold;
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.85rem;
+  color: white;
+  margin-right: 0.5rem;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.info2:hover {
+  background-color: #e65a30 !important;
+}
+
+.danger2 {
+  background-color: #e63946 !important;
+  border: none !important;
+  font-weight: bold;
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.85rem;
+  color: white;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.danger2:hover {
+  background-color: #c5303b !important;
+}
+
+/* Mensaje si no hay reportes */
+.no-reports-message {
+  text-align: center;
+  color: #666;
+  padding: 2rem;
+  font-size: 1.1rem;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .action-buttons {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
   }
+}
+
+/***********************FREQUENT QUESTIONS*************************/
+/* Fondo general gris claro */
+body {
+  background-color: #ECECEC !important;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+/* Título principal */
+h1 {
+  color: #ff6200;
+  font-weight: 800;
+}
+
+/* Estilo para el texto principal */
+.lead {
+  color: #333;
+  font-size: 1.1rem;
+}
+
+/* Acordeón */
+.accordion-item {
+  border: 1px solid #ff6200;
+  border-radius: 1rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.accordion-button {
+  background-color: #ffffff;
+  color: #ff6200;
+  font-weight: bold;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.accordion-button:focus {
+  box-shadow: 0 0 0 0.25rem rgba(255, 108, 64, 0.25);
+}
+
+/* Botón activo (cuando está expandido) */
+.accordion-button:not(.collapsed) {
+  background-color: #ff6200 !important; 
+  color: #FFFFFF !important;
+  font-weight: bold;
+  box-shadow: none;
+}
+
+/* Fondo y texto del contenido del acordeón */
+.accordion-body {
+  background-color: #FFFFFF; 
+  color: black;            
+  padding: 1rem 1.25rem;
+  font-size: 0.95rem;
+}
+
+/*******************LANDING PAGE********************/
+body, .landing-page {
+	background-color: #ECECEC;
+	font-family: 'Helvetica Neue', sans-serif;
+}
+
+.hero-section {
+	background-color: #FF6200;
+	color: white;
+}
+
+.features-section {
+	background-color: #F8FAFC;
+}
+
+.cta-section {
+	background-color: #FFECE6;
+}
+
+.text-orange {
+	color: #FF6200;
+}
+
+.btn-orange {
+	background-color: #FF6200;
+	border: none;
+	color: white;
+	font-weight: bold;
+	border-radius: 1.5rem;
+	transition: background-color 0.3s ease-in-out;
+}
+
+.btn-orange:hover {
+	background-color: #e55a00;
+	color: white;
+}
+
+.feature-card {
+	border: none;
+	border-radius: 1rem;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}

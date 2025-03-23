@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css'; // Importar Bootstrap
-import { Context } from "../store/appContext"
+import { Context } from "../store/appContext";
 
 const Dashboard = () => {
   const { store, actions } = useContext(Context);
@@ -143,14 +143,13 @@ const Dashboard = () => {
   };
 
     return (
-      <div className="min-vh-100 bg-light">
-
+      <div className="min-vh-100">
         {store.restaurants.map((restaurante) => (
         <div key={restaurante.id}>
           <h2>{restaurante.nombre}</h2>
           <p>{restaurante.direccion}</p>
         </div>
-      ))}
+        ))}
 
         {/* Navbar */}
         <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
