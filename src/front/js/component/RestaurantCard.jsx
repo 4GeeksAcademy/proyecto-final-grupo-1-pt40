@@ -10,6 +10,7 @@ function RestaurantCard({ data }) {
     const [like, setLike] = useState(false)
     const [idFav, setIdFav] = useState(null)
     const navigateTo = useNavigate()
+    const token = sessionStorage.getItem('token')
     const handleClick = async (username) => {
         const response = await actions.getRestaurantMenusPublic(username)
         if (response && Array.isArray(response)) {
@@ -20,7 +21,7 @@ function RestaurantCard({ data }) {
 
     }
 
-    const checkRestaurant = async () => {
+    const checkRestaurant = () => {
         if (Array.isArray(store.favorites) && store.favorites.length > 0) {
             const restaurants = store.favorites.filter(fav => fav.restaurant);
             if (restaurants.length > 0) {
@@ -59,7 +60,7 @@ function RestaurantCard({ data }) {
                     Ver Menu
                 </Button>
                 <div className="me-1">
-                    <FavoriteButton dish_id={null} restaurant_id={data.restaurant_id} status={like} id={idFav} />
+                    {token && <FavoriteButton dish_id={null} restaurant_id={data.restaurant_id} status={like} id={idFav} />}
                 </div>
             </Card.Footer>
         </Card>

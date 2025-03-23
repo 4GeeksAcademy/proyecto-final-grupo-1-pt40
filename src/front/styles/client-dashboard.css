@@ -31,7 +31,7 @@ body {
   background-color: var(--orange-primary) !important;
   border-color: var(--orange-primary) !important;
   color: #FFF !important; 
-  font-weight: 500;
+  font-weight: bold;
 }
 
 .menu-button:hover {
@@ -83,6 +83,12 @@ body {
 
 .favorite-tab-content {
   padding: 15px;
+}
+
+.custom-badge .badge {
+  background-color: #ff6200!important;
+  color: #fff!important;
+  border: none;
 }
 
 
