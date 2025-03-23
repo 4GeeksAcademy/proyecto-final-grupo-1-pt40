@@ -207,18 +207,18 @@ const MenuView = () => {
 
                                         {Array.isArray(dishes[cat]) && dishes[cat].length > 0 ? (
                                             dishes[cat].map((dish, dishIndex) => (
-                                                <Card className="my-2 menu-builder-dish-card" key={dishIndex}>
-                                                    <Row className="w-100 h-100 m-0">
+                                                <Card className="my-2 menu-builder-dish-card d-flex" key={dishIndex}>
+                                                    <Row className="w-100 m-0 gx-0">
                                                         {dish.image &&
-                                                            <Col xs='12' md='4' lg='4' className="p-0 m-0 ">
+                                                            <Col xs='12' md='3' lg='3' className="p-0 m-0">
                                                                 <Card.Img src={dish.image} alt='Sin imagen' className="menu-builder-img m-auto" />
                                                             </Col>
                                                         }
-                                                        <Col xs="12" md={dish.image ? "6" : "10"} lg={dish.image ? "8" : "10"} className="m-auto h-100 ">
+                                                        <Col xs="12" md={dish.image ? "8" : "10"} lg={dish.image ? "8" : "10"} className="m-0 p-0 h-100 ">
                                                             <Card.Body>
                                                                 <Card.Title>{dish.name}</Card.Title>
-                                                                <Card.Text>{dish.description}</Card.Text>
-                                                                <Card.Text><strong>Precio:</strong> {`${dish.price} ${menu.currency}`}</Card.Text>
+                                                                        <Card.Text >{dish.description}</Card.Text>
+                                                                        <Card.Text><strong>Precio:</strong>{` ${dish.price} ${menu.currency}`}</Card.Text>
                                                             </Card.Body>
                                                         </Col>
                                                     </Row>

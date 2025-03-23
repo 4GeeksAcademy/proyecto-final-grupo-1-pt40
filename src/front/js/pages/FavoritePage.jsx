@@ -8,8 +8,11 @@ const FavoriteView = () => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate();
 
+    const onLoad = async ()=>{
+        await actions.fetchFavorites()
+    }
     useEffect(() => {
-        actions.fetchFavorites();
+        onLoad();
     }, []);
 
     const handleMenuClick = async (username) => {

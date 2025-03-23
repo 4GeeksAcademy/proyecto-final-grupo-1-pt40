@@ -4,6 +4,7 @@ import { Context } from "../store/appContext";
 import { Container, Card, Row, Col, Form, Button, Badge, Spinner } from "react-bootstrap";
 import RestaurantCard from "../component/RestaurantCard.jsx";
 import ClientNavbar from "../component/ClientNavbar.jsx";
+import MainNavbar from "../component/MainNavbar.jsx";
 
 
 const ExplorePage = () => {
@@ -13,7 +14,9 @@ const ExplorePage = () => {
     const [cities, setCities] = useState([])
     const [search, setSearch] = useState({ 'department': '', "city": '', "cuisine": '', "keyword": '' })
     const [searchOn, setSearchOn] = useState({ 'department': false, 'city': false, 'cuisine': false, 'keyword': false })
+    const [disable, setDisable] = useState(false)
     const [top, setTop] = useState({})
+    const [isLogged, setIsLogged] = useState(null)
 
 
     const setOne = ["Colombiana", "Americana", "Peruana", "Mexicana", "Brasileña"]
@@ -34,6 +37,7 @@ const ExplorePage = () => {
             const selectedDepartment = event.target.options[selectedIndex].text
             setSearch((prevState) => ({ ...prevState, department: { 'id': value, 'name': selectedDepartment } }));
             setSearch((prevState) => ({ ...prevState, city: { 'id': '', "name": '' } }));
+            setSearchOn((prevState) => ({ ...prevState, department: true }))
 
         }
     }
@@ -42,6 +46,7 @@ const ExplorePage = () => {
         const { value, selectedIndex } = event.target
         const selectedCity = event.target.options[selectedIndex].text
         setSearch((prevState) => ({ ...prevState, city: { 'id': value, 'name': selectedCity } }));
+        setSearchOn((prevState) => ({ ...prevState, city: true }))
     }
 
     const handleSelectCuisine = (event) => {
@@ -49,6 +54,7 @@ const ExplorePage = () => {
         if (value) {
             const selectedCuisine = event.target.options[selectedIndex].text
             setSearch((prevState) => ({ ...prevState, cuisine: selectedCuisine }));
+            setSearchOn((prevState) => ({ ...prevState, cuisine: true }))
         }
     }
     const handleCities = async (department) => {
@@ -59,22 +65,36 @@ const ExplorePage = () => {
     const handleKeyword = (e) => {
         e.persist()
         setSearch((prev) => ({ ...prev, keyword: e.target.value }))
+        setSearchOn((prevState) => ({ ...prevState, keyword: true }))
     }
 
     const handleSubmission = async (e) => {
         e.preventDefault();
+        setDisable(true)
         await actions.searchRequest(search)
-        setSearchOn({ 'department': true, 'city': true, 'cuisine': true, 'keyword': true })
+
 
     }
 
     const handleReset = () => {
         setSearchOn({ 'department': false, 'city': false, 'cuisine': false, 'keyword': false })
+        setDisable(false)
         setSearch({ 'department': { id: '', name: '' }, "city": { id: '', name: '' }, "cuisine": '', "keyword": '' })
         actions.resetSearch()
     }
 
+    const checkLogged = async () => {
+        const clientStatus = await actions.checkClient()
+        if (clientStatus) {
+            await actions.fetchFavorites()
+            setIsLogged(true)
+        } else {
+            setIsLogged(false)
+        }
+    }
+
     useEffect(() => {
+        checkLogged()
         onLoad()
     }, [])
 
@@ -100,29 +120,34 @@ const ExplorePage = () => {
     return (
 
         <div>
-            <ClientNavbar />
+            {isLogged ? <ClientNavbar /> : <MainNavbar />}
             <Container>
-                <h1 className="mb-4 fw-bold text-orange" >Top Restaurantes en {top.city}</h1>
-                <Row className="flex-nowrap overflow-auto p-3" style={{ whiteSpace: 'nowrap' }}>
-                    {top.restaurants && top.restaurants.length > 0 ? (
-                        top.restaurants.map((res, index) => (
-                            <Col key={index} className="d-inline-block">
-                                <RestaurantCard data={res} />
-                            </Col>
-                        ))
-                    ) : (
-                        <Col className="d-inline-block">
-                            <div>No se encontraron restaurantes</div>
-                        </Col>
-                    )}
+                {isLogged ? (
+                    <>
+                        <h1 className="mb-4 fw-bold text-orange">TOP RESTAURANTES EN: {top.city}</h1>
+                        <Row className="flex-nowrap overflow-auto p-3" style={{ whiteSpace: 'nowrap' }}>
+                            {top.restaurants && top.restaurants.length > 0 ? (
+                                top.restaurants.map((res, index) => (
+                                    <Col key={index} className="d-inline-block">
+                                        <RestaurantCard data={res} />
+                                    </Col>
+                                ))
+                            ) : (
+                                <Col className="d-inline-block">
+                                    <div>No se encontraron restaurantes</div>
+                                </Col>
+                            )}
+                        </Row>
+                    </>
+                ) : (
+                    <h1 className="mb-4 fw-bold text-orange">Inicia sesión para ver mejores restaurantes de tu ciudad</h1>
+                )}
 
-
-                </Row>
                 <Form className="mt-4 mb-4">
                     <Row className="d-flex justify-content-center g-3">
                         <Col xs={12} md={6} lg={3}>
                             <Form.Group className="mb-3" controlId="Address">
-                                <Form.Select aria-label="Departments" onChange={handleDepartment} disabled={searchOn.department} value={search.department.id} className="form-select-custom">
+                                <Form.Select aria-label="Departments" onChange={handleDepartment} disabled={disable} value={search.department.id} className="form-select-custom">
                                     <option value=''>Departamento</option>
                                     {
                                         deparments?.map((dep, index) => (
@@ -135,7 +160,7 @@ const ExplorePage = () => {
 
                         <Col xs={12} md={6} lg={2}>
                             <Form.Group>
-                                <Form.Select aria-label="Cities" onChange={handleSelectCity} disabled={searchOn.city} value={search.city.id} className="form-select-custom">
+                                <Form.Select aria-label="Cities" onChange={handleSelectCity} disabled={disable} value={search.city.id} className="form-select-custom">
                                     <option value=''>Ciudad</option>
                                     {
                                         cities?.map((city, index) => (
@@ -148,7 +173,7 @@ const ExplorePage = () => {
 
                         <Col xs={12} md={6} lg={2}>
                             <Form.Group>
-                                <Form.Select aria-label="Cuisine" onChange={handleSelectCuisine} disabled={searchOn.cuisine} value={search.cuisine}className="form-select-custom">
+                                <Form.Select aria-label="Cuisine" onChange={handleSelectCuisine} disabled={disable} value={search.cuisine} className="form-select-custom">
                                     <option value=''>Estilo</option>
                                     {
                                         cuisine?.map((cuisine, index) => (
@@ -161,12 +186,12 @@ const ExplorePage = () => {
 
                         <Col xs={12} md={6} lg={4}>
                             <Form.Group className="mb-3" controlId="Search Bar">
-                                <Form.Control type="text" placeholder="Buscar por restaurante o palabra clave" value={search.keyword} name='keyword' onChange={handleKeyword} disabled={searchOn.keyword}className="search-input-custom" />
+                                <Form.Control type="text" placeholder="Buscar por restaurante o palabra clave" value={search.keyword} name='keyword' onChange={handleKeyword} disabled={disable} className="search-input-custom" />
                             </Form.Group>
                         </Col>
 
                         <Col xs={12} md={12} lg={1} className="d-flex justify-content-center">
-                            <Button variant="primary" type="submit" onClick={handleSubmission}className="menu-button" >
+                            <Button variant="primary" type="submit" onClick={handleSubmission} className="menu-button" >
                                 Buscar
                             </Button>
                         </Col>
@@ -174,14 +199,14 @@ const ExplorePage = () => {
                 </Form>
 
                 <Row className="mb-4" >
-                    <h3 className="fw-bold text-orange" >Filtros</h3>
+                    <h3 className="fw-bold text-orange" >FILTROS</h3>
                     <div className="d-flex flex-wrap">
                         {Object.entries(search).map((param, index) => {
                             if (param[1] && searchOn[param[0]]) {
                                 if (typeof param[1] === 'string') {
-                                    return <Badge bg="secondary" className="m-2" key={index}>{param[1]}</Badge>
+                                    return <div bg='secondary' className="m-2 orange-button rounded d-flex px-2 align-middle align-items-center" key={index}>{param[1]}</div>
                                 } else {
-                                    return <Badge bg="secondary" className="m-2" key={index}>{param[1].name}</Badge>
+                                    return <div bg="secondary" className="m-2 orange-button  d-flex rounded px-2 align-middle align-items-center" key={index}>{param[1].name}</div>
                                 }
                             }
                             return
@@ -192,16 +217,35 @@ const ExplorePage = () => {
                     </div>
                 </Row>
                 <Row className="g-4 justify-content-center">
-                    {store.search?.map((res, index) => (
-                        <Col key={index}xs={12} sm={6} md={6} lg={4} xl={3} className="justify-content-center" >
-                            <RestaurantCard data={res} />
-                        </Col>
-                    ))}
+                    {disable ? (
+                        store.search && store.search.length > 0 ? (
+                            store.search.map((res, index) => (
+                                <Col
+                                    key={index}
+                                    xs={12}
+                                    sm={6}
+                                    md={6}
+                                    lg={4}
+                                    xl={3}
+                                    className="justify-content-center"
+                                >
+                                    <RestaurantCard data={res} />
+                                </Col>
+                            ))
+                        ) : (
+                            <div className="text-orange fw-bold">No se encontraron restaurantes</div>
+                        )
+                    ) : (
+                        <div className="text-orange fw-bold">
+                            Usa los filtros para buscar restaurantes
+                        </div>
+                    )}
+
 
                 </Row>
 
             </Container >
-        </div>
+        </div >
     )
 
 };

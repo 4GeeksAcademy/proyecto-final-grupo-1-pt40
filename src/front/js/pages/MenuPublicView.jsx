@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Container, Card, Button, Row, Col, Nav, Badge, Spinner, Offcanvas } from "react-bootstrap";
+import { Container, Card, Button, Row, Col, Nav, Badge, Spinner, Offcanvas, Stack } from "react-bootstrap";
 import { useParams } from 'react-router-dom';
 import { Context } from "../store/appContext";
 import GoogleMapsModal from "../component/GoogleMapsModal.jsx";
@@ -42,11 +42,51 @@ const MenuPublicView = () => {
     const checkLogged = async () => {
         const clientStatus = await actions.checkClient()
         if (clientStatus) {
+            await actions.fetchFavorites()
             setIsLogged(true)
         } else {
             setIsLogged(false)
         }
     }
+
+
+
+    const checkRestaurant = () => {
+        if (Array.isArray(store.favorites) && store.favorites.length > 0) {
+            const restaurants = store.favorites.filter(fav => fav.restaurant);
+            if (restaurants.length > 0) {
+                const status = restaurants.some(res => res.restaurant.restaurant_id === restaurant.restaurant_id)
+                if (status) {
+                    const favInfo = restaurants.filter(res => res.restaurant.restaurant_id === restaurant.restaurant_id)
+                    return { 'status': true, 'id': favInfo[0].id }
+                }
+                else {
+                    return { 'status': false, 'id': null }
+                }
+            }
+            return { 'status': false, 'id': null }
+        }
+    }
+
+
+    const checkDish = (id) => {
+        if (Array.isArray(store.favorites) && store.favorites.length > 0) {
+            const dishes = store.favorites.filter(fav => fav.dish);
+            if (dishes.length > 0) {
+                const status = dishes.some(item => item.dish.dish_id === id)
+                if (status) {
+                    const favInfo = dishes.filter(item => item.dish.dish_id === id)
+                    return { 'status': true, 'id': favInfo[0].id }
+                }
+                else {
+                    return { 'status': false, 'id': null }
+                }
+            }
+        }
+        return { 'status': false, 'id': null }
+    }
+
+
 
     const convertToAmPm = (time) => {
         if (!time) return "";
@@ -64,9 +104,9 @@ const MenuPublicView = () => {
         }
     }
     useEffect(() => {
+        checkLogged()
         onLoad()
         getMenuList()
-        checkLogged()
     }, [menu_id]);
 
 
@@ -86,12 +126,25 @@ const MenuPublicView = () => {
                     <Col xs md lg='4'>
                         <MenuNavigation username={restaurant_username} menus={menuList} />
                     </Col>
-
-                    <Col xs md lg='8' className="d-flex justify-content-center">
-                        {isLogged && <div className="d-flex justify-content-between align-items-center bg-gray px-3 py-2 mt-3 rounded">
-                            <span className="mx-2 fs-6 fw-bold">Agregar Restaurante a Favoritos</span>
-                             <FavoriteButton dish_id={null} restaurant_id={restaurant.restaurant_id} />
-                        </div>}
+                    <Col xs md lg="8" className="d-flex justify-content-center">
+                        {isLogged ? (
+                            (() => {
+                                const likeId = checkRestaurant() || { status: false, id: null }; // Fallback for undefined results
+                                return (
+                                    <div className="d-flex justify-content-between align-items-center bg-gray px-3 py-2 mt-3 rounded">
+                                        <span className="mx-2 fs-6 fw-bold">Agregar Restaurante a Favoritos</span>
+                                        <FavoriteButton
+                                            dish_id={null}
+                                            restaurant_id={restaurant.restaurant_id}
+                                            status={likeId.status}
+                                            id={likeId.id}
+                                        />
+                                    </div>
+                                );
+                            })()
+                        ) : (
+                            ''
+                        )}
                     </Col>
                 </Row>
 
@@ -239,21 +292,37 @@ const MenuPublicView = () => {
                                                 <Card className="my-2 menu-builder-dish-card" key={dishIndex}>
                                                     <Row className="w-100 h-100 m-0">
                                                         {dish.image &&
-                                                            <Col xs='12' md='4' lg='4' className="p-0 m-0 ">
+                                                            <Col xs='12' md='3' lg='3' className="p-0 m-0 ">
                                                                 <Card.Img src={dish.image} alt='Sin imagen' className="menu-builder-img m-auto" />
                                                             </Col>
                                                         }
-                                                        <Col xs="12" md={dish.image ? "6" : "10"} lg={dish.image ? "7" : "10"} className="m-auto h-100 ">
+                                                        <Col xs="12" md={dish.image ? "7" : "10"} lg={dish.image ? "7" : "10"} className="m-auto h-100 ">
                                                             <Card.Body>
                                                                 <Card.Title>{dish.name}</Card.Title>
                                                                 <Card.Text>{dish.description}</Card.Text>
                                                                 <Card.Text><strong>Precio:</strong> {`${dish.price} ${menu.currency}`}</Card.Text>
                                                             </Card.Body>
                                                         </Col>
-                                                        <Col xs md='1' lg='1' className="align-middle text-center align-items-center d-flex justify-content-center">
+                                                        <Col xs='12' md='2' lg='2' className="align-middle text-center align-items-center d-flex justify-content-center">
                                                             <div className="m-2">
-                                                                {isLogged && <FavoriteButton dish_id={dish.dish_id} restaurant_id={null} />}
+                                                                {isLogged ? (
+                                                                    (() => {
+                                                                        const likeId = checkDish(dish.dish_id);
+                                                                        console.log(likeId)
+                                                                        return (
+                                                                            <FavoriteButton
+                                                                                dish_id={dish.dish_id}
+                                                                                restaurant_id={null}
+                                                                                status={likeId.status}
+                                                                                id={likeId.id}
+                                                                            />
+                                                                        );
+                                                                    })()
+                                                                ) : (
+                                                                    ''
+                                                                )}
                                                             </div>
+
                                                         </Col>
                                                     </Row>
                                                 </Card>

@@ -50,8 +50,18 @@
   transition: color 0.3s ease-in-out;
 }
 
+
+.gray-button {
+    color: black !important;
+    background-color: #ecebeb !important;
+    border: none !important;
+    transition: background-color 0.3s ease !important;
+    font-weight: bold !important;
+    text-transform: capitalize;
+
 .admin-navbar .nav-link:hover svg {
   color: #CCCCCC !important;
+
 }
 
 /* Botón hamburguesa */
@@ -67,6 +77,15 @@
   border-color: #FF6C40;
 }
 
+
+.orange-button  {
+    color: white !important;
+    background-color: #ff6200 !important;
+    border: none !important;
+    font-weight: bold !important;
+    text-transform: capitalize;
+    transition: background-color 0.3s ease !important;
+
 /* Icono hamburguesa en SVG */
 .custom-toggler-icon {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23CCCCCC' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
@@ -76,6 +95,7 @@
   width: 1.5em;
   height: 1.5em;
   transition: filter 0.3s ease-in-out;
+
 }
 
 /* Hover suave del icono */

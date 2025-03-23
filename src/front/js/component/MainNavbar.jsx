@@ -27,8 +27,11 @@ const MainNavbar = () => {
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link 
-                                className="nav-link" 
+                            <Link className="nav-link" to="/explore-page/">Explora</Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link
+                                className="nav-link"
                                 to="/signup/"
                             >
                                 Registrarse
@@ -45,8 +48,8 @@ const MainNavbar = () => {
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link 
-                                className="nav-link" 
+                            <Link
+                                className="nav-link"
                                 to="/login/"
                             >
                                 Iniciar sesión
