@@ -32,8 +32,8 @@ const FavoriteButton = ({ dish_id, restaurant_id, status, id }) => {
 
 
     return (
-       <Button onClick = {handleLike} style={{backgroundColor:'red', border:'none'}}>
-            <FontAwesomeIcon  className={`fs-5 ${like ? 'text-dark': 'text-light'}`} icon={faHeart} />
+       <Button onClick = {handleLike} style={{backgroundColor:'gray', border:'none'}}>
+            <FontAwesomeIcon  className={`fs-5 ${like ? 'text-orange': 'text-light'}`} icon={faHeart} />
        </Button>
     );
 };

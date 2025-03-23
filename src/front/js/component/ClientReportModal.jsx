@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { Button, Form, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -8,13 +8,22 @@ function ClientReportModal({ restaurant_id }) {
     const [show, setShow] = useState(false);
     const [subject, setSubject] = useState("");
     const [message, setMessage] = useState("");
+    const [isLogged, setIsLogged] = useState(false)
     const navigate = useNavigate();
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
+    const checkLogged = async () => {
+        const clientStatus = await actions.checkClient()
+        if (clientStatus) {
+            setIsLogged(true)
+        } else {
+            setIsLogged(false)
+        }
+    }
     const handleSendReport = async () => {
-        if (!store.client?.client_id) {
+        if (!isLogged) {
             alert("Debes iniciar sesión para reportar un restaurante.");
             navigate("/login");
             return;
@@ -28,12 +37,16 @@ function ClientReportModal({ restaurant_id }) {
 
         const response = await actions.clientMakeReport(restaurant_id, subject, message);
         if (response) {
-            alert("Reporte enviado correctamente.");
+            // alert("Reporte enviado correctamente.");
             setShow(false);
         } else {
             alert("Hubo un error al enviar el reporte.");
         }
     };
+
+    useEffect(()=>{
+        checkLogged()
+    },[])
 
     return (
         <>

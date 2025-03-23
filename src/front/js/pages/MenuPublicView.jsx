@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Container, Card, Button, Row, Col, Nav, Badge, Spinner, Offcanvas } from "react-bootstrap";
+import { Container, Card, Button, Row, Col, Nav, Badge, Spinner, Offcanvas, Stack } from "react-bootstrap";
 import { useParams } from 'react-router-dom';
 import { Context } from "../store/appContext";
 import GoogleMapsModal from "../component/GoogleMapsModal.jsx";
@@ -64,8 +64,9 @@ const MenuPublicView = () => {
                     return { 'status': false, 'id': null }
                 }
             }
-        return { 'status': false, 'id': null }
-    }}
+            return { 'status': false, 'id': null }
+        }
+    }
 
 
     const checkDish = (id) => {
@@ -80,10 +81,10 @@ const MenuPublicView = () => {
                 else {
                     return { 'status': false, 'id': null }
                 }
-            } 
-        } 
-            return { 'status': false, 'id': null }
+            }
         }
+        return { 'status': false, 'id': null }
+    }
 
 
 
@@ -135,14 +136,14 @@ const MenuPublicView = () => {
                                         <FavoriteButton
                                             dish_id={null}
                                             restaurant_id={restaurant.restaurant_id}
-                                            status={likeId.status} 
-                                            id={likeId.id}         
+                                            status={likeId.status}
+                                            id={likeId.id}
                                         />
                                     </div>
                                 );
                             })()
                         ) : (
-                            '' 
+                            ''
                         )}
                     </Col>
                 </Row>
@@ -291,18 +292,18 @@ const MenuPublicView = () => {
                                                 <Card className="my-2 menu-builder-dish-card" key={dishIndex}>
                                                     <Row className="w-100 h-100 m-0">
                                                         {dish.image &&
-                                                            <Col xs='12' md='4' lg='4' className="p-0 m-0 ">
+                                                            <Col xs='12' md='3' lg='3' className="p-0 m-0 ">
                                                                 <Card.Img src={dish.image} alt='Sin imagen' className="menu-builder-img m-auto" />
                                                             </Col>
                                                         }
-                                                        <Col xs="12" md={dish.image ? "6" : "10"} lg={dish.image ? "7" : "10"} className="m-auto h-100 ">
+                                                        <Col xs="12" md={dish.image ? "7" : "10"} lg={dish.image ? "7" : "10"} className="m-auto h-100 ">
                                                             <Card.Body>
                                                                 <Card.Title>{dish.name}</Card.Title>
                                                                 <Card.Text>{dish.description}</Card.Text>
                                                                 <Card.Text><strong>Precio:</strong> {`${dish.price} ${menu.currency}`}</Card.Text>
                                                             </Card.Body>
                                                         </Col>
-                                                        <Col xs md='1' lg='1' className="align-middle text-center align-items-center d-flex justify-content-center">
+                                                        <Col xs='12' md='2' lg='2' className="align-middle text-center align-items-center d-flex justify-content-center">
                                                             <div className="m-2">
                                                                 {isLogged ? (
                                                                     (() => {
