@@ -1,16 +1,19 @@
 .menu-builder-dish-card {
     width: 100% !important; /* Keep all cards the same width */
     height: 100% !important; /* Set a fixed height for uniformity */
+    min-height: 150px;
+    max-height: 200px;
     /* Optional, consistent spacing between cards */
 
 }
 
 .menu-builder-img {
-    height: auto; /* Set a fixed height */
+    height: 100%; /* Set a fixed height */
     object-fit: cover; /* Ensures the image scales proportionally and crops if necessary */
     width: 100%; /* Ensures the image fills the card's width */
     display: block;
-    max-height: 140px;
+    min-height: 150px;
+    max-height:200px;
   }
 
   .form-input{

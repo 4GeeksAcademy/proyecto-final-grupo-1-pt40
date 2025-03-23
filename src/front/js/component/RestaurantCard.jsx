@@ -7,7 +7,8 @@ import { Context } from "../store/appContext";
 
 function RestaurantCard({ data }) {
     const { store, actions } = useContext(Context);
-
+    const [like, setLike] = useState(false)
+    const [idFav, setIdFav] = useState(null)
     const navigateTo = useNavigate()
     const handleClick = async (username) => {
         const response = await actions.getRestaurantMenusPublic(username)
@@ -18,6 +19,25 @@ function RestaurantCard({ data }) {
         }
 
     }
+
+    const checkRestaurant = async () => {
+        if (Array.isArray(store.favorites) && store.favorites.length > 0) {
+            const restaurants = store.favorites.filter(fav => fav.restaurant);
+            if (restaurants.length > 0) {
+                const status = restaurants.some(res => res.restaurant.restaurant_id === data.restaurant_id)
+                if (status) {
+                    const favInfo = restaurants.filter(res => res.restaurant.restaurant_id === data.restaurant_id)
+                    console.log(favInfo)
+                    setLike(true)
+                    setIdFav(favInfo[0].id)
+                }
+            }
+        }
+    }
+
+    useEffect(() => {
+        checkRestaurant()
+    }, [])
 
     return (
 
@@ -39,7 +59,7 @@ function RestaurantCard({ data }) {
                     Ver Menu
                 </Button>
                 <div className="me-1">
-                    <FavoriteButton dish_id={null} restaurant_id={data.restaurant_id} />
+                    <FavoriteButton dish_id={null} restaurant_id={data.restaurant_id} status={like} id={idFav} />
                 </div>
             </Card.Footer>
         </Card>

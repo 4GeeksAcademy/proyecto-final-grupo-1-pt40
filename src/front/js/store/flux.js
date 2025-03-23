@@ -592,8 +592,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                     sessionStorage.setItem('userFavorites', JSON.stringify([...currentFavorites, newFavorite]));
 
                     setStore({ favorites: [...store.favorites, newFavorite] });
+                    return true
                 } catch (error) {
                     console.error("Error al agregar favorito:", error);
+                    return false
                 }
             },
 
@@ -614,12 +616,13 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const store = getStore();
                     const currentFavorites = Array.isArray(store.favorites) ? store.favorites : [];
                     const updatedFavorites = currentFavorites.filter(fav => fav.id !== favoriteId);
-                    
                     setStore({ ...store, favorites: updatedFavorites });
-                    
                     sessionStorage.setItem('userFavorites', JSON.stringify(updatedFavorites));
+                    
+                    return true
                 } catch (error) {
                     console.error("Error al eliminar favorito:", error);
+                    return false
                 }
             },
 

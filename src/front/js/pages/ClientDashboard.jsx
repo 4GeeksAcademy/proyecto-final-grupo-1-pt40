@@ -7,8 +7,12 @@ import RestaurantCard from "../component/RestaurantCard.jsx";
 const ClientDashboard = () => {
   const { store, actions } = useContext(Context);
 
+  const onLoad = async  ()=>{
+    await actions.fetchFavorites()
+    await actions.getRestaurants()
+  }
   useEffect(() => {
-    actions.getRestaurants();
+    onLoad()
   }, []);
 
   return (
