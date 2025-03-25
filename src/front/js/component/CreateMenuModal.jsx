@@ -33,7 +33,7 @@ function CreateMenuModal() {
     return (
         <>
             <Button className='orange-button d-inline-block' onClick={handleShow}>
-                + Nuevo Menú
+                + NUEVO MENÚ
             </Button>
 
             <Modal
@@ -73,7 +73,7 @@ function CreateMenuModal() {
                     <Button className="close-modal-button mx-1" onClick={handleClose}>
                         Cerrar
                     </Button>
-                    <Button  className="orange-button mx-1" onClick={handleCreate}>Crear Menú</Button>
+                    <Button  className="orange-button mx-1" onClick={handleCreate}>CREAR MENÚ</Button>
                 </Modal.Footer>
             </Modal>
 

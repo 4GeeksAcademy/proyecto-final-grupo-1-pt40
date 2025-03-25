@@ -53,11 +53,18 @@
 
 .gray-button {
     color: black !important;
-    background-color: #ecebeb !important;
+    background-color: #F8FAFC !important;
     border: none !important;
     transition: background-color 0.3s ease !important;
     font-weight: bold !important;
-    text-transform: capitalize;
+    }
+
+  .gray-button:hover{
+    background-color: #ff6200 !important;
+    color: white!important;
+  }
+
+
 
 .admin-navbar .nav-link:hover svg {
   color: #CCCCCC !important;
@@ -84,7 +91,7 @@
     border: none !important;
     font-weight: bold !important;
     text-transform: capitalize;
-    transition: background-color 0.3s ease !important;
+    transition: background-color 0.3s ease !important;}
 
 /* Icono hamburguesa en SVG */
 .custom-toggler-icon {
@@ -285,8 +292,8 @@ body {
 
 /* Botón Eliminar */
 .btn-danger {
-  background-color: #FF6C40 !important;
-  border: none !important;
+  background-color: #FF6C40 ;
+  border: none ;
   font-weight: bold;
   border-radius: 1.5rem;
   padding: 0.3rem 0.9rem;
@@ -295,7 +302,7 @@ body {
 }
 
 .btn-danger:hover {
-  background-color: #e55a00 !important;
+  background-color: #e55a00;
 }
 
 /* Mensaje sin notificaciones */

@@ -4,15 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { Button, Container, Row, Col, Card } from "react-bootstrap";
 import MainNavbar from "../component/MainNavbar.jsx";
 import "../../styles/home.css";
+import Logo from "../../img/logo.png"
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
 	const navigate = useNavigate();
 
 	return (
-		<div className="landing-page">
+		<Container fluid className="landing-page m-0 p-0">
 			<MainNavbar />
-
 			{/* Hero Section */}
 			<section className="hero-section text-white text-center py-5">
 				<Container>
@@ -26,7 +26,7 @@ export const Home = () => {
 			{/* Beneficios */}
 			<section className="features-section py-5">
 				<Container>
-					<h2 className="text-center mb-5 text-orange">¿Por qué elegir Al Punto?</h2>
+					<h2 className="text-center mb-5 text-orange fs-1">¿Por qué elegir <strong>ALPUNT<img className='img-logo-bullseye' src={Logo} /></strong>?</h2>
 					<Row className="g-4">
 						<Col md={4}>
 							<Card className="feature-card h-100">
@@ -71,6 +71,6 @@ export const Home = () => {
 					<h2 className="fw-bold mb-4">¿Listo para explorar lo mejor de tu ciudad?</h2>
 				</Container>
 			</section>
-		</div>
+		</Container>
 	);
 };

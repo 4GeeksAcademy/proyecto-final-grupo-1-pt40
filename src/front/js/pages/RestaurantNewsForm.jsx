@@ -133,7 +133,7 @@ const RestaurantNewsForm = () => {
                     </div>
 
                     <div className="d-flex justify-content-center mt-4 w-100">
-                        {edit ? <button type="submit" onClick={handleEdit} className="btn gray-button fw-bold fs-5 d-inline-block">Editar</button> : <button type="submit" className="btn gray-button fw-bold fs-5 d-inline-block">Publicar</button>}
+                        {edit ? <button type="submit" onClick={handleEdit} className="btn orange-button fw-bold fs-5 d-inline-block px-3 py-2">EDITAR</button> : <button type="submit" className="btn orange-button fw-bold fs-5 d-inline-block rounded-pill px-3 py-2">PUBLICAR</button>}
                     </div>
                 </form>
 

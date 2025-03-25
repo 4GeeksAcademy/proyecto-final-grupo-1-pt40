@@ -240,7 +240,7 @@ const RestaurantDashboard = () => {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button className="close-modal-button mx-1" onClick={() => setShowEditModal(false)}>Cancelar</Button>
-                        <Button className="orange-button mx-1" onClick={handleUpdateMenu}>Guardar Cambios</Button>
+                        <Button className="orange-button mx-1" onClick={handleUpdateMenu}>GUARDAR CAMBIOS</Button>
                     </Modal.Footer>
                 </Modal>
             </Container>
