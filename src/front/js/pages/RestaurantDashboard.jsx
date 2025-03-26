@@ -64,6 +64,7 @@ const RestaurantDashboard = () => {
     const handleUpdateMenu = async () => {
         if (selectedMenu) {
             await actions.updateMenu(selectedMenu.menu_id, { name: menuName, currency: currency });
+            onLoad()
             setShowEditModal(false);
         }
     };
@@ -101,7 +102,7 @@ const RestaurantDashboard = () => {
 
 
                 <div className="d-flex"><h2 className="mb-4 me-5 fw-bold text-orange">MENÚS</h2> <span><CreateMenuModal /></span></div>
-                
+
                 <Row className="menu-list p-4 shadow rounded d-flex mx-2">
                     {Array.isArray(store.restaurantMenus) ? (
                         store.restaurantMenus.length > 0 ? (

@@ -416,8 +416,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                         menu: data.menu
                     });
 
-                    alert("Menú actualizado con éxito");
-
                 } catch (error) {
                     console.error("Error updating menu:", error);
                 }
