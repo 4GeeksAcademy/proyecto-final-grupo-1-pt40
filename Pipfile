@@ -20,7 +20,6 @@ flask-admin = "*"
 typing-extensions = "*"
 flask-jwt-extended = "*"
 wtforms = "==3.1.2"
-mercadopago = "*"
 paypalrestsdk = "*"
 mailjet-rest = "*"
 

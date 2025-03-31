@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import { Tabs, Tab, Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { showLoginError, showIncompleteFieldsError } from "../store/utils";
 import "../../styles/Login.css"; 
 
 const Login = () => {
@@ -23,10 +24,10 @@ const Login = () => {
             navigate("/restaurant-dashboard");
           }
         } else {
-          alert("Error en el login. Verifica tus credenciales.");
+          showLoginError();
         }
       } else {
-        alert("Por favor, ingrese su email y contraseña.");
+        showIncompleteFieldsError();
       }
     };
 

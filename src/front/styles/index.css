@@ -64,6 +64,19 @@
     color: white!important;
   }
 
+  .alert-cancel-button {
+    color: black !important;
+    background-color: #F8FAFC !important;
+    border: none !important;
+    transition: background-color 0.3s ease !important;
+    font-weight: bold !important;
+    }
+
+  .alert-cancel-button:hover{
+    background-color: #CCCCCC !important;
+  
+  }
+
 
 
 .admin-navbar .nav-link:hover svg {

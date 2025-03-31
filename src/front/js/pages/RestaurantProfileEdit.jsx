@@ -65,7 +65,6 @@ const RestaurantProfileEdit = () => {
             }
             const newSchedule = unformatSchedule(restaurant.schedule);
             setSchedule(newSchedule);
-            console.log(newSchedule);
         } catch (error) {
             console.error("Error loading data:", error);
         }

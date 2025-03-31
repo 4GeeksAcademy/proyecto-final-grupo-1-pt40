@@ -1,3 +1,4 @@
+import { showUpgradePlanAlert } from "./utils";
 const getState = ({ getStore, getActions, setStore }) => {
     return {
         store: {
@@ -168,7 +169,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
                     const totalDishes = Object.values(store.menuBuilder.dishes).flat().length;
                     if (totalDishes >= 10) {
-                        alert("Has alcanzado el límite de 10 platillos por menú en la cuenta gratuita. 📌 Unete a Al Punto+.");
+                        showUpgradePlanAlert()
                         return;
                     }
                     const response = await fetch(`${backendURL}api/new/dish`,
@@ -297,7 +298,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
                     if (store.menuList.length >= 1) {
-                        alert("Upss. Solo puedes crear un menú con la cuenta gratuita. Para agregar más menús, únete a Al Punto+ 🚀");
+                        showUpgradePlanAlert()
+                        // alert("Upss. Solo puedes crear un menú con la cuenta gratuita. Para agregar más menús, únete a Al Punto+ 🚀");
                         return;
                     }
 
@@ -308,7 +310,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
                     )
                     if (!response.ok) {
-                        alert("⚠️ No puedes crear más menús.");
+                        showUpgradePlanAlert();
                         throw new Error(res.statusText);
                     }
                     const data = await response.json()
@@ -520,7 +522,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const data = await response.json();
                     const favoritesArray = Array.isArray(data) ? data : [];
                     setStore({ ...store, favorites: favoritesArray });
-                    
+
                     sessionStorage.setItem('userFavorites', JSON.stringify(data));
                     return favoritesArray;
                 } catch (error) {
@@ -584,9 +586,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const newFavorite = await response.json();
                     const store = getStore();
                     const currentFavorites = Array.isArray(store.favorites) ? store.favorites : [];
-    
+
                     setStore({ ...store, favorites: [...currentFavorites, newFavorite] });
-                    
+
                     sessionStorage.setItem('userFavorites', JSON.stringify([...currentFavorites, newFavorite]));
 
                     setStore({ favorites: [...store.favorites, newFavorite] });
@@ -616,7 +618,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const updatedFavorites = currentFavorites.filter(fav => fav.id !== favoriteId);
                     setStore({ ...store, favorites: updatedFavorites });
                     sessionStorage.setItem('userFavorites', JSON.stringify(updatedFavorites));
-                    
+
                     return true
                 } catch (error) {
                     console.error("Error al eliminar favorito:", error);
@@ -1378,17 +1380,17 @@ const getState = ({ getStore, getActions, setStore }) => {
                 if (token) {
                     // Si hay token, carga la información del cliente
                     getActions().fetchCurrentClient();
-                    
+
                     // Y también carga los favoritos
                     getActions().fetchFavorites();
                 }
             },
-            
+
             // Después de iniciar sesión exitosamente
             loginSuccess: (userData, token) => {
                 sessionStorage.setItem('token', token);
                 setStore({ client: userData });
-                
+
                 // Cargar favoritos inmediatamente después del login
                 getActions().fetchFavorites();
             },

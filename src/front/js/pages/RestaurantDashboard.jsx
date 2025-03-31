@@ -7,6 +7,7 @@ import DeleteMenuModal from "../component/DeleteMenuModal.jsx"
 import RestaurantNavbar from "../component/RestaurantNavbar.jsx";
 import "../../styles/restaurant-dashboard.css"
 import CreateMenuModal from "../component/CreateMenuModal.jsx";
+import { showUpgradePlanAlert } from "../store/utils.js";
 
 const RestaurantDashboard = () => {
     const { store, actions } = useContext(Context);
