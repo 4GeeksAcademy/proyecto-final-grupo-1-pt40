@@ -7,6 +7,7 @@ import DeleteMenuModal from "../component/DeleteMenuModal.jsx"
 import RestaurantNavbar from "../component/RestaurantNavbar.jsx";
 import "../../styles/restaurant-dashboard.css"
 import CreateMenuModal from "../component/CreateMenuModal.jsx";
+import { showUpgradePlanAlert } from "../store/utils.js";
 
 const RestaurantDashboard = () => {
     const { store, actions } = useContext(Context);
@@ -64,6 +65,7 @@ const RestaurantDashboard = () => {
     const handleUpdateMenu = async () => {
         if (selectedMenu) {
             await actions.updateMenu(selectedMenu.menu_id, { name: menuName, currency: currency });
+            onLoad()
             setShowEditModal(false);
         }
     };
@@ -101,7 +103,7 @@ const RestaurantDashboard = () => {
 
 
                 <div className="d-flex"><h2 className="mb-4 me-5 fw-bold text-orange">MENÚS</h2> <span><CreateMenuModal /></span></div>
-                
+
                 <Row className="menu-list p-4 shadow rounded d-flex mx-2">
                     {Array.isArray(store.restaurantMenus) ? (
                         store.restaurantMenus.length > 0 ? (
@@ -240,7 +242,7 @@ const RestaurantDashboard = () => {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button className="close-modal-button mx-1" onClick={() => setShowEditModal(false)}>Cancelar</Button>
-                        <Button className="orange-button mx-1" onClick={handleUpdateMenu}>Guardar Cambios</Button>
+                        <Button className="orange-button mx-1" onClick={handleUpdateMenu}>GUARDAR CAMBIOS</Button>
                     </Modal.Footer>
                 </Modal>
             </Container>

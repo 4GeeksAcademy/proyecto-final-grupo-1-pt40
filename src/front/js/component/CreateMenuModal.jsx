@@ -5,6 +5,7 @@ import { Form, Dropdown, DropdownButton, Row, Col } from "react-bootstrap";
 import Modal from 'react-bootstrap/Modal';
 import { useNavigate } from "react-router-dom";
 import '../../styles/menu-builder.css'
+import { showIncompleteFieldsError } from "../store/utils";
 
 function CreateMenuModal() {
     const { store, actions } = useContext(Context);
@@ -18,7 +19,8 @@ function CreateMenuModal() {
 
     const handleCreate = async () => {
         if (newMenu.currency.length > 3 || !newMenu.name) {
-            alert('Debes escoger un nombre y una moneda para crear un menu')
+            showIncompleteFieldsError()
+            return
         }
         const response = await actions.createMenu(newMenu)
         if (response) {
@@ -33,7 +35,7 @@ function CreateMenuModal() {
     return (
         <>
             <Button className='orange-button d-inline-block' onClick={handleShow}>
-                + Nuevo Menú
+                + NUEVO MENÚ
             </Button>
 
             <Modal
@@ -73,7 +75,7 @@ function CreateMenuModal() {
                     <Button className="close-modal-button mx-1" onClick={handleClose}>
                         Cerrar
                     </Button>
-                    <Button  className="orange-button mx-1" onClick={handleCreate}>Crear Menú</Button>
+                    <Button  className="orange-button mx-1" onClick={handleCreate}>CREAR MENÚ</Button>
                 </Modal.Footer>
             </Modal>
 

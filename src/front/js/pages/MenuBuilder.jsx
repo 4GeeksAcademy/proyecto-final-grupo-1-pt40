@@ -40,7 +40,7 @@ const MenuBuilder = () => {
     setEditedCategoryName(category);
   };
 
-  const saveCategoryName = (oldName) => {
+  const saveCategoryName = async (oldName) => {
     if (!editedCategoryName.trim()) return;
 
     const oldCategories = [...categories];
@@ -56,8 +56,8 @@ const MenuBuilder = () => {
       oldCategories
     });
 
-    actions.menuBuilderCategories(menuID, updatedCategories, oldCategories);
-
+    await actions.menuBuilderCategories(menuID, updatedCategories, oldCategories);
+    onLoad()
     setCategories(updatedCategories);
     setEditingCategory(null);
   };
@@ -154,7 +154,7 @@ const MenuBuilder = () => {
                         </>
                       ) : (
                         <>
-                          <span onClick={() => setSelectedCategory(category)} className={`${category === selectedCategory ? "text-white" : ''}`} style={{ cursor: "pointer" }}>{category}</span>
+                          <span onClick={() => setSelectedCategory(category)} className={`${category === selectedCategory ? "text-orange" : ''}`} style={{ cursor: "pointer" }}>{category}</span>
                           <div>
                             <Button variant="warning" size="sm" className="px-2" onClick={() => startEditing(category)}><FontAwesomeIcon className='text-dark fs-5' icon={faPenToSquare} /></Button>
                             <Button variant="danger" size="sm" onClick={() => removeCategory(category)} className="ms-2 px-2 py-1"><FontAwesomeIcon className="fs-5" icon={faTrash} /></Button>
@@ -172,7 +172,7 @@ const MenuBuilder = () => {
                 onChange={(e) => setNewCategory(e.target.value)}
               />
               <div className="mt-3 d-flex justify-content-center">
-                <Button className="gray-button fw-bold fs-5" onClick={addCategory}>Agregar Categoría</Button>
+                <Button className="orange-button fw-bold fs-5 py-2 px-3" onClick={addCategory}>Agregar Categoría</Button>
               </div>
             </Col> : <Spinner animation="border" variant="danger" />}
 
@@ -205,7 +205,7 @@ const MenuBuilder = () => {
                   onChange={(e) => setNewDish({ ...newDish, price: e.target.value })}
                 />
                 <div className="d-flex justify-content-center mt-3">
-                  <Button className=" gray-button fs-5 fw-bold" onClick={addDish}>Agregar Platillo</Button>
+                  <Button className=" orange-button fs-5 fw-bold px-3 py-2" onClick={addDish}>Agregar Platillo</Button>
                 </div>
               </Form>
             )}
@@ -217,7 +217,7 @@ const MenuBuilder = () => {
                   Array.isArray(store.menuBuilder.dishes[selectedCategory]) ? (
                     store.menuBuilder.dishes[selectedCategory]?.length > 0 ? (
                       store.menuBuilder.dishes[selectedCategory].map((dish, index) => (
-                        <Card className="my-2 menu-builder-dish-card" key={index}>
+                        <Card className="my-2 menu-builder-dish-card" key={dish.dish_id}>
                           <Row className="w-100 h-100 m-0">
                             {dish.image &&
                               <Col xs='12' md='4' lg='4' className="p-0 m-0 ">

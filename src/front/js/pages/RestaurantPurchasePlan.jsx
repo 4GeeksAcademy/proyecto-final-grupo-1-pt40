@@ -52,7 +52,7 @@ const RestaurantPurchasePlan = () => {
                             <Col xs md lg='6'>
                                 <Card className='p-3'>
                                     <Card.Body>
-                                        <h2>Plan: <span className='fw-bold text-orange'>AlPunto+</span></h2>
+                                        <h2>Plan: <span className='fw-bold text-orange'>ALPUNTO+</span></h2>
                                         <Card.Text>Crea menús y añade platillos sin límites!</Card.Text>
                                         <Card.Text><strong>Costo:</strong> 10 Dólares Americanos</Card.Text>
                                         <Card.Text><strong>Frecuencia:</strong> Pago Único</Card.Text>

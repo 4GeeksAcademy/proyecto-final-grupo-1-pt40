@@ -79,7 +79,7 @@ function EditModal({ dish }) {
                     <Button className="close-modal-button mx-1" onClick={handleClose}>
                         Cerrar
                     </Button>
-                    <Button className="orange-button mx-1" onClick={handleEdit}>Guardar Cambios</Button>
+                    <Button className="orange-button mx-1" onClick={handleEdit}>GUARDAR CAMBIOS</Button>
                 </Modal.Footer>
             </Modal>
         </>
